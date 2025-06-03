@@ -1,0 +1,51 @@
+version: 1.0
+
+source:
+  type: REST_API
+  api:
+    url: http://127.0.0.1:5000/v1/data
+    method: GET
+    auth:
+      type: static_token
+      token: "{{API_TOKEN}}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    params:
+      start_date: "{{START_DATE}}"
+      end_date: "{{END_DATE}}"
+    data_path: data.items
+    timeout: 30
+    pagination:
+      type: page_number
+      page_param: page
+      page_size_param: limit
+      page_size: 100
+      max_pages: 10
+
+destination:
+  csv:
+    output_path: ./data/output.csv
+    write_mode: overwrite
+  database:
+    enabled: true
+    type: postgresql
+    table: api_data
+    auto_create_table: true        # New: Enable automatic table creation
+    handle_conflicts: true         # New: Handle primary key conflicts
+    primary_key: id               # New: Specify primary key column
+    schema:
+      - name: id
+        type: INTEGER
+      - name: created_at
+        type: TIMESTAMP
+
+execution:
+  time_window:
+    enabled: true
+    start_date: "2023-01-01"
+    end_date: "2023-01-31"
+    chunk_size: "1 day"
+
+secrets:
+  - API_TOKEN
