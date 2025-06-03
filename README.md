@@ -67,7 +67,3 @@ pg_ctl.exe stop -D ../data
 ## 2nd cmd prompt (To connect)
 C:\Postgres\postgresql-16.0-1-windows-x64-binaries\pgsql\bin\psql.exe -h localhost -p 5432 -U postgres -d DataLake
 -----------------------------------------------------------------
-
-
-
-
