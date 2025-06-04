@@ -9,6 +9,9 @@ from src.logging_utils import setup_logging
 from src.pipeline import DataPipeline
 from src.scheduler import start_simple_scheduler
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -62,6 +65,7 @@ from scheduler import start_smart_scheduler  # or start_file_watcher_scheduler
 def run_ingestion():
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     config_path = "config/api_config.yaml"
     pipeline = DataPipeline(config_path)
     pipeline.run()
@@ -96,12 +100,27 @@ if __name__ == "__main__":
 
 if __name__ == "__main__":
 >>>>>>> Stashed changes
+=======
+    """
+    Simple ingestion function - always runs full pipeline
+    UPSERT in database handles duplicates gracefully
+    """
+    config_path = "config/api_config.yaml"
+    pipeline = DataPipeline(config_path)
+    pipeline.run()  # Always run full pipeline
+
+if __name__ == "__main__":
+>>>>>>> Stashed changes
     # Configure logging to file only
     setup_logging("INFO", "pipeline.log")
     
     # Use simple scheduler - no complex state management
     start_simple_scheduler(run_ingestion, interval_minutes=1)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+    
+>>>>>>> Stashed changes
+=======
     
 >>>>>>> Stashed changes
 =======

@@ -4,6 +4,7 @@ import schedule
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 def start_smart_scheduler(job_func, initial_interval_minutes=1, max_interval_minutes=30):
     """
     Smart scheduler that increases sleep time when no new data is found
@@ -16,6 +17,8 @@ def start_smart_scheduler(job_func, initial_interval_minutes=1, max_interval_min
     
     # Load last known state
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 logger = logging.getLogger(__name__)
@@ -32,6 +35,9 @@ def start_simple_scheduler(job_func, interval_minutes=1):
     
     # Run once immediately
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -39,6 +45,7 @@ def start_simple_scheduler(job_func, interval_minutes=1):
         logging.info("Running initial pipeline execution")
         job_func()
     except Exception as e:
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
         logging.warning(f"Could not load scheduler state: {e}")
@@ -87,6 +94,15 @@ def start_simple_scheduler(job_func, interval_minutes=1):
             schedule.run_pending()
             time.sleep(1)
 >>>>>>> Stashed changes
+=======
+        logging.error(f"Initial job execution failed: {e}", exc_info=True)
+    
+    # Main scheduler loop
+    while True:
+        try:
+            schedule.run_pending()
+            time.sleep(1)
+>>>>>>> Stashed changes
         except KeyboardInterrupt:
             logging.info("Scheduler stopped by user")
             break
@@ -96,6 +112,7 @@ def start_simple_scheduler(job_func, interval_minutes=1):
 
 def start_manual_trigger_scheduler(job_func):
     """
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
     Get a hash of the current data to detect changes
@@ -124,6 +141,11 @@ def start_manual_trigger_scheduler(job_func):
     Only runs when you manually trigger it
     """
 >>>>>>> Stashed changes
+=======
+    Alternative: Manual trigger scheduler
+    Only runs when you manually trigger it
+    """
+>>>>>>> Stashed changes
     logging.info("Manual trigger scheduler ready - call run_job() to execute")
     
     def run_job():
@@ -136,6 +158,9 @@ def start_manual_trigger_scheduler(job_func):
     
     return run_job
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

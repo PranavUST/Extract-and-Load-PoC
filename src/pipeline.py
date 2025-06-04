@@ -32,11 +32,14 @@ class DataPipeline:
     def export_to_csv(self, data: List[Dict], output_path: str):
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         logger.info("Starting CSV export to: %s", output_path)
         if not data:
             logger.warning("No data to export to CSV")
             return
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
         """Export data to CSV format."""
@@ -106,6 +109,7 @@ class DataPipeline:
         mode = 'w' if self.config['destination']['csv']['write_mode'] == 'overwrite' else 'a'
         logger.debug("CSV write mode: %s", mode)
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
         all_fieldnames = list(data[0].keys())
@@ -203,6 +207,12 @@ class DataPipeline:
         logger.info("Starting DataPipeline execution")
         try:
 >>>>>>> Stashed changes
+=======
+    # ADD THIS METHOD - This is what's missing!
+    def run(self, csv_only=False):
+        logger.info("Starting DataPipeline execution")
+        try:
+>>>>>>> Stashed changes
             # Fetch data
             logger.info("Fetching data")
             raw_data = self.fetch_data()
@@ -210,6 +220,9 @@ class DataPipeline:
 
             # ALWAYS export to CSV
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -235,6 +248,7 @@ class DataPipeline:
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                 # Step 1: Create or update table based on CSV schema
                 logger.info("Creating or updating table '%s' based on CSV schema", table_name)
                 self.schema_generator.create_table_from_csv(csv_output_path, table_name, conn_params)
@@ -248,6 +262,12 @@ class DataPipeline:
                 self.schema_generator.create_table_from_csv(csv_output_path, table_name, conn_params)
 >>>>>>> Stashed changes
 
+=======
+                # Create table if needed
+                logger.info("Creating or updating table '%s' based on CSV schema", table_name)
+                self.schema_generator.create_table_from_csv(csv_output_path, table_name, conn_params)
+
+>>>>>>> Stashed changes
 =======
                 # Create table if needed
                 logger.info("Creating or updating table '%s' based on CSV schema", table_name)
