@@ -16,7 +16,8 @@ source:
       page_size: 100
     timeout: 30
     data_path: data.items     # Add this line to specify where to find records in the API response
-    params: {}                # Optional: add default query params if needed
+    params: {}
+    retries: 3                # Optional: add default query params if needed
   ftp:
     host: ftp.example.com
     username: your_ftp_username
@@ -27,6 +28,7 @@ source:
       - .csv
       - .json
       - .parquet
+    retries: 3
 
 destination:
   csv:

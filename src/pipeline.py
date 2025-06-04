@@ -28,17 +28,20 @@ class DataPipeline:
             api_client = APIClient(self.config['source']['api'])
             return api_client.fetch_data()
         elif source_type == "FTP":
-            ftp_config = resolve_config_vars(load_config("config/ftp_config.yaml"))
-            ftp_cfg = ftp_config['ftp']
+            ftp_cfg = self.config['source']['ftp']
+            retries = ftp_cfg.get('retries', 3)  # <-- Get retries from config
             # Uncomment the following lines to enable FTP download
-            # download_ftp_files(
-            #     host=ftp_cfg['host'],
-            #     username=ftp_cfg['username'],
-            #     password=ftp_cfg['password'],
-            #     remote_dir=ftp_cfg['remote_dir'],
-            #     local_dir=ftp_cfg['local_dir'],
-            #     file_types=ftp_cfg.get('file_types', ['.csv', '.json', '.parquet'])
-            # )
+            """
+            download_ftp_files(
+                 host=ftp_cfg['host'],
+                 username=ftp_cfg['username'],
+                 password=ftp_cfg['password'],
+                 remote_dir=ftp_cfg['remote_dir'],
+                 local_dir=ftp_cfg['local_dir'],
+                 file_types=ftp_cfg.get('file_types', ['.csv', '.json', '.parquet']),
+                 retries=retries,
+            )
+            """
             return self._load_files_from_local(ftp_cfg['local_dir'])
         else:
             raise ValueError(f"Unknown source type: {source_type}")

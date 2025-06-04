@@ -1,4 +1,5 @@
 import requests
+import time
 import logging
 from typing import Dict, Any, List
 
@@ -45,20 +46,27 @@ class APIClient:
         return all_records
 
     def _make_request(self, params: Dict) -> Dict:
-        try:
-            resp = self.session.request(
-                method=self.config.get('method', 'GET'),
-                url=self.config.get('url', ''),
-                headers=self.config.get('headers', {}),
-                params=params,
-                timeout=self.config.get('timeout', 30)
-            )
-            resp.raise_for_status()
-            logger.debug("Request successful: %s %s", self.config.get('method', 'GET'), self.config.get('url', ''))
-            return resp.json()
-        except requests.exceptions.RequestException as e:
-            logger.error("API request failed: %s", str(e))
-            raise
+        retries = self.config.get('retries', 3)  # Default to 3 retries if not set
+        delay = 2  # seconds between retries
+        for attempt in range(1, retries + 1):
+            try:
+                resp = self.session.request(
+                    method=self.config.get('method', 'GET'),
+                    url=self.config.get('url', ''),
+                    headers=self.config.get('headers', {}),
+                    params=params,
+                    timeout=self.config.get('timeout', 30)
+                )
+                resp.raise_for_status()
+                logger.debug("Request successful: %s %s", self.config.get('method', 'GET'), self.config.get('url', ''))
+                return resp.json()
+            except requests.exceptions.RequestException as e:
+                logger.error(f"API request failed (attempt {attempt}/{retries}): {e}")
+                if attempt < retries:
+                    time.sleep(delay)
+                else:
+                    logger.error("Max retries reached. Raising exception.")
+                    raise
 
     def _extract_records(self, response: Dict) -> List[Dict]:
         """Extracts records from the API response using the configured data path."""
