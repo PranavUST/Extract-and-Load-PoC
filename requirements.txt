@@ -5,3 +5,5 @@ Flask
 psycopg2
 pytest
 schedule
+pandas
+pyarrow

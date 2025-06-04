@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 from src.database import load_csv_to_db
 
 def test_load_csv_to_db(tmp_path):
-    # Prepare a fake CSV file with union columns
+    # Prepare a fake CSV file
     csv_content = "id,name,extra\n1,Test,\n,Other,42\n"
     csv_path = tmp_path / "test.csv"
     csv_path.write_text(csv_content)

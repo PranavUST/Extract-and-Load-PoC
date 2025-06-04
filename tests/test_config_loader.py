@@ -1,6 +1,7 @@
 import tempfile
 import yaml
 from src.config_loader import load_config, resolve_config_vars
+import os
 
 def test_load_and_resolve_config():
     config_dict = {'secrets': [], 'key': '{{TEST_ENV}}'}
@@ -8,7 +9,6 @@ def test_load_and_resolve_config():
         yaml.dump(config_dict, f)
         fname = f.name
     # Set environment variable for testing
-    import os
     os.environ['TEST_ENV'] = 'value'
     config = load_config(fname)
     resolved = resolve_config_vars(config)
