@@ -29,7 +29,6 @@ destination:
     table: api_data
     auto_create_table: true
     handle_conflicts: true
-    primary_key: id
 
 execution:
   time_window:

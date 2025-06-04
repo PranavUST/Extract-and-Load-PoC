@@ -17,81 +17,62 @@ def download_ftp_files(
     delay: int = 5
 ) -> List[str]:
     """
-    Download files from an FTP server to a local directory with enhanced logging and retry logic.
-    Returns list of downloaded file paths (empty list if none).
+    Robust FTP downloader with improved error handling
+    Returns list of downloaded file paths (empty list if none)
     """
     downloaded_files = []
     attempt = 0
+    
+    logger.info("Starting FTP download to: %s", local_dir)
+    logger.debug("Connection params - Host: %s, User: %s, Remote: %s", 
+                host, username, remote_dir)
 
-    logger.info("Starting FTP download process")
-    logger.debug(f"Connection parameters - Host: {host}, User: {username}, Remote Dir: {remote_dir}")
-
-    while attempt < retries:
+    while attempt <= retries:
         try:
-            # Ensure local directory exists
-            logger.debug(f"Creating local directory: {local_dir}")
+            # Create local directory if needed
             os.makedirs(local_dir, exist_ok=True)
-
-            # Validate local directory permissions
+            
+            # Validate directory permissions
             if not os.access(local_dir, os.W_OK):
-                raise PermissionError(f"No write permissions for local directory: {local_dir}")
+                raise PermissionError(f"Cannot write to {local_dir}")
 
             with ftplib.FTP(host, timeout=30) as ftp:
-                logger.info(f"Connected to FTP server: {host}")
-
-                # Login
                 ftp.login(user=username, passwd=password)
-                logger.debug("Authentication successful")
-
-                # Change to remote directory
                 ftp.cwd(remote_dir)
-                logger.info(f"Changed to remote directory: {remote_dir}")
-
-                # List files
+                
                 files = ftp.nlst()
-                logger.info(f"Found {len(files)} files in remote directory: {files}")
-
-                if not files:
-                    logger.warning("No files found in remote directory")
-                    return []
-
-                # Filter and download files
+                logger.info("Found %d files in %s", len(files), remote_dir)
+                
                 for filename in files:
-                    if file_types and not any(filename.lower().endswith(ext.lower()) for ext in file_types):
-                        logger.debug(f"Skipping non-matching file: {filename}")
+                    if file_types and not filename.lower().endswith(tuple(file_types)):
+                        logger.debug("Skipping non-matching file: %s", filename)
                         continue
-
+                        
                     local_path = os.path.join(local_dir, filename)
-                    logger.info(f"Downloading {filename} -> {local_path}")
-
+                    
+                    # Skip existing files
+                    if os.path.exists(local_path):
+                        logger.debug("File exists, skipping: %s", filename)
+                        continue
+                        
+                    logger.info("Downloading %s", filename)
                     with open(local_path, 'wb') as f:
                         ftp.retrbinary(f"RETR {filename}", f.write)
-
+                    
                     downloaded_files.append(local_path)
-                    logger.debug(f"Successfully downloaded {filename}")
-
-                if not downloaded_files:
-                    logger.warning("No files matched the specified file_types filter.")
-                else:
-                    logger.info(f"Downloaded {len(downloaded_files)} files successfully")
-
+                
                 return downloaded_files
 
         except ftplib.error_perm as e:
-            logger.error(f"FTP permission error: {str(e)}")
+            logger.error("FTP Error: %s", e)
             if "530" in str(e):
-                logger.error("Invalid credentials. Check username/password.")
-            break  # Don't retry on permission errors
+                logger.error("Invalid credentials")
+            return []
         except Exception as e:
             attempt += 1
-            logger.error(f"Attempt {attempt}/{retries} failed: {str(e)}")
-            if attempt < retries:
-                logger.info(f"Retrying in {delay} seconds...")
+            logger.error("Attempt %d/%d failed: %s", attempt, retries, e)
+            if attempt <= retries:
                 time.sleep(delay)
-            else:
-                logger.critical("Maximum retry attempts reached")
-                break
-
-    # If we reach here, either all retries failed or a fatal error occurred
-    logger.error("FTP download failed or no files downloaded after all attempts.")
+    
+    logger.error("All %d retries exhausted", retries)
     return []
