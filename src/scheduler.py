@@ -1,9 +1,8 @@
 import time
 import logging
-import hashlib
-import json
-import os
+import schedule
 
+<<<<<<< Updated upstream
 def start_smart_scheduler(job_func, initial_interval_minutes=1, max_interval_minutes=30):
     """
     Smart scheduler that increases sleep time when no new data is found
@@ -15,12 +14,26 @@ def start_smart_scheduler(job_func, initial_interval_minutes=1, max_interval_min
     state_file = "./data/scheduler_state.json"
     
     # Load last known state
+=======
+logger = logging.getLogger(__name__)
+
+def start_simple_scheduler(job_func, interval_minutes=1):
+    """
+    Simple scheduler that runs the job at regular intervals
+    Uses UPSERT in database to handle duplicates gracefully
+    """
+    logging.info(f"Starting simple scheduler - runs every {interval_minutes} minute(s)")
+    
+    # Schedule the job
+    schedule.every(interval_minutes).minutes.do(job_func)
+    
+    # Run once immediately
+>>>>>>> Stashed changes
     try:
-        if os.path.exists(state_file):
-            with open(state_file, 'r') as f:
-                state = json.load(f)
-                last_data_hash = state.get('last_data_hash')
+        logging.info("Running initial pipeline execution")
+        job_func()
     except Exception as e:
+<<<<<<< Updated upstream
         logging.warning(f"Could not load scheduler state: {e}")
     
     while True:
@@ -49,6 +62,15 @@ def start_smart_scheduler(job_func, initial_interval_minutes=1, max_interval_min
             # Sleep for the current interval
             time.sleep(current_interval * 60)
             
+=======
+        logging.error(f"Initial job execution failed: {e}", exc_info=True)
+    
+    # Main scheduler loop
+    while True:
+        try:
+            schedule.run_pending()
+            time.sleep(1)
+>>>>>>> Stashed changes
         except KeyboardInterrupt:
             logging.info("Scheduler stopped by user")
             break
@@ -56,8 +78,9 @@ def start_smart_scheduler(job_func, initial_interval_minutes=1, max_interval_min
             logging.error(f"Scheduler error: {e}", exc_info=True)
             time.sleep(60)  # Sleep 1 minute on error
 
-def get_current_data_hash():
+def start_manual_trigger_scheduler(job_func):
     """
+<<<<<<< Updated upstream
     Get a hash of the current data to detect changes
     You'll need to implement this based on your data source
     """
@@ -75,3 +98,19 @@ def get_current_data_hash():
     except Exception as e:
         logging.warning(f"Could not get current data hash: {e}")
         return None
+=======
+    Alternative: Manual trigger scheduler
+    Only runs when you manually trigger it
+    """
+    logging.info("Manual trigger scheduler ready - call run_job() to execute")
+    
+    def run_job():
+        try:
+            logging.info("Manual job execution triggered")
+            job_func()
+            logging.info("Manual job execution completed")
+        except Exception as e:
+            logging.error(f"Manual job execution failed: {e}", exc_info=True)
+    
+    return run_job
+>>>>>>> Stashed changes

@@ -5,10 +5,18 @@ from pathlib import Path
 import os
 import json
 
+<<<<<<< Updated upstream
 from api_client import APIClient
 from config_loader import load_config, resolve_config_vars
 from database import load_csv_to_db
 from schema_generator import CSVSchemaGenerator
+=======
+from src.api_client import APIClient
+from src.config_loader import load_config, resolve_config_vars
+from src.database import load_csv_to_db_with_upsert
+from src.schema_generator import CSVSchemaGenerator
+from src.ftp_client import download_ftp_files
+>>>>>>> Stashed changes
 
 logger = logging.getLogger(__name__)
 
@@ -22,15 +30,80 @@ class DataPipeline:
         logger.info("DataPipeline initialization complete")
 
     def export_to_csv(self, data: List[Dict], output_path: str):
+<<<<<<< Updated upstream
         logger.info("Starting CSV export to: %s", output_path)
         if not data:
             logger.warning("No data to export to CSV")
             return
+=======
+        """Export data to CSV format."""
+        if not data:
+            logger.warning("No data to export")
+            return
+
+        logger.info("Starting CSV export to: %s", output_path)
+        
+        # Ensure output directory exists
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        
+        # Get all unique fieldnames from all records
+        all_fieldnames = set()
+        for record in data:
+            all_fieldnames.update(record.keys())
+        all_fieldnames = sorted(list(all_fieldnames))
+        
+        # Write CSV
+        with open(output_path, 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=all_fieldnames)
+            writer.writeheader()
+            
+            for record in data:
+                # Clean the record before writing
+                cleaned_record = {}
+                for field in all_fieldnames:
+                    value = record.get(field, '')
+                    
+                    # Clean different data types
+                    if isinstance(value, (int, float)):
+                        cleaned_record[field] = value
+                    elif isinstance(value, (list, dict)):
+                        cleaned_record[field] = json.dumps(value)
+                    elif isinstance(value, str):
+                        cleaned_record[field] = value.strip()
+                    else:
+                        cleaned_record[field] = str(value) if value is not None else ''
+                
+                writer.writerow(cleaned_record)
+        
+        logger.info("Successfully exported %d records to %s", len(data), output_path)
+
+    def fetch_data(self) -> List[Dict]:
+        source_type = self.config['source']['type']
+        if source_type == "REST_API":
+            api_client = APIClient(self.config['source']['api'])
+            return api_client.fetch_data()
+        elif source_type == "FTP":
+            from src.config_loader import load_config, resolve_config_vars
+            ftp_config = resolve_config_vars(load_config("config/ftp_config.yaml"))
+            ftp_cfg = ftp_config['ftp']
+            download_ftp_files(
+                host=ftp_cfg['host'],
+                username=ftp_cfg['username'],
+                password=ftp_cfg['password'],
+                remote_dir=ftp_cfg['remote_dir'],
+                local_dir=ftp_cfg['local_dir'],
+                file_types=ftp_cfg.get('file_types', ['.csv', '.json', '.parquet'])
+            )
+            return self._load_files_from_local(ftp_cfg['local_dir'])
+        else:
+            raise ValueError(f"Unknown source type: {source_type}")
+>>>>>>> Stashed changes
 
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         mode = 'w' if self.config['destination']['csv']['write_mode'] == 'overwrite' else 'a'
         logger.debug("CSV write mode: %s", mode)
 
+<<<<<<< Updated upstream
         all_fieldnames = list(data[0].keys())
 
         # Define field-specific cleaning rules
@@ -115,12 +188,27 @@ class DataPipeline:
             logger.info("API data fetch completed. Records retrieved: %d", len(raw_data))
 
             # Export all records to a single CSV
+=======
+    # ADD THIS METHOD - This is what's missing!
+    def run(self, csv_only=False):
+        logger.info("Starting DataPipeline execution")
+        try:
+            # Fetch data
+            logger.info("Fetching data")
+            raw_data = self.fetch_data()
+            logger.info("Data fetch completed. Records retrieved: %d", len(raw_data))
+
+            # ALWAYS export to CSV
+>>>>>>> Stashed changes
             csv_output_path = self.config['destination']['csv']['output_path']
             logger.info("Exporting all data to CSV: %s", csv_output_path)
             self.export_to_csv(raw_data, csv_output_path)
 
-            if self.config['destination']['database']['enabled']:
-                logger.info("Database integration enabled, creating/updating table and loading data from CSV...")
+            # CONDITIONALLY run database operations
+            if csv_only:
+                logger.info("CSV-only mode: Skipping database operations")
+            elif self.config['destination']['database']['enabled']:
+                logger.info("Database integration enabled, running UPSERT operations...")
                 db_config = self.config['destination']['database']
                 table_name = db_config.get('table', 'api_data')
 
@@ -132,6 +220,7 @@ class DataPipeline:
                     "password": os.getenv("DB_PASSWORD"),
                 }
 
+<<<<<<< Updated upstream
                 # Step 1: Create or update table based on CSV schema
                 logger.info("Creating or updating table '%s' based on CSV schema", table_name)
                 self.schema_generator.create_table_from_csv(csv_output_path, table_name, conn_params)
@@ -139,8 +228,17 @@ class DataPipeline:
                 # Step 2: Load CSV data into the table
                 logger.info("Loading CSV data into table '%s'", table_name)
                 load_csv_to_db(csv_output_path, table_name, conn_params)
+=======
+                # Create table if needed
+                logger.info("Creating or updating table '%s' based on CSV schema", table_name)
+                self.schema_generator.create_table_from_csv(csv_output_path, table_name, conn_params)
+>>>>>>> Stashed changes
 
-                logger.info("Database insertion from CSV completed successfully")
+                # Load data with UPSERT
+                logger.info("Loading CSV data into table '%s' using UPSERT", table_name)
+                load_csv_to_db_with_upsert(csv_output_path, table_name, conn_params)
+
+                logger.info("UPSERT operations completed successfully")
             else:
                 logger.warning("Database integration not enabled")
 

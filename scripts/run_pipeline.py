@@ -1,6 +1,14 @@
 import logging
 import sys
+import logging
 from pathlib import Path
+<<<<<<< Updated upstream
+=======
+from dotenv import load_dotenv
+from src.logging_utils import setup_logging
+from src.pipeline import DataPipeline
+from src.scheduler import start_simple_scheduler
+>>>>>>> Stashed changes
 
 # Add project root to Python path
 project_root = Path(__file__).parent.parent
@@ -49,6 +57,7 @@ from pipeline import DataPipeline
 from scheduler import start_smart_scheduler  # or start_file_watcher_scheduler
 
 def run_ingestion():
+<<<<<<< Updated upstream
     config_path = "config/api_config.yaml"
     pipeline = DataPipeline(config_path)
     pipeline.run()
@@ -62,3 +71,20 @@ if __name__ == "__main__":
         initial_interval_minutes=1,    # Start checking every minute
         max_interval_minutes=30        # Max wait time when no data changes
     )
+=======
+    """
+    Simple ingestion function - always runs full pipeline
+    UPSERT in database handles duplicates gracefully
+    """
+    config_path = "config/api_config.yaml"
+    pipeline = DataPipeline(config_path)
+    pipeline.run()  # Always run full pipeline
+
+if __name__ == "__main__":
+    # Configure logging to file only
+    setup_logging("INFO", "pipeline.log")
+    
+    # Use simple scheduler - no complex state management
+    start_simple_scheduler(run_ingestion, interval_minutes=1)
+    
+>>>>>>> Stashed changes

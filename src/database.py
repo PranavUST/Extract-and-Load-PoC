@@ -1,9 +1,8 @@
 import os
 import psycopg2
-from psycopg2.extras import execute_values
-from dotenv import load_dotenv
-import logging
 import csv
+import logging
+from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -19,19 +18,29 @@ def get_connection():
         password=os.getenv("DB_PASSWORD"),
     )
 
-def load_csv_to_db_with_conflict_handling(csv_path, table_name, conn_params):
+def load_csv_to_db_with_upsert(csv_path: str, table_name: str, conn_params: dict):
     """
+<<<<<<< Updated upstream
     Loads CSV data with duplicate handling using ON CONFLICT DO NOTHING
+=======
+    Load CSV data using UPSERT (INSERT ... ON CONFLICT DO UPDATE)
+    This handles duplicates gracefully without errors
+>>>>>>> Stashed changes
     """
     try:
         conn = psycopg2.connect(**conn_params)
         cur = conn.cursor()
         
+<<<<<<< Updated upstream
         # Read CSV and insert with conflict handling
+=======
+        # Read CSV to get column names
+>>>>>>> Stashed changes
         with open(csv_path, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             columns = reader.fieldnames
             
+<<<<<<< Updated upstream
             # Create INSERT statement with ON CONFLICT
             placeholders = ', '.join(['%s'] * len(columns))
             columns_str = ', '.join([f'"{col}"' for col in columns])
@@ -52,15 +61,59 @@ def load_csv_to_db_with_conflict_handling(csv_path, table_name, conn_params):
         
         conn.commit()
         logger.info(f"Loaded CSV '{csv_path}' into table '{table_name}'. {rows_inserted} new records inserted.")
+=======
+            if not columns:
+                logger.warning("No columns found in CSV file")
+                return
+            
+            # Build UPSERT query
+            columns_str = ', '.join([f'"{col}"' for col in columns])
+            placeholders = ', '.join(['%s'] * len(columns))
+            
+            # Build UPDATE SET clause (exclude primary key 'id')
+            update_columns = [col for col in columns if col != 'id']
+            if update_columns:
+                update_set = ', '.join([f'"{col}" = EXCLUDED."{col}"' for col in update_columns])
+                upsert_sql = f'''
+                    INSERT INTO "{table_name}" ({columns_str}) 
+                    VALUES ({placeholders})
+                    ON CONFLICT (id) DO UPDATE 
+                    SET {update_set}
+                '''
+            else:
+                # If only ID column, just ignore conflicts
+                upsert_sql = f'''
+                    INSERT INTO "{table_name}" ({columns_str}) 
+                    VALUES ({placeholders})
+                    ON CONFLICT (id) DO NOTHING
+                '''
+            
+            # Execute UPSERT for each row
+            rows_processed = 0
+            
+            # Reset file pointer to read data
+            f.seek(0)
+            reader = csv.DictReader(f)
+            
+            for row in reader:
+                values = [row[col] for col in columns]
+                cur.execute(upsert_sql, values)
+                rows_processed += 1
+        
+        conn.commit()
+        logger.info(f"UPSERT completed: {rows_processed} rows processed from '{csv_path}' into table '{table_name}'")
+>>>>>>> Stashed changes
         
     except Exception as e:
-        logger.error(f"Failed to load CSV '{csv_path}' into table '{table_name}': {e}")
+        logger.error(f"Failed to UPSERT CSV '{csv_path}' into table '{table_name}': {e}")
         raise
     finally:
         if 'conn' in locals():
             conn.close()
 
+# Keep the original function for backward compatibility
 def load_csv_to_db(csv_path: str, table_name: str, conn_params: dict):
+<<<<<<< Updated upstream
     try:
         conn = psycopg2.connect(**conn_params)
         with conn.cursor() as cur:
@@ -78,3 +131,9 @@ def load_csv_to_db(csv_path: str, table_name: str, conn_params: dict):
     finally:
         conn.close()
 
+=======
+    """
+    Legacy function - redirects to UPSERT version to avoid duplicate key errors
+    """
+    return load_csv_to_db_with_upsert(csv_path, table_name, conn_params)
+>>>>>>> Stashed changes

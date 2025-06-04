@@ -1,57 +1,13 @@
-[
+[  
   {
-    "id": 1,
-    "title": "First Post",
-    "body": "This is the first post",
-    "author_id": 101,
-    "created_at": "2024-01-15T10:30:00",
-    "tags": ["python", "api"],
-    "category": "tutorial",
-    "is_published": true,
-    "view_count": 1250
-  },
-  {
-    "id": 2,
-    "title": "Advanced Python Techniques",
-    "body": "Deep dive into advanced Python concepts",
-    "author_id": 102,
-    "created_at": "2024-02-20T14:45:00",
-    "tags": ["python", "advanced"],
-    "category": "advanced",
-    "is_published": true,
-    "view_count": 2340
-  },
-  {
-    "id": 3,
-    "title": "REST API Best Practices",
-    "body": "How to design robust APIs",
-    "author_id": 103,
-    "created_at": "2024-03-10T09:00:00",
-    "tags": ["api", "design"],
-    "category": "guide",
-    "is_published": false,
-    "view_count": 890
-  },
-  {
-    "id": 4,
-    "title": "Python for Data Science",
-    "body": "Using Python in data science workflows",
-    "author_id": 104,
-    "created_at": "2024-04-05T16:20:00",
-    "tags": ["python", "data science"],
-    "category": "tutorial",
-    "is_published": true,
-    "view_count": 1675
-  },
-  {
-    "id": 5,
-    "title": "Understanding JSON Schema",
-    "body": "A guide to JSON schema for APIs",
-    "author_id": 105,
-    "created_at": "2024-05-01T11:10:00",
-    "tags": ["json", "schema"],
+    "id": 12,
+    "title": "API Rate Limiting Strategies",
+    "body": "How to handle API rate limits in data ingestion.",
+    "author_id": 112,
+    "created_at": "2024-06-07T12:15:00",
+    "tags": ["api", "rate limiting"],
     "category": "reference",
     "is_published": false,
-    "view_count": 430
+    "view_count": 340
   }
 ]

@@ -51,6 +51,8 @@ python -m sample_api.app
 
 - Run your pipeline
 python scripts/run_pipeline.py
+or
+python -m scripts.run_pipeline
 --------------------------------
 
 
