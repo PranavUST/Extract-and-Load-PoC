@@ -1,6 +1,6 @@
 [
   {
-    "id": 6,
+    "id": 1,
     "title": "First Post",
     "body": "This is the first post",
     "author_id": 101,
@@ -11,7 +11,7 @@
     "view_count": 1250
   },
   {
-    "id": 7,
+    "id": 2,
     "title": "Advanced Python Techniques",
     "body": "Deep dive into advanced Python concepts",
     "author_id": 102,
@@ -22,7 +22,7 @@
     "view_count": 2340
   },
   {
-    "id": 8,
+    "id": 3,
     "title": "REST API Best Practices",
     "body": "How to design robust APIs",
     "author_id": 103,
@@ -33,7 +33,7 @@
     "view_count": 890
   },
   {
-    "id": 9,
+    "id": 4,
     "title": "Python for Data Science",
     "body": "Using Python in data science workflows",
     "author_id": 104,
@@ -44,7 +44,7 @@
     "view_count": 1675
   },
   {
-    "id": 10,
+    "id": 5,
     "title": "Understanding JSON Schema",
     "body": "A guide to JSON schema for APIs",
     "author_id": 105,
