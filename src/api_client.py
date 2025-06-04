@@ -1,4 +1,5 @@
 import requests
+import time
 import logging
 from typing import Dict, Any, List
 
@@ -13,19 +14,27 @@ class APIClient:
         logger.debug("APIClient initialized with config: %s", config)
 
     def _handle_pagination(self, params: Dict) -> List[Dict]:
-        """Handles paginated API requests and aggregates results."""
         pagination = self.config.get('pagination', {})
         all_records = []
         max_pages = pagination.get('max_pages', 1)
+        page_param = pagination.get('page_param')
+        page_size_param = pagination.get('page_size_param')
+        page_size = pagination.get('page_size')
         logger.info("Starting paginated fetch: max_pages=%d", max_pages)
 
-        for page in range(1, max_pages + 1):
-            params.update({
-                pagination['page_param']: page,
-                pagination['page_size_param']: pagination['page_size']
-            })
-            logger.debug("Requesting page %d with params: %s", page, params)
+        if not (page_param and page_size_param and page_size):
+            logger.warning("Pagination parameters missing, fetching only first page.")
             response = self._make_request(params)
+            return self._extract_records(response)
+
+        for page in range(1, max_pages + 1):
+            page_params = params.copy()
+            page_params.update({
+                page_param: page,
+                page_size_param: page_size
+            })
+            logger.debug("Requesting page %d with params: %s", page, page_params)
+            response = self._make_request(page_params)
             records = self._extract_records(response)
             logger.info("Fetched %d records from page %d", len(records), page)
             if not records:
@@ -37,27 +46,39 @@ class APIClient:
         return all_records
 
     def _make_request(self, params: Dict) -> Dict:
-        """Makes a single API request and returns the JSON response."""
-        try:
-            resp = self.session.request(
-                method=self.config['method'],
-                url=self.config['url'],
-                headers=self.config['headers'],
-                params=params,
-                timeout=self.config['timeout']
-            )
-            resp.raise_for_status()
-            logger.debug("Request successful: %s %s", self.config['method'], self.config['url'])
-            return resp.json()
-        except requests.exceptions.RequestException as e:
-            logger.error("API request failed: %s", str(e))
-            raise
+        retries = self.config.get('retries', 3)  # Default to 3 retries if not set
+        delay = 2  # seconds between retries
+        for attempt in range(1, retries + 1):
+            try:
+                resp = self.session.request(
+                    method=self.config.get('method', 'GET'),
+                    url=self.config.get('url', ''),
+                    headers=self.config.get('headers', {}),
+                    params=params,
+                    timeout=self.config.get('timeout', 30)
+                )
+                resp.raise_for_status()
+                logger.debug("Request successful: %s %s", self.config.get('method', 'GET'), self.config.get('url', ''))
+                return resp.json()
+            except requests.exceptions.RequestException as e:
+                logger.error(f"API request failed (attempt {attempt}/{retries}): {e}")
+                if attempt < retries:
+                    time.sleep(delay)
+                else:
+                    logger.error("Max retries reached. Raising exception.")
+                    raise
 
     def _extract_records(self, response: Dict) -> List[Dict]:
         """Extracts records from the API response using the configured data path."""
+        data_path = self.config.get('data_path', '')
         current_data = response
-        for key in self.config['data_path'].split('.'):
-            current_data = current_data.get(key, [])
+        if data_path:
+            for key in data_path.split('.'):
+                if isinstance(current_data, dict):
+                    current_data = current_data.get(key, [])
+                else:
+                    logger.warning("Data path did not yield a dict at key '%s'. Got: %s", key, type(current_data))
+                    return []
         if isinstance(current_data, list):
             logger.debug("Extracted %d records from response", len(current_data))
             return current_data

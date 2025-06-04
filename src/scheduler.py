@@ -6,8 +6,8 @@ logger = logging.getLogger(__name__)
 
 def start_simple_scheduler(job_func, interval_minutes=1):
     """
-    Simple scheduler that runs the job at regular intervals
-    Uses UPSERT in database to handle duplicates gracefully
+    Simple scheduler that runs the job at regular intervals.
+    Uses UPSERT in database to handle duplicates gracefully.
     """
     logging.info(f"Starting simple scheduler - runs every {interval_minutes} minute(s)")
     
@@ -35,8 +35,8 @@ def start_simple_scheduler(job_func, interval_minutes=1):
 
 def start_manual_trigger_scheduler(job_func):
     """
-    Alternative: Manual trigger scheduler
-    Only runs when you manually trigger it
+    Manual trigger scheduler.
+    Only runs when you manually trigger it.
     """
     logging.info("Manual trigger scheduler ready - call run_job() to execute")
     
@@ -52,8 +52,8 @@ def start_manual_trigger_scheduler(job_func):
 
 def start_cron_scheduler(job_func, cron_expression="*/1 * * * *"):
     """
-    Cron-style scheduler for more complex scheduling
-    Default: every minute
+    Cron-style scheduler for more complex scheduling.
+    Default: every minute.
     """
     logging.info(f"Starting cron scheduler with expression: {cron_expression}")
     
@@ -90,7 +90,7 @@ def start_cron_scheduler(job_func, cron_expression="*/1 * * * *"):
 
 def start_interval_scheduler(job_func, seconds=60):
     """
-    Scheduler that runs at specific second intervals
+    Scheduler that runs at specific second intervals.
     """
     logging.info(f"Starting interval scheduler - runs every {seconds} seconds")
     
@@ -116,7 +116,7 @@ def start_interval_scheduler(job_func, seconds=60):
 
 def start_one_time_job(job_func):
     """
-    Run the job just once
+    Run the job just once.
     """
     logging.info("Running one-time job execution")
     try:

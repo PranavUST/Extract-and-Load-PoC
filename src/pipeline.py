@@ -60,16 +60,22 @@ class DataPipeline:
         if source_type == "REST_API":
             return self.api_client.fetch_data()
         elif source_type == "FTP":
-            ftp_config = resolve_config_vars(load_config("config/ftp_config.yaml"))
-            ftp_cfg = ftp_config['ftp']
+            # Use the FTP config from the main config file, not a separate one
+            ftp_cfg = self.config['source']['ftp']
+            retries = ftp_cfg.get('retries', 3)  # Get retries from config if present
+
+            # Uncomment the following block to enable FTP download
+            """
             download_ftp_files(
                 host=ftp_cfg['host'],
                 username=ftp_cfg['username'],
                 password=ftp_cfg['password'],
                 remote_dir=ftp_cfg['remote_dir'],
                 local_dir=ftp_cfg['local_dir'],
-                file_types=ftp_cfg.get('file_types', ['.csv', '.json', '.parquet'])
+                file_types=ftp_cfg.get('file_types', ['.csv', '.json', '.parquet']),
+                retries=retries,
             )
+            """
             return self._load_files_from_local(ftp_cfg['local_dir'])
         else:
             raise ValueError(f"Unknown source type: {source_type}")
@@ -85,7 +91,10 @@ class DataPipeline:
             elif fname.lower().endswith('.json'):
                 with open(fpath, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    if isinstance(data, list):
+                    # If the JSON is a dict with a single key whose value is a list, use the list
+                    if isinstance(data, dict) and len(data) == 1 and isinstance(next(iter(data.values())), list):
+                        all_data.extend(next(iter(data.values())))
+                    elif isinstance(data, list):
                         all_data.extend(data)
                     else:
                         all_data.append(data)
@@ -111,10 +120,16 @@ class DataPipeline:
             # Conditionally run database operations
             if csv_only:
                 logger.info("CSV-only mode: Skipping database operations")
-            elif self.config['destination']['database']['enabled']:
+            elif self.config['destination']['database'].get('enabled'):
                 logger.info("Database integration enabled, running UPSERT operations...")
                 db_config = self.config['destination']['database']
-                table_name = db_config.get('table', 'api_data')
+                source_type = self.config['source']['type']
+                if source_type == "FTP":
+                    table_name = db_config.get('table', 'ftp_data')
+                elif source_type == "REST_API":
+                    table_name = db_config.get('table', 'api_data')
+                else:
+                    table_name = db_config.get('table', 'data')
                 conn_params = {
                     "host": os.getenv("DB_HOST"),
                     "port": os.getenv("DB_PORT"),
