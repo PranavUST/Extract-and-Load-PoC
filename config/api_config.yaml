@@ -1,27 +1,32 @@
 version: 1.0
 
 source:
-  type: REST_API
+  type: FTP        # Set to REST_API or FTP as needed
   api:
     url: http://127.0.0.1:5000/v1/data
     method: GET
     auth:
       type: static_token
       token: "{{API_TOKEN}}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json
-    params:
-      start_date: "{{START_DATE}}"
-      end_date: "{{END_DATE}}"
-    data_path: data.items
-    timeout: 30
+    headers: {}               # Add any custom headers here, or leave as {}
     pagination:
-      type: page_number
+      max_pages: 10
       page_param: page
       page_size_param: limit
       page_size: 100
-      max_pages: 10
+    timeout: 30
+    data_path: data.items     # Add this line to specify where to find records in the API response
+    params: {}                # Optional: add default query params if needed
+  ftp:
+    host: ftp.example.com
+    username: your_ftp_username
+    password: your_ftp_password
+    remote_dir: /data
+    local_dir: ./ftp_downloads
+    file_types:
+      - .csv
+      - .json
+      - .parquet
 
 destination:
   csv:
@@ -30,22 +35,14 @@ destination:
   database:
     enabled: true
     type: postgresql
-    table: api_data
-    auto_create_table: true        # New: Enable automatic table creation
-    handle_conflicts: true         # New: Handle primary key conflicts
-    primary_key: id               # New: Specify primary key column
-    schema:
-      - name: id
-        type: INTEGER
-      - name: created_at
-        type: TIMESTAMP
+    table: ftp_data                       #api_data or ftp_data
+    auto_create_table: true
+    handle_conflicts: true
+    primary_key: id
 
 execution:
   time_window:
-    enabled: true
-    start_date: "2023-01-01"
-    end_date: "2023-01-31"
-    chunk_size: "1 day"
+    enabled: false
 
 secrets:
   - API_TOKEN

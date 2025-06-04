@@ -28,17 +28,17 @@ class DataPipeline:
             api_client = APIClient(self.config['source']['api'])
             return api_client.fetch_data()
         elif source_type == "FTP":
-            from src.config_loader import load_config, resolve_config_vars
             ftp_config = resolve_config_vars(load_config("config/ftp_config.yaml"))
             ftp_cfg = ftp_config['ftp']
-            download_ftp_files(
-                host=ftp_cfg['host'],
-                username=ftp_cfg['username'],
-                password=ftp_cfg['password'],
-                remote_dir=ftp_cfg['remote_dir'],
-                local_dir=ftp_cfg['local_dir'],
-                file_types=ftp_cfg.get('file_types', ['.csv', '.json', '.parquet'])
-            )
+            # Uncomment the following lines to enable FTP download
+            # download_ftp_files(
+            #     host=ftp_cfg['host'],
+            #     username=ftp_cfg['username'],
+            #     password=ftp_cfg['password'],
+            #     remote_dir=ftp_cfg['remote_dir'],
+            #     local_dir=ftp_cfg['local_dir'],
+            #     file_types=ftp_cfg.get('file_types', ['.csv', '.json', '.parquet'])
+            # )
             return self._load_files_from_local(ftp_cfg['local_dir'])
         else:
             raise ValueError(f"Unknown source type: {source_type}")
@@ -55,7 +55,10 @@ class DataPipeline:
             elif fname.lower().endswith('.json'):
                 with open(fpath, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    if isinstance(data, list):
+                    # If the JSON is a dict with a single key whose value is a list, use the list
+                    if isinstance(data, dict) and len(data) == 1 and isinstance(next(iter(data.values())), list):
+                        all_data.extend(next(iter(data.values())))
+                    elif isinstance(data, list):
                         all_data.extend(data)
                     else:
                         all_data.append(data)
@@ -65,11 +68,22 @@ class DataPipeline:
         logger.info(f"Loaded {len(all_data)} records from FTP files in {local_dir}")
         return all_data
 
-    # ...existing export_to_csv, _clean_integer, _clean_float, _clean_json...
+    def export_to_csv(self, data: List[Dict], output_path: str):
+        """Export a list of dictionaries to a CSV file."""
+        if not data:
+            logger.warning("No data to export to CSV")
+            return
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=data[0].keys())
+            writer.writeheader()
+            writer.writerows(data)
+        logger.info("Exported %d records to CSV: %s", len(data), output_path)
 
     def run(self):
         logger.info("Starting DataPipeline execution")
         try:
+            source_type = self.config['source']['type']
             raw_data = self.fetch_data()
             logger.info("Data fetch completed. Records retrieved: %d", len(raw_data))
 
@@ -77,11 +91,15 @@ class DataPipeline:
             logger.info("Exporting all data to CSV: %s", csv_output_path)
             self.export_to_csv(raw_data, csv_output_path)
 
-            if self.config['destination']['database']['enabled']:
+            if self.config['destination']['database'].get('enabled'):
                 logger.info("Database integration enabled, creating/updating table and loading data from CSV...")
                 db_config = self.config['destination']['database']
-                table_name = db_config.get('table', 'api_data')
-
+                if source_type == "FTP":
+                    table_name = db_config.get('table', 'ftp_data')
+                elif source_type == "REST_API":
+                    table_name = db_config.get('table', 'api_data')
+                else:
+                    table_name = db_config.get('table', 'data')
                 conn_params = {
                     "host": os.getenv("DB_HOST"),
                     "port": os.getenv("DB_PORT"),

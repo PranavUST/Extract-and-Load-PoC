@@ -68,3 +68,16 @@ pg_ctl.exe stop -D ../data
 C:\Postgres\postgresql-16.0-1-windows-x64-binaries\pgsql\bin\psql.exe -h localhost -p 5432 -U postgres -d DataLake
 -----------------------------------------------------------------
 
+## to run ftp:
+1. delete file scheduler_state.json in the folder data(if present)
+2. clear contents of output.csv
+3. changes in api_config.yaml(source type and destination table_name)
+4. run: python -m scripts.run_pipeline
+-------------------------------------------------------------------
+
+## to run api:
+1. delete file scheduler_state.json in the folder data(if present)
+2. clear contents of output.csv
+3. changes in api_config.yaml(source type and destination table_name)
+4. run in cmd1: python -m sample_api.app
+   run in cmd2: python -m scripts.run_pipeline

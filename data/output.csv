@@ -1,6 +1,46 @@
-author_id,body,category,created_at,id,is_published,tags,title,view_count
-101,This is the first post,tutorial,2024-01-15T10:30:00,1,True,"[""python"", ""api""]",First Post,1250
-102,Deep dive into advanced Python concepts,advanced,2024-02-20T14:45:00,2,True,"[""python"", ""advanced""]",Advanced Python Techniques,2340
-103,How to design robust APIs,guide,2024-03-10T09:00:00,3,False,"[""api"", ""design""]",REST API Best Practices,890
-104,Using Python in data science workflows,tutorial,2024-04-05T16:20:00,4,True,"[""python"", ""data science""]",Python for Data Science,1675
-105,A guide to JSON schema for APIs,reference,2024-05-01T11:10:00,5,False,"[""json"", ""schema""]",Understanding JSON Schema,430
+order_id,customer_id,product_name,category,quantity,unit_price,total_amount,order_date,customer_name,customer_email,shipping_address,payment_method,status
+ORD016,CUST101,Wireless Headphones,Electronics,2,89.99,179.98,2024-01-15,Alice Johnson,alice.johnson@email.com,"123 Main St, New York, NY",Credit Card,Delivered
+ORD017,CUST102,Running Shoes,Sports,1,125.00,125.00,2024-01-16,Bob Smith,bob.smith@email.com,"456 Oak Ave, Los Angeles, CA",PayPal,Shipped
+ORD018,CUST103,Coffee Maker,Home & Kitchen,1,199.99,199.99,2024-01-17,Carol Davis,carol.davis@email.com,"789 Pine Rd, Chicago, IL",Credit Card,Processing
+ORD019,CUST104,Smartphone Case,Electronics,3,24.99,74.97,2024-01-18,Diana Wilson,diana.wilson@email.com,"321 Elm St, Houston, TX",Debit Card,Delivered
+ORD020,CUST105,Yoga Mat,Sports,1,45.00,45.00,2024-01-19,Edward Brown,edward.brown@email.com,"654 Maple Dr, Phoenix, AZ",Credit Card,Shipped
+ORD021,CUST106,Novel Book,Books,2,12.99,25.98,2024-01-20,Fiona Miller,fiona.miller@email.com,"987 Cedar Ln, Philadelphia, PA",PayPal,Delivered
+ORD022,CUST107,Bluetooth Speaker,Electronics,1,79.99,79.99,2024-01-21,George Taylor,george.taylor@email.com,"159 Birch St, San Antonio, TX",Credit Card,Processing
+ORD023,CUST108,Protein Powder,Health,1,39.99,39.99,2024-01-22,Hannah Garcia,hannah.garcia@email.com,"753 Spruce Ave, San Diego, CA",Debit Card,Shipped
+ORD024,CUST109,Desk Lamp,Home & Kitchen,1,65.00,65.00,2024-01-23,Ian Martinez,ian.martinez@email.com,"852 Willow Rd, Dallas, TX",PayPal,Delivered
+ORD025,CUST110,Cookbook,Books,1,29.99,29.99,2024-01-24,Julia Anderson,julia.anderson@email.com,"741 Poplar St, San Jose, CA",Credit Card,Processing
+ORD026,CUST111,Gaming Mouse,Electronics,1,99.99,99.99,2024-01-25,Kevin Rodriguez,kevin.rodriguez@email.com,"963 Ash Blvd, Austin, TX",Debit Card,Shipped
+ORD027,CUST112,Water Bottle,Sports,2,19.99,39.98,2024-01-26,Laura Thompson,laura.thompson@email.com,"147 Sycamore St, Jacksonville, FL",Credit Card,Delivered
+ORD028,CUST113,Tea Set,Home & Kitchen,1,89.99,89.99,2024-01-27,Michael White,michael.white@email.com,"258 Hickory Ave, Columbus, OH",PayPal,Processing
+ORD029,CUST114,Fiction Novel,Books,3,15.99,47.97,2024-01-28,Nancy Lee,nancy.lee@email.com,"369 Dogwood Rd, Charlotte, NC",Credit Card,Shipped
+ORD030,CUST115,Fitness Tracker,Electronics,1,149.99,149.99,2024-01-29,Oscar Clark,oscar.clark@email.com,"481 Magnolia Dr, Seattle, WA",Debit Card,Delivered
+ORD001,CUST101,Wireless Headphones,Electronics,2,89.99,179.98,2024-01-15,Alice Johnson,alice.johnson@email.com,"123 Main St, New York, NY",Credit Card,Delivered
+ORD002,CUST102,Running Shoes,Sports,1,125.0,125.0,2024-01-16,Bob Smith,bob.smith@email.com,"456 Oak Ave, Los Angeles, CA",PayPal,Shipped
+ORD003,CUST103,Coffee Maker,Home & Kitchen,1,199.99,199.99,2024-01-17,Carol Davis,carol.davis@email.com,"789 Pine Rd, Chicago, IL",Credit Card,Processing
+ORD004,CUST104,Smartphone Case,Electronics,3,24.99,74.97,2024-01-18,Diana Wilson,diana.wilson@email.com,"321 Elm St, Houston, TX",Debit Card,Delivered
+ORD005,CUST105,Yoga Mat,Sports,1,45.0,45.0,2024-01-19,Edward Brown,edward.brown@email.com,"654 Maple Dr, Phoenix, AZ",Credit Card,Shipped
+ORD006,CUST106,Novel Book,Books,2,12.99,25.98,2024-01-20,Fiona Miller,fiona.miller@email.com,"987 Cedar Ln, Philadelphia, PA",PayPal,Delivered
+ORD007,CUST107,Bluetooth Speaker,Electronics,1,79.99,79.99,2024-01-21,George Taylor,george.taylor@email.com,"159 Birch St, San Antonio, TX",Credit Card,Processing
+ORD008,CUST108,Protein Powder,Health,1,39.99,39.99,2024-01-22,Hannah Garcia,hannah.garcia@email.com,"753 Spruce Ave, San Diego, CA",Debit Card,Shipped
+ORD009,CUST109,Desk Lamp,Home & Kitchen,1,65.0,65.0,2024-01-23,Ian Martinez,ian.martinez@email.com,"852 Willow Rd, Dallas, TX",PayPal,Delivered
+ORD010,CUST110,Cookbook,Books,1,29.99,29.99,2024-01-24,Julia Anderson,julia.anderson@email.com,"741 Poplar St, San Jose, CA",Credit Card,Processing
+ORD011,CUST111,Gaming Mouse,Electronics,1,99.99,99.99,2024-01-25,Kevin Rodriguez,kevin.rodriguez@email.com,"963 Ash Blvd, Austin, TX",Debit Card,Shipped
+ORD012,CUST112,Water Bottle,Sports,2,19.99,39.98,2024-01-26,Laura Thompson,laura.thompson@email.com,"147 Sycamore St, Jacksonville, FL",Credit Card,Delivered
+ORD013,CUST113,Tea Set,Home & Kitchen,1,89.99,89.99,2024-01-27,Michael White,michael.white@email.com,"258 Hickory Ave, Columbus, OH",PayPal,Processing
+ORD014,CUST114,Fiction Novel,Books,3,15.99,47.97,2024-01-28,Nancy Lee,nancy.lee@email.com,"369 Dogwood Rd, Charlotte, NC",Credit Card,Shipped
+ORD015,CUST115,Fitness Tracker,Electronics,1,149.99,149.99,2024-01-29,Oscar Clark,oscar.clark@email.com,"481 Magnolia Dr, Seattle, WA",Debit Card,Delivered
+ORD031,CUST201,Laptop Stand,Office,1,79.99,79.99,2024-02-01,Peter Collins,peter.collins@email.com,"501 Cherry Lane, Boston, MA",Credit Card,Delivered
+ORD032,CUST202,Wireless Keyboard,Electronics,1,59.99,59.99,2024-02-02,Quinn Roberts,quinn.roberts@email.com,"602 Walnut St, Denver, CO",PayPal,Shipped
+ORD033,CUST203,Hiking Boots,Outdoor,1,159.99,159.99,2024-02-03,Rachel Green,rachel.green@email.com,"703 Chestnut Ave, Portland, OR",Credit Card,Processing
+ORD034,CUST204,Electric Kettle,Home & Kitchen,2,45.99,91.98,2024-02-04,Samuel Turner,samuel.turner@email.com,"804 Pine Circle, Nashville, TN",Debit Card,Delivered
+ORD035,CUST205,Art Supplies Set,Hobbies,1,89.99,89.99,2024-02-05,Tina Adams,tina.adams@email.com,"905 Oak Plaza, Miami, FL",Credit Card,Shipped
+ORD036,CUST206,Smartphone,Electronics,1,699.99,699.99,2024-02-06,Ulysses Baker,ulysses.baker@email.com,"106 Maple Ridge, Salt Lake City, UT",PayPal,Processing
+ORD037,CUST207,Garden Tools,Outdoor,3,29.99,89.97,2024-02-07,Victoria Cox,victoria.cox@email.com,"207 Elm Grove, Raleigh, NC",Credit Card,Delivered
+ORD038,CUST208,Board Game,Entertainment,1,34.99,34.99,2024-02-08,William Davis,william.davis@email.com,"308 Cedar Point, Kansas City, MO",Debit Card,Shipped
+ORD039,CUST209,Perfume,Beauty,1,129.99,129.99,2024-02-09,Xara Evans,xara.evans@email.com,"409 Birch Valley, Las Vegas, NV",Credit Card,Processing
+ORD040,CUST210,Camping Tent,Outdoor,1,249.99,249.99,2024-02-10,Yolanda Foster,yolanda.foster@email.com,"510 Spruce Hill, San Francisco, CA",PayPal,Delivered
+ORD041,CUST211,Electric Toothbrush,Health,1,99.99,99.99,2024-02-11,Zachary Garcia,zachary.garcia@email.com,"611 Willow Creek, Atlanta, GA",Credit Card,Shipped
+ORD042,CUST212,Tablet Case,Electronics,2,24.99,49.98,2024-02-12,Amy Harrison,amy.harrison@email.com,"712 Poplar Drive, Detroit, MI",Debit Card,Processing
+ORD043,CUST213,Cooking Pan Set,Home & Kitchen,1,179.99,179.99,2024-02-13,Brian Johnson,brian.johnson@email.com,"813 Sycamore Road, Phoenix, AZ",Credit Card,Delivered
+ORD044,CUST214,Wireless Earbuds,Electronics,1,149.99,149.99,2024-02-14,Catherine King,catherine.king@email.com,"914 Hickory Lane, Philadelphia, PA",PayPal,Shipped
+ORD045,CUST215,Desk Chair,Office,1,299.99,299.99,2024-02-15,Daniel Lewis,daniel.lewis@email.com,"115 Magnolia Court, San Diego, CA",Credit Card,Processing

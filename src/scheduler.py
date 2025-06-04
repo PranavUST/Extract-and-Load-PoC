@@ -1,8 +1,15 @@
 import time
+import datetime
 import logging
 import hashlib
 import json
 import os
+
+class EnhancedJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (datetime.date, datetime.datetime)):
+            return obj.isoformat()
+        return super().default(obj)
 
 def start_smart_scheduler(job_func, initial_interval_minutes=1, max_interval_minutes=30):
     """
@@ -53,15 +60,25 @@ def start_smart_scheduler(job_func, initial_interval_minutes=1, max_interval_min
 def get_current_data_hash():
     """
     Get a hash of the current data to detect changes.
-    Implement this based on your data source.
+    Uses the correct source type (API or FTP).
     """
     try:
-        from src.api_client import APIClient
         from src.config_loader import load_config, resolve_config_vars
         config = resolve_config_vars(load_config("config/api_config.yaml"))
-        client = APIClient(config['source']['api'])
-        data = client.fetch_data()
-        data_str = json.dumps(data, sort_keys=True)
+        source_type = config['source']['type']
+
+        if source_type == "REST_API":
+            from src.api_client import APIClient
+            client = APIClient(config['source']['api'])
+            data = client.fetch_data()
+        elif source_type == "FTP":
+            from src.pipeline import DataPipeline
+            pipeline = DataPipeline("config/api_config.yaml")
+            data = pipeline.fetch_data()
+        else:
+            raise ValueError(f"Unknown source type: {source_type}")
+
+        data_str = json.dumps(data, sort_keys=True, cls=EnhancedJSONEncoder)
         return hashlib.md5(data_str.encode()).hexdigest()
     except Exception as e:
         logging.warning(f"Could not get current data hash: {e}")
