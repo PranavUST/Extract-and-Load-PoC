@@ -1,0 +1,10 @@
+ftp:
+  host: ftp.example.com
+  username: your_ftp_username
+  password: your_ftp_password
+  remote_dir: /data
+  local_dir: ./ftp_downloads
+  file_types:
+    - .csv
+    - .json
+    - .parquet

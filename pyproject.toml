@@ -16,6 +16,5 @@ dependencies = [
     "pytest",
     "schedule"
 ]
-
 [tool.pytest.ini_options]
 pythonpath = "."

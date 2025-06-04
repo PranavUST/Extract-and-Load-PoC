@@ -5,17 +5,20 @@ from typing import Dict, Any, List
 logger = logging.getLogger(__name__)
 
 class APIClient:
+    """Client for fetching data from a REST API with pagination support."""
+
     def __init__(self, config: Dict[str, Any]):
         self.config = config
         self.session = requests.Session()
         logger.debug("APIClient initialized with config: %s", config)
 
     def _handle_pagination(self, params: Dict) -> List[Dict]:
+        """Handles paginated API requests and aggregates results."""
         pagination = self.config.get('pagination', {})
         all_records = []
         max_pages = pagination.get('max_pages', 1)
         logger.info("Starting paginated fetch: max_pages=%d", max_pages)
-        
+
         for page in range(1, max_pages + 1):
             params.update({
                 pagination['page_param']: page,
@@ -29,11 +32,12 @@ class APIClient:
                 logger.info("No more records found at page %d. Stopping pagination.", page)
                 break
             all_records.extend(records)
-            
+
         logger.info("Total records fetched: %d", len(all_records))
         return all_records
 
     def _make_request(self, params: Dict) -> Dict:
+        """Makes a single API request and returns the JSON response."""
         try:
             resp = self.session.request(
                 method=self.config['method'],
@@ -50,6 +54,7 @@ class APIClient:
             raise
 
     def _extract_records(self, response: Dict) -> List[Dict]:
+        """Extracts records from the API response using the configured data path."""
         current_data = response
         for key in self.config['data_path'].split('.'):
             current_data = current_data.get(key, [])
@@ -61,6 +66,7 @@ class APIClient:
             return []
 
     def fetch_data(self) -> List[Dict]:
+        """Fetches data from the API using pagination."""
         logger.info("Fetching data using APIClient")
         params = self.config.get('params', {})
         data = self._handle_pagination(params)

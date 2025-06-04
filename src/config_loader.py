@@ -11,7 +11,7 @@ def load_config(file_path: str) -> Dict[str, Any]:
         config = yaml.safe_load(f)
     logger.debug(f"Raw config loaded: {config}")
 
-    # Replace environment variables
+    # Load secrets from environment variables
     secrets = config.get('secrets', [])
     for secret in secrets:
         os.environ[secret] = os.getenv(secret, '')
@@ -21,10 +21,12 @@ def load_config(file_path: str) -> Dict[str, Any]:
     return config
 
 def resolve_config_vars(config: Dict[str, Any]) -> Dict[str, Any]:
-    # Resolve {{VARS}} in config
+    """
+    Recursively resolve {{VARS}} in config using environment variables.
+    """
     resolved = {}
     for key, value in config.items():
-        if isinstance(value, str) and value.startswith('{{'):
+        if isinstance(value, str) and value.startswith('{{') and value.endswith('}}'):
             var_name = value[2:-2].strip()
             resolved_value = os.getenv(var_name, '')
             resolved[key] = resolved_value

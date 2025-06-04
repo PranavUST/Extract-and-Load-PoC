@@ -7,7 +7,7 @@ def setup_logging(level="INFO", log_file=None):
     - log_file: Optional path to a file to write logs to.
     """
     log_level = getattr(logging, level.upper(), logging.INFO)
-    handlers = [logging.StreamHandler()]
+    handlers = []
     if log_file:
         handlers.append(logging.FileHandler(log_file))
     logging.basicConfig(
