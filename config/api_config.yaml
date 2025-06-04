@@ -1,33 +1,22 @@
 version: 1.0
 
 source:
-  type: FTP        # Set to REST_API or FTP as needed
+  type: REST_API
   api:
     url: http://127.0.0.1:5000/v1/data
     method: GET
     auth:
       type: static_token
       token: "{{API_TOKEN}}"
-    headers: {}               # Add any custom headers here, or leave as {}
+    headers: {}
     pagination:
       max_pages: 10
       page_param: page
       page_size_param: limit
       page_size: 100
     timeout: 30
-    data_path: data.items     # Add this line to specify where to find records in the API response
+    data_path: data.items
     params: {}
-    retries: 3                # Optional: add default query params if needed
-  ftp:
-    host: ftp.example.com
-    username: your_ftp_username
-    password: your_ftp_password
-    remote_dir: /data
-    local_dir: ./ftp_downloads
-    file_types:
-      - .csv
-      - .json
-      - .parquet
     retries: 3
 
 destination:
@@ -37,7 +26,7 @@ destination:
   database:
     enabled: true
     type: postgresql
-    table: ftp_data                       #api_data or ftp_data
+    table: api_data
     auto_create_table: true
     handle_conflicts: true
     primary_key: id

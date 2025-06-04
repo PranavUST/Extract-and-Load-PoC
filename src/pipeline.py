@@ -57,59 +57,62 @@ class DataPipeline:
 
     def fetch_data(self) -> List[Dict]:
         source_type = self.config['source']['type']
-        if source_type == "REST_API":
-            return self.api_client.fetch_data()
-        elif source_type == "FTP":
-            # Use the FTP config from the main config file, not a separate one
+        if source_type == "FTP":
             ftp_cfg = self.config['source']['ftp']
-            retries = ftp_cfg.get('retries', 3)  # Get retries from config if present
-
-            # Uncomment the following block to enable FTP download
-            """
-            download_ftp_files(
+            downloaded_files = download_ftp_files(
                 host=ftp_cfg['host'],
                 username=ftp_cfg['username'],
                 password=ftp_cfg['password'],
                 remote_dir=ftp_cfg['remote_dir'],
                 local_dir=ftp_cfg['local_dir'],
                 file_types=ftp_cfg.get('file_types', ['.csv', '.json', '.parquet']),
-                retries=retries,
+                retries=ftp_cfg.get('retries', 3),
             )
-            """
-            return self._load_files_from_local(ftp_cfg['local_dir'])
+            if not downloaded_files:
+                logger.warning("No files downloaded from FTP server. Returning empty list.")
+                return []
+            data = self._load_files_from_local(ftp_cfg['local_dir'])
+            return data if data else []
+        elif source_type == "REST_API":
+            data = self.api_client.fetch_data()
+            return data if data else []
         else:
-            raise ValueError(f"Unknown source type: {source_type}")
+            logger.error(f"Unknown source type: {source_type}. Returning empty list.")
+            return []
 
     def _load_files_from_local(self, local_dir: str) -> List[Dict]:
         all_data = []
-        for fname in os.listdir(local_dir):
-            fpath = os.path.join(local_dir, fname)
-            if fname.lower().endswith('.csv'):
-                with open(fpath, 'r', encoding='utf-8') as f:
-                    reader = csv.DictReader(f)
-                    all_data.extend(list(reader))
-            elif fname.lower().endswith('.json'):
-                with open(fpath, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    # If the JSON is a dict with a single key whose value is a list, use the list
-                    if isinstance(data, dict) and len(data) == 1 and isinstance(next(iter(data.values())), list):
-                        all_data.extend(next(iter(data.values())))
-                    elif isinstance(data, list):
-                        all_data.extend(data)
-                    else:
-                        all_data.append(data)
-            elif fname.lower().endswith('.parquet'):
-                import pandas as pd
-                df = pd.read_parquet(fpath)
-                all_data.extend(df.to_dict(orient='records'))
-        logger.info(f"Loaded {len(all_data)} records from FTP files in {local_dir}")
-        return all_data
+        try:
+            if not os.path.exists(local_dir):
+                logger.error(f"Local directory does not exist: {local_dir}")
+                return []
+            
+            for fname in os.listdir(local_dir):
+                fpath = os.path.join(local_dir, fname)
+                if fname.lower().endswith('.csv'):
+                    with open(fpath, 'r', encoding='utf-8') as f:
+                        reader = csv.DictReader(f)
+                        all_data.extend(list(reader))
+                elif fname.lower().endswith('.json'):
+                    with open(fpath, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        if isinstance(data, list):
+                            all_data.extend(data)
+                        else:
+                            all_data.append(data)
+                elif fname.lower().endswith('.parquet'):
+                    import pandas as pd
+                    df = pd.read_parquet(fpath)
+                    all_data.extend(df.to_dict(orient='records'))
+        except Exception as e:
+            logger.error(f"Error loading files from {local_dir}: {e}")
+        return all_data  # Returns empty list on failure
 
     def run(self, csv_only=False):
         logger.info("Starting DataPipeline execution")
         try:
             logger.info("Fetching data")
-            raw_data = self.fetch_data()
+            raw_data = self.fetch_data() or []  # Ensure it's never None
             logger.info("Data fetch completed. Records retrieved: %d", len(raw_data))
 
             # Always export to CSV
@@ -123,13 +126,7 @@ class DataPipeline:
             elif self.config['destination']['database'].get('enabled'):
                 logger.info("Database integration enabled, running UPSERT operations...")
                 db_config = self.config['destination']['database']
-                source_type = self.config['source']['type']
-                if source_type == "FTP":
-                    table_name = db_config.get('table', 'ftp_data')
-                elif source_type == "REST_API":
-                    table_name = db_config.get('table', 'api_data')
-                else:
-                    table_name = db_config.get('table', 'data')
+                table_name = db_config.get('table', 'api_data' if self.config['source']['type'] == "REST_API" else 'ftp_data')
                 conn_params = {
                     "host": os.getenv("DB_HOST"),
                     "port": os.getenv("DB_PORT"),
