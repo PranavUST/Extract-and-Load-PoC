@@ -114,13 +114,29 @@ class DataPipeline:
 
     def run(self, csv_only=False):
         logger.info("Starting DataPipeline execution")
-        error_occurred = False
         stats = {
             'records_fetched': 0,
             'records_inserted': 0,
             'error_count': 0,
             'status': 'success'
         }
+
+        # Initialize conn_params BEFORE try block
+        conn_params = None
+        if self.config['destination']['database'].get('enabled'):
+            conn_params = {
+                "host": os.getenv("DB_HOST"),
+                "port": os.getenv("DB_PORT"),
+                "dbname": os.getenv("DB_NAME"),
+                "user": os.getenv("DB_USER"),
+                "password": os.getenv("DB_PASSWORD"),
+            }
+            # Create stats table immediately
+            try:
+                self.schema_generator.create_pipeline_stats_table(conn_params)
+                logger.info("Stats table initialized successfully")
+            except Exception as e:
+                logger.critical("Failed to create stats table: %s", str(e))
 
         try:
             logger.info("Fetching data")
@@ -141,18 +157,10 @@ class DataPipeline:
                 logger.info("Database integration enabled, running INSERT operations...")
                 db_config = self.config['destination']['database']
                 table_name = db_config.get('table', 'data')
-                conn_params = {
-                    "host": os.getenv("DB_HOST"),
-                    "port": os.getenv("DB_PORT"),
-                    "dbname": os.getenv("DB_NAME"),
-                    "user": os.getenv("DB_USER"),
-                    "password": os.getenv("DB_PASSWORD"),
-                }
 
-                # Create tables
+                # Create main data table
                 logger.info("Creating/updating table '%s'", table_name)
                 self.schema_generator.create_table_from_csv(csv_output_path, table_name, conn_params)
-                self.schema_generator.create_pipeline_stats_table(conn_params)
                 
                 # Load data
                 logger.info("Loading CSV data into table '%s'", table_name)
@@ -161,17 +169,19 @@ class DataPipeline:
             logger.info("DataPipeline execution completed successfully")
 
         except Exception as e:
-            error_occurred = True
             stats['error_count'] = 1
             stats['status'] = 'failed'
             logger.error("Pipeline execution failed: %s", str(e))
-            logger.debug("Pipeline failure details", exc_info=True)
             raise
         finally:
+            # Stats logging with guaranteed conn_params availability
             try:
-                if not error_occurred:
-                    stats['status'] = 'success'
-                log_pipeline_stats(stats)
-                logger.debug("Pipeline statistics: %s", stats)
+                if conn_params:
+                    # Ensure stats table exists before logging
+                    self.schema_generator.create_pipeline_stats_table(conn_params)
+                    log_pipeline_stats(stats, conn_params)
+                    logger.debug("Pipeline statistics logged: %s", stats)
+                else:
+                    logger.warning("Database not enabled - skipping stats logging")
             except Exception as e:
-                logger.error("Failed to log pipeline stats: %s", str(e))
+                logger.critical("FATAL: Stats logging failed: %s", str(e))

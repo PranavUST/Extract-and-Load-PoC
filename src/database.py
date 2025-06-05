@@ -106,31 +106,36 @@ def get_table_row_count(table_name: str, conn_params: dict = None) -> int:
         logger.error(f"Failed to get row count for table '{table_name}': {e}")
         return 0
     
-def log_pipeline_stats(stats: dict):
-    """Log pipeline statistics to database (aggregated daily)"""
+def log_pipeline_stats(stats: dict, conn_params: dict):
+    """Atomic stats logging with self-healing schema"""
     from datetime import date
-    query = """
-    INSERT INTO pipeline_stats 
-        (stat_date, records_fetched, records_inserted, error_count, total_runs, status)
-    VALUES (%s, %s, %s, %s, 1, %s)
-    ON CONFLICT (stat_date) DO UPDATE SET
-        records_fetched = pipeline_stats.records_fetched + EXCLUDED.records_fetched,
-        records_inserted = pipeline_stats.records_inserted + EXCLUDED.records_inserted,
-        error_count = pipeline_stats.error_count + EXCLUDED.error_count,
-        total_runs = pipeline_stats.total_runs + 1,
-        status = EXCLUDED.status;
-    """
-    values = (
-        date.today(),
-        stats.get('records_fetched', 0),
-        stats.get('records_inserted', 0),
-        stats.get('error_count', 0),
-        stats.get('status', 'unknown')
-    )
-    execute_query(query, values)
-    # Log the update using the existing logger and logfile
-    logger.info(
-        f"pipeline_stats updated: Date={values[0]}, "
-        f"Fetched={values[1]}, Inserted={values[2]}, "
-        f"Errors={values[3]}, Runs incremented, Status={values[4]}"
-    )
+    
+    if not conn_params:
+        logger.error("No connection parameters provided for stats logging")
+        return
+
+    try:
+        # Always verify table exists before logging
+        from src.schema_generator import CSVSchemaGenerator
+        CSVSchemaGenerator().create_pipeline_stats_table(conn_params)
+        
+        query = """
+        INSERT INTO pipeline_stats 
+            (stat_date, records_fetched, records_inserted, error_count, status)
+        VALUES (%s, %s, %s, %s, %s)
+        ON CONFLICT (stat_date) DO UPDATE SET
+            records_fetched = EXCLUDED.records_fetched,
+            records_inserted = EXCLUDED.records_inserted,
+            error_count = EXCLUDED.error_count,
+            status = EXCLUDED.status;
+        """
+        execute_query(query, (
+            date.today(),
+            stats['records_fetched'],
+            stats['records_inserted'],
+            stats['error_count'],
+            stats['status']
+        ), conn_params)
+        logger.info("Stats logged: %s", stats)
+    except Exception as e:
+        logger.error("Stats logging failed: %s", str(e))
