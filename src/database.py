@@ -116,7 +116,7 @@ def log_pipeline_stats(stats: dict, conn_params: dict):
 
     try:
         # Always verify table exists before logging
-        from schema_generator import CSVSchemaGenerator
+        from src.schema_generator import CSVSchemaGenerator
         CSVSchemaGenerator().create_pipeline_stats_table(conn_params)
         
         query = """
