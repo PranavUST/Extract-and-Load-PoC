@@ -169,14 +169,20 @@ class CSVSchemaGenerator:
             return execute_query(query, conn_params=conn_params)
     
     def create_pipeline_stats_table(self, conn_params: dict):
+        """Idempotent table creation with explicit columns"""
         create_table_sql = """
         CREATE TABLE IF NOT EXISTS pipeline_stats (
             stat_date DATE PRIMARY KEY,
             records_fetched INT NOT NULL,
             records_inserted INT NOT NULL,
             error_count INT DEFAULT 0,
-            total_runs INT NOT NULL DEFAULT 0,
             status VARCHAR(50) NOT NULL
         );
         """
-        self.execute_query(create_table_sql, conn_params)
+        try:
+            self.execute_query(create_table_sql, conn_params=conn_params)
+            logger.info("Created/verified pipeline_stats table structure")
+        except Exception as e:
+            logger.critical("FAILED TO CREATE STATS TABLE: %s", str(e))
+            raise
+
