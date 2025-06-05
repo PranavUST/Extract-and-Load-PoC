@@ -121,9 +121,12 @@ def test_get_table_row_count_exception(monkeypatch, conn_params):
     monkeypatch.setattr(db, "execute_query", MagicMock(side_effect=Exception("fail")))
     assert db.get_table_row_count("t", conn_params=conn_params) == 0
 
-def test_log_pipeline_stats(monkeypatch):
+def test_log_pipeline_stats(monkeypatch, conn_params):
     mock_execute = MagicMock()
     monkeypatch.setattr(db, "execute_query", mock_execute)
+    # Patch CSVSchemaGenerator to avoid import error and method call
+    mock_schema_gen = MagicMock()
+    monkeypatch.setattr("schema_generator.CSVSchemaGenerator", lambda: mock_schema_gen)
     stats = {"records_fetched": 1, "records_inserted": 2, "error_count": 0, "status": "ok"}
-    db.log_pipeline_stats(stats)
+    db.log_pipeline_stats(stats, conn_params)
     assert mock_execute.called
