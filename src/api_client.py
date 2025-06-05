@@ -2,7 +2,7 @@ import requests
 import time
 import logging
 from typing import Dict, Any, List
-
+from src.retry_utils import retry
 logger = logging.getLogger(__name__)
 
 class APIClient:
@@ -44,29 +44,18 @@ class APIClient:
 
         logger.info("Total records fetched: %d", len(all_records))
         return all_records
-
+    @retry(retries=3, delay=2, exceptions=(requests.exceptions.RequestException,))
     def _make_request(self, params: Dict) -> Dict:
-        retries = self.config.get('retries', 3)  # Default to 3 retries if not set
-        delay = 2  # seconds between retries
-        for attempt in range(1, retries + 1):
-            try:
-                resp = self.session.request(
-                    method=self.config.get('method', 'GET'),
-                    url=self.config.get('url', ''),
-                    headers=self.config.get('headers', {}),
-                    params=params,
-                    timeout=self.config.get('timeout', 30)
-                )
-                resp.raise_for_status()
-                logger.debug("Request successful: %s %s", self.config.get('method', 'GET'), self.config.get('url', ''))
-                return resp.json()
-            except requests.exceptions.RequestException as e:
-                logger.error(f"API request failed (attempt {attempt}/{retries}): {e}")
-                if attempt < retries:
-                    time.sleep(delay)
-                else:
-                    logger.error("Max retries reached. Raising exception.")
-                    raise
+        resp = self.session.request(
+            method=self.config.get('method', 'GET'),
+            url=self.config.get('url', ''),
+            headers=self.config.get('headers', {}),
+            params=params,
+            timeout=self.config.get('timeout', 30)
+        )
+        resp.raise_for_status()
+        logger.debug("Request successful: %s %s", self.config.get('method', 'GET'), self.config.get('url', ''))
+        return resp.json()
 
     def _extract_records(self, response: Dict) -> List[Dict]:
         """Extracts records from the API response using the configured data path."""
