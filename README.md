@@ -96,3 +96,6 @@ python -m scripts.input_selector
 python -m scripts.run_pipeline config/ftp_config.yaml
 - api
 python -m scripts.run_pipeline config/api_config.yaml
+
+## To test files individually
+pytest tests\test_file_name.py

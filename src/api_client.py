@@ -2,7 +2,7 @@ import requests
 import time
 import logging
 from typing import Dict, Any, List
-from src.retry_utils import retry
+from retry_utils import retry
 logger = logging.getLogger(__name__)
 
 class APIClient:

@@ -27,11 +27,10 @@ def load_csv_to_db(csv_path: str, table_name: str, conn_params: dict):
     try:
         with open(csv_path, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
-            columns = [col.strip() for col in reader.fieldnames]
-            if not columns:
+            if not reader.fieldnames:
                 logger.error("CSV file has no columns")
                 return
-
+            columns = [col.strip() for col in reader.fieldnames]
             columns_str = ', '.join([f'"{col}"' for col in columns])
             placeholders = ', '.join(['%s'] * len(columns))
             insert_sql = f'INSERT INTO "{table_name}" ({columns_str}) VALUES ({placeholders})'
