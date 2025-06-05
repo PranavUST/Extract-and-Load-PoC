@@ -1,2 +1,3 @@
 author_id,body,category,created_at,id,is_published,tags,title,view_count
-112,How to handle API rate limits in data ingestion.,reference,2024-06-07T12:15:00,12,False,"[""api"", ""rate limiting""]",API Rate Limiting Strategies,340
+115,How to monitor and alert on data pipeline failures.,reference,2024-06-09T10:00:00,15,False,"[""monitoring"", ""pipelines""]",Monitoring Data Pipeline Health,95
+116,Techniques for handling schema changes in production.,how-to,2024-06-09T16:30:00,16,True,"[""schema"", ""automation""]",Automating Schema Evolution,122

@@ -162,3 +162,21 @@ class CSVSchemaGenerator:
         finally:
             if 'conn' in locals():
                 conn.close()
+
+    def execute_query(self, query: str, conn_params: dict):
+            """Execute a raw SQL query using database.py's execute_query"""
+            from src.database import execute_query  # Import here to avoid circular dependencies
+            return execute_query(query, conn_params=conn_params)
+    
+    def create_pipeline_stats_table(self, conn_params: dict):
+        create_table_sql = """
+        CREATE TABLE IF NOT EXISTS pipeline_stats (
+            stat_date DATE PRIMARY KEY,
+            records_fetched INT NOT NULL,
+            records_inserted INT NOT NULL,
+            error_count INT DEFAULT 0,
+            total_runs INT NOT NULL DEFAULT 0,
+            status VARCHAR(50) NOT NULL
+        );
+        """
+        self.execute_query(create_table_sql, conn_params)

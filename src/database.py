@@ -3,6 +3,7 @@ import psycopg2
 import csv
 import logging
 from dotenv import load_dotenv
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -105,3 +106,32 @@ def get_table_row_count(table_name: str, conn_params: dict = None) -> int:
     except Exception as e:
         logger.error(f"Failed to get row count for table '{table_name}': {e}")
         return 0
+    
+def log_pipeline_stats(stats: dict):
+    """Log pipeline statistics to database (aggregated daily)"""
+    from datetime import date
+    query = """
+    INSERT INTO pipeline_stats 
+        (stat_date, records_fetched, records_inserted, error_count, total_runs, status)
+    VALUES (%s, %s, %s, %s, 1, %s)
+    ON CONFLICT (stat_date) DO UPDATE SET
+        records_fetched = pipeline_stats.records_fetched + EXCLUDED.records_fetched,
+        records_inserted = pipeline_stats.records_inserted + EXCLUDED.records_inserted,
+        error_count = pipeline_stats.error_count + EXCLUDED.error_count,
+        total_runs = pipeline_stats.total_runs + 1,
+        status = EXCLUDED.status;
+    """
+    values = (
+        date.today(),
+        stats.get('records_fetched', 0),
+        stats.get('records_inserted', 0),
+        stats.get('error_count', 0),
+        stats.get('status', 'unknown')
+    )
+    execute_query(query, values)
+    # Log the update using the existing logger and logfile
+    logger.info(
+        f"pipeline_stats updated: Date={values[0]}, "
+        f"Fetched={values[1]}, Inserted={values[2]}, "
+        f"Errors={values[3]}, Runs incremented, Status={values[4]}"
+    )

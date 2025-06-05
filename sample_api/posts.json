@@ -1,13 +1,24 @@
-[  
+[
   {
-    "id": 12,
-    "title": "API Rate Limiting Strategies",
-    "body": "How to handle API rate limits in data ingestion.",
-    "author_id": 112,
-    "created_at": "2024-06-07T12:15:00",
-    "tags": ["api", "rate limiting"],
+    "id": 15,
+    "title": "Monitoring Data Pipeline Health",
+    "body": "How to monitor and alert on data pipeline failures.",
+    "author_id": 115,
+    "created_at": "2024-06-09T10:00:00",
+    "tags": ["monitoring", "pipelines"],
     "category": "reference",
     "is_published": false,
-    "view_count": 340
+    "view_count": 95
+  },
+  {
+    "id": 16,
+    "title": "Automating Schema Evolution",
+    "body": "Techniques for handling schema changes in production.",
+    "author_id": 116,
+    "created_at": "2024-06-09T16:30:00",
+    "tags": ["schema", "automation"],
+    "category": "how-to",
+    "is_published": true,
+    "view_count": 122
   }
 ]

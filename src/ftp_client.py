@@ -17,8 +17,8 @@ def download_ftp_files(
     delay: int = 5
 ) -> List[str]:
     """
-    Robust FTP downloader with improved error handling
-    Returns list of downloaded file paths (empty list if none)
+    Robust FTP downloader with improved error handling.
+    Returns list of downloaded file paths (empty list if none).
     """
     downloaded_files = []
     attempt = 0
@@ -27,7 +27,7 @@ def download_ftp_files(
     logger.debug("Connection params - Host: %s, User: %s, Remote: %s", 
                 host, username, remote_dir)
 
-    while attempt <= retries:
+    while attempt < retries:
         try:
             # Create local directory if needed
             os.makedirs(local_dir, exist_ok=True)
@@ -61,18 +61,21 @@ def download_ftp_files(
                     
                     downloaded_files.append(local_path)
                 
-                return downloaded_files
+                # Success: exit loop
+                break
 
         except ftplib.error_perm as e:
             logger.error("FTP Error: %s", e)
             if "530" in str(e):
                 logger.error("Invalid credentials")
-            return []
+            break  # Don't retry on permission errors
         except Exception as e:
             attempt += 1
             logger.error("Attempt %d/%d failed: %s", attempt, retries, e)
-            if attempt <= retries:
+            if attempt < retries:
                 time.sleep(delay)
-    
-    logger.error("All %d retries exhausted", retries)
-    return []
+            else:
+                logger.error("All %d retries exhausted", retries)
+                break
+
+    return downloaded_files

@@ -3,11 +3,11 @@ import json
 import os
 import logging
 from typing import List, Dict
-from pathlib import Path
+from datetime import datetime
 
 from src.api_client import APIClient
 from src.config_loader import load_config, resolve_config_vars
-from src.database import load_csv_to_db
+from src.database import load_csv_to_db, log_pipeline_stats
 from src.schema_generator import CSVSchemaGenerator
 from src.ftp_client import download_ftp_files
 
@@ -23,10 +23,10 @@ class DataPipeline:
         if source_type == "REST_API":
             self.api_client = APIClient(self.config['source']['api'])
         elif source_type == "FTP":
-            self.ftp_config = self.config['source']['ftp']  # Stores FTP settings
+            self.ftp_config = self.config['source']['ftp']
         else:
             raise ValueError(f"Unsupported source type: {source_type}")
-            
+        
         # Common components
         self.schema_generator = CSVSchemaGenerator()
         logger.debug("Pipeline configuration loaded: %s", self.config)
@@ -67,53 +67,72 @@ class DataPipeline:
 
     def fetch_data(self) -> List[Dict]:
         source_type = self.config['source']['type']
-        
         if source_type == "REST_API":
             return self.api_client.fetch_data()
-            
         elif source_type == "FTP":
-            downloaded_files = download_ftp_files(
-                host=self.ftp_config['host'],
-                username=self.ftp_config['username'],
-                password=self.ftp_config['password'],
-                remote_dir=self.ftp_config['remote_dir'],
-                local_dir=self.ftp_config['local_dir'],
-                file_types=self.ftp_config.get('file_types', ['.csv', '.json', '.parquet'])
-            )
+            # For local testing without FTP server
+            if self.ftp_config.get('skip_download', False):
+                logger.info("Skipping FTP download (local test mode)")
+            else:
+                downloaded_files = download_ftp_files(
+                    host=self.ftp_config['host'],
+                    username=self.ftp_config['username'],
+                    password=self.ftp_config['password'],
+                    remote_dir=self.ftp_config['remote_dir'],
+                    local_dir=self.ftp_config['local_dir'],
+                    file_types=self.ftp_config.get('file_types', ['.csv', '.json', '.parquet'])
+                )
+                if not downloaded_files:
+                    logger.error("FTP download failed. No new files processed.")
+                    return []
             return self._load_files_from_local(self.ftp_config['local_dir'])
-            
         else:
             raise ValueError(f"Unknown source type: {source_type}")
 
-
     def _load_files_from_local(self, local_dir: str) -> List[Dict]:
         all_data = []
+        if not os.path.exists(local_dir):
+            logger.error("Local directory does not exist: %s", local_dir)
+            return []
+            
         for fname in os.listdir(local_dir):
             fpath = os.path.join(local_dir, fname)
-            if fname.lower().endswith('.json'):
-                with open(fpath, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    # Extract nested lists like "orders"
-                    if isinstance(data, dict):
-                        for key in data:
-                            if isinstance(data[key], list):
-                                all_data.extend(data[key])
-                    elif isinstance(data, list):
-                        all_data.extend(data)
+            try:
+                if fname.lower().endswith('.json'):
+                    with open(fpath, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        if isinstance(data, dict):
+                            for key in data:
+                                if isinstance(data[key], list):
+                                    all_data.extend(data[key])
+                        elif isinstance(data, list):
+                            all_data.extend(data)
+                # Add CSV/Parquet handling here if needed
+            except Exception as e:
+                logger.error("Failed to load %s: %s", fname, str(e))
         return all_data
-
 
     def run(self, csv_only=False):
         logger.info("Starting DataPipeline execution")
+        error_occurred = False
+        stats = {
+            'records_fetched': 0,
+            'records_inserted': 0,
+            'error_count': 0,
+            'status': 'success'
+        }
+
         try:
             logger.info("Fetching data")
             raw_data = self.fetch_data() or []
-            logger.info("Data fetch completed. Records retrieved: %d", len(raw_data))
+            stats['records_fetched'] = len(raw_data)
+            logger.info("Data fetch completed. Records retrieved: %d", stats['records_fetched'])
 
             # Always export to CSV
             csv_output_path = self.config['destination']['csv']['output_path']
             logger.info("Exporting all data to CSV: %s", csv_output_path)
             self.export_to_csv(raw_data, csv_output_path)
+            stats['records_inserted'] = len(raw_data)
 
             # Conditionally run database operations
             if csv_only:
@@ -129,17 +148,30 @@ class DataPipeline:
                     "user": os.getenv("DB_USER"),
                     "password": os.getenv("DB_PASSWORD"),
                 }
-                logger.info("Creating or updating table '%s' based on CSV schema", table_name)
+
+                # Create tables
+                logger.info("Creating/updating table '%s'", table_name)
                 self.schema_generator.create_table_from_csv(csv_output_path, table_name, conn_params)
-                logger.info("Loading CSV data into table '%s' using INSERT", table_name)
+                self.schema_generator.create_pipeline_stats_table(conn_params)
+                
+                # Load data
+                logger.info("Loading CSV data into table '%s'", table_name)
                 load_csv_to_db(csv_output_path, table_name, conn_params)
-                logger.info("INSERT operations completed successfully")
-            else:
-                logger.warning("Database integration not enabled")
 
             logger.info("DataPipeline execution completed successfully")
 
         except Exception as e:
+            error_occurred = True
+            stats['error_count'] = 1
+            stats['status'] = 'failed'
             logger.error("Pipeline execution failed: %s", str(e))
             logger.debug("Pipeline failure details", exc_info=True)
             raise
+        finally:
+            try:
+                if not error_occurred:
+                    stats['status'] = 'success'
+                log_pipeline_stats(stats)
+                logger.debug("Pipeline statistics: %s", stats)
+            except Exception as e:
+                logger.error("Failed to log pipeline stats: %s", str(e))
