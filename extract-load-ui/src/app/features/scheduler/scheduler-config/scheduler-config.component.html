@@ -1,0 +1,25 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Schedule Pipeline</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="schedulerForm" (ngSubmit)="saveSchedule()">
+      <mat-form-field>
+        <mat-label>Cron Expression</mat-label>
+        <input matInput formControlName="cronExpression">
+        <mat-hint>Example: */5 * * * * (every 5 minutes)</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Pipeline</mat-label>
+        <mat-select formControlName="pipeline">
+          <mat-option *ngFor="let pipe of pipelines" [value]="pipe.id">
+            {{ pipe.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit">Schedule</button>
+    </form>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,52 @@
+.template-list-container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-actions {
+  margin-left: auto;
+}
+
+.table-container {
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+
+.templates-table {
+  width: 100%;
+  
+  mat-chip {
+    font-size: 0.75rem;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #666;
+  
+  mat-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 1rem;
+    color: #ddd;
+  }
+  
+  h3 {
+    margin: 1rem 0 0.5rem 0;
+    font-weight: 400;
+  }
+  
+  p {
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+mat-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

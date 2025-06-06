@@ -10,5 +10,5 @@
   },
   "include": [
     "src/**/*.ts"
-  ]
+, "src/app/features/user-management/user-list/user-list.component.ts", "src/app/pages/landing/landing.component.ts"  ]
 }
