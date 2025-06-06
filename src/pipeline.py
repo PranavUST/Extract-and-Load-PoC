@@ -2,6 +2,7 @@ import csv
 import json
 import os
 import logging
+import pandas as pd
 from typing import List, Dict
 from datetime import datetime
 
@@ -83,8 +84,8 @@ class DataPipeline:
                     file_types=self.ftp_config.get('file_types', ['.csv', '.json', '.parquet'])
                 )
                 if not downloaded_files:
-                    logger.error("FTP download failed. No new files processed.")
-                    return []
+                    logger.error("FTP download failed. Will attempt to load files from local directory anyway.")
+            # Always try to load from local directory, even if FTP failed
             return self._load_files_from_local(self.ftp_config['local_dir'])
         else:
             raise ValueError(f"Unknown source type: {source_type}")
@@ -94,7 +95,9 @@ class DataPipeline:
         if not os.path.exists(local_dir):
             logger.error("Local directory does not exist: %s", local_dir)
             return []
-            
+
+        logger.info("Loading files from local directory: %s", local_dir)
+        logger.info("Files found: %s", os.listdir(local_dir))
         for fname in os.listdir(local_dir):
             fpath = os.path.join(local_dir, fname)
             try:
@@ -107,9 +110,16 @@ class DataPipeline:
                                     all_data.extend(data[key])
                         elif isinstance(data, list):
                             all_data.extend(data)
-                # Add CSV/Parquet handling here if needed
+                elif fname.lower().endswith('.csv'):
+                    with open(fpath, 'r', encoding='utf-8') as f:
+                        reader = csv.DictReader(f)
+                        all_data.extend(list(reader))
+                elif fname.lower().endswith('.parquet'):
+                    df = pd.read_parquet(fpath)
+                    all_data.extend(df.to_dict(orient='records'))
             except Exception as e:
                 logger.error("Failed to load %s: %s", fname, str(e))
+        logger.info("Total records loaded from local: %d", len(all_data))
         return all_data
 
     def run(self, csv_only=False):
