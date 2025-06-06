@@ -1,0 +1,20 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Run Pipeline</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="schedulerForm" (ngSubmit)="runPipeline()">
+      <mat-form-field appearance="fill">
+        <mat-label>Config File Path</mat-label>
+        <input matInput formControlName="configFile" required>
+        <mat-error *ngIf="schedulerForm.get('configFile')?.invalid">Config file is required</mat-error>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit" [disabled]="schedulerForm.invalid">
+        Run Pipeline
+      </button>
+    </form>
+    <div *ngIf="status" class="status-message" style="margin-top:1rem;">
+      {{ status }}
+    </div>
+  </mat-card-content>
+</mat-card>

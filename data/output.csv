@@ -1,16 +1,3 @@
-department,email,employee_id,first_name,hire_date,last_name,location,manager_id,position,salary
-Engineering,john.smith@company.com,101,John,2023-01-15,Smith,New York,201.0,Software Engineer,75000
-Marketing,sarah.johnson@company.com,102,Sarah,2022-08-22,Johnson,Los Angeles,202.0,Marketing Manager,68000
-Sales,michael.brown@company.com,103,Michael,2023-03-10,Brown,Chicago,203.0,Sales Representative,55000
-Engineering,emily.davis@company.com,104,Emily,2021-11-05,Davis,New York,201.0,Senior Developer,85000
-HR,david.wilson@company.com,105,David,2023-02-18,Wilson,Houston,204.0,HR Specialist,52000
-Finance,lisa.anderson@company.com,106,Lisa,2022-12-01,Anderson,Boston,205.0,Financial Analyst,62000
-Sales,robert.taylor@company.com,107,Robert,2023-04-12,Taylor,Chicago,203.0,Account Executive,58000
-Marketing,jennifer.martinez@company.com,108,Jennifer,2023-05-20,Martinez,Los Angeles,202.0,Content Creator,48000
-Engineering,william.garcia@company.com,109,William,2022-09-14,Garcia,Seattle,201.0,DevOps Engineer,78000
-Finance,amanda.rodriguez@company.com,110,Amanda,2021-07-30,Rodriguez,Boston,205.0,Senior Accountant,65000
-Engineering,mark.thompson@company.com,201,Mark,2020-03-15,Thompson,New York,nan,Engineering Manager,95000
-Marketing,rebecca.white@company.com,202,Rebecca,2019-11-20,White,Los Angeles,nan,Marketing Director,88000
-Sales,james.lee@company.com,203,James,2020-01-08,Lee,Chicago,nan,Sales Director,92000
-HR,patricia.clark@company.com,204,Patricia,2019-06-12,Clark,Houston,nan,HR Director,82000
-Finance,christopher.lewis@company.com,205,Christopher,2018-10-25,Lewis,Boston,nan,Finance Director,98000
+author_id,body,category,created_at,id,is_published,tags,title,view_count
+115,How to monitor and alert on data pipeline failures.,reference,2024-06-09T10:00:00,15,False,"[""monitoring"", ""pipelines""]",Monitoring Data Pipeline Health,95
+116,Techniques for handling schema changes in production.,how-to,2024-06-09T16:30:00,16,True,"[""schema"", ""automation""]",Automating Schema Evolution,122

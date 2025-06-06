@@ -1,0 +1,38 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Extraction Templates</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <table mat-table [dataSource]="templates" class="mat-elevation-z2" *ngIf="templates.length > 0">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Template Name</th>
+        <td mat-cell *matCellDef="let t">{{ t.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="sourceType">
+        <th mat-header-cell *matHeaderCellDef>Source</th>
+        <td mat-cell *matCellDef="let t">{{ t.sourceType }}</td>
+      </ng-container>
+      <ng-container matColumnDef="targetType">
+        <th mat-header-cell *matHeaderCellDef>Target</th>
+        <td mat-cell *matCellDef="let t">{{ t.targetType }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let t">
+          <button mat-icon-button color="primary" (click)="editTemplate(t)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteTemplate(t)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="['name', 'sourceType', 'targetType', 'actions']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['name', 'sourceType', 'targetType', 'actions'];"></tr>
+    </table>
+    <div *ngIf="!templates?.length" class="empty-state">
+      <p>No templates found. Click below to add one.</p>
+      <button mat-raised-button color="primary" (click)="createNewTemplate()">Add Template</button>
+    </div>
+  </mat-card-content>
+</mat-card>

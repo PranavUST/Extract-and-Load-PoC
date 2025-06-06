@@ -1,0 +1,42 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>User List</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <table mat-table [dataSource]="users" class="mat-elevation-z2">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let user">{{ user.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef>Role</th>
+        <td mat-cell *matCellDef="let user">
+          <mat-select [(ngModel)]="user.role" (selectionChange)="updateUser(user)">
+            <mat-option *ngFor="let role of roles" [value]="role">{{ role | titlecase }}</mat-option>
+          </mat-select>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="permissions">
+        <th mat-header-cell *matHeaderCellDef>Permissions</th>
+        <td mat-cell *matCellDef="let user">
+          <mat-chip-listbox>
+            <mat-chip-option *ngFor="let perm of user.permissions">{{ perm }}</mat-chip-option>
+          </mat-chip-listbox>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let user">
+          <button mat-icon-button color="warn" (click)="deleteUser(user)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <div *ngIf="!users?.length" class="empty-state">
+      <p>No users found.</p>
+    </div>
+  </mat-card-content>
+</mat-card>
