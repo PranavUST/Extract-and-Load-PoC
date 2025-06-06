@@ -5,7 +5,8 @@ import logging
 import pandas as pd
 from typing import List, Dict
 from datetime import datetime
-
+from pathlib import Path
+output_path = Path(__file__).parent.parent / 'data' / 'output.csv'
 from src.api_client import APIClient
 from src.config_loader import load_config, resolve_config_vars
 from src.database import load_csv_to_db, log_pipeline_stats
@@ -13,7 +14,13 @@ from src.schema_generator import CSVSchemaGenerator
 from src.ftp_client import download_ftp_files
 
 logger = logging.getLogger(__name__)
-
+def get_project_root():
+    return Path(__file__).parent.parent
+def resolve_path(path_from_config):
+    p = Path(path_from_config)
+    if not p.is_absolute():
+        return get_project_root() / p
+    return p
 class DataPipeline:
     def __init__(self, config_path: str):
         logger.info("Initializing DataPipeline with config: %s", config_path)
@@ -32,7 +39,8 @@ class DataPipeline:
         self.schema_generator = CSVSchemaGenerator()
         logger.debug("Pipeline configuration loaded: %s", self.config)
         logger.info("DataPipeline initialization complete")
-
+        logger.info(f"Current working directory: {os.getcwd()}")
+        logger.info(f"Resolved output CSV path: {os.path.abspath(output_path)}")
     def export_to_csv(self, data: List[Dict], output_path: str):
         """Export data to CSV format."""
         if not data:
@@ -91,6 +99,8 @@ class DataPipeline:
             raise ValueError(f"Unknown source type: {source_type}")
 
     def _load_files_from_local(self, local_dir: str) -> List[Dict]:
+        # Always resolve local_dir relative to project root
+        local_dir = str((Path(__file__).parent.parent / local_dir).resolve())
         all_data = []
         if not os.path.exists(local_dir):
             logger.error("Local directory does not exist: %s", local_dir)
@@ -156,6 +166,8 @@ class DataPipeline:
 
             # Always export to CSV
             csv_output_path = self.config['destination']['csv']['output_path']
+           # Convert to absolute path if not already
+            csv_output_path = str((Path(__file__).parent.parent / csv_output_path).resolve())
             logger.info("Exporting all data to CSV: %s", csv_output_path)
             self.export_to_csv(raw_data, csv_output_path)
             stats['records_inserted'] = len(raw_data)

@@ -1,0 +1,9 @@
+<div>
+  <label>Config File:</label>
+  <input [(ngModel)]="configFile" placeholder="Enter config file path" />
+  <button (click)="runPipeline()">Run Pipeline</button>
+  <button (click)="checkStatus()">Check Status</button>
+</div>
+<div>
+  <strong>Status:</strong> {{ status }}
+</div>

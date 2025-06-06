@@ -44,7 +44,7 @@ class InputSelector:
         sftp_frame = ttk.LabelFrame(main_frame, text="SFTP/FTP", padding="10")
         sftp_frame.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=5)
         ttk.Radiobutton(sftp_frame, text="Extract data from SFTP/FTP",
-                        variable=self.mode_var, value="SFTP").grid(row=0, column=0, sticky=tk.W)
+                        variable=self.mode_var, value="FTP").grid(row=0, column=0, sticky=tk.W)
         ttk.Label(sftp_frame, text="Download files from SFTP/FTP server",
                   foreground="gray").grid(row=1, column=0, sticky=tk.W, pady=(5, 0))
 

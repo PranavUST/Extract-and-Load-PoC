@@ -43,11 +43,17 @@ def download_ftp_files(
                 files = ftp.nlst()
                 logger.info("Found %d files in %s", len(files), remote_dir)
                 
+                # ...existing code...
                 for filename in files:
-                    if file_types and not filename.lower().endswith(tuple(file_types)):
-                        logger.debug("Skipping non-matching file: %s", filename)
-                        continue
-                        
+                    # Ensure file_types is a list of lowercase extensions with dot
+                    if file_types:
+                        logger.info("Filtering for file types: %s", file_types)
+                        file_types_lc = [ft.lower() if ft.startswith('.') else f'.{ft.lower()}' for ft in file_types]
+                        if not filename.lower().endswith(tuple(file_types_lc)):
+                            logger.debug("Skipping non-matching file: %s", filename)
+                            continue
+                    # ...existing code...
+                    logger.info("Files found on FTP: %s", files)     
                     local_path = os.path.join(local_dir, filename)
                     
                     # Skip existing files
