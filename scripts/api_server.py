@@ -1,4 +1,5 @@
 import sys
+import logging
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from flask import Flask, request, jsonify
@@ -8,7 +9,11 @@ from src.logging_utils import setup_logging
 import threading
 import os
 
-setup_logging("pipeline.log")
+# Configure logging with absolute path
+log_file_path = str(Path(__file__).parent.parent / "pipeline.log")
+setup_logging(log_file=log_file_path)
+
+execution_cycle = 0  # Added execution counter
 print("Current working directory:", os.getcwd())
 
 app = Flask(__name__)
@@ -23,20 +28,29 @@ pipeline_status = {"status": "idle", "message": ""}
 status_lock = threading.Lock()
 
 def run_pipeline_thread(config_file):
+    global execution_cycle
+    execution_cycle += 1
+    logging.info(f"--- Pipeline Execution Cycle: {execution_cycle} ---")
+    
     try:
         if not os.path.isabs(config_file):
             config_file = str(Path(__file__).parent.parent / config_file)
+        
         with status_lock:
             pipeline_status["status"] = "running"
             pipeline_status["message"] = "Pipeline is running"
+        
         run_ingestion(config_file)
+        
         with status_lock:
             pipeline_status["status"] = "success"
             pipeline_status["message"] = "Pipeline completed successfully"
     except Exception as e:
-        with status_lock:
+        with status_lock:  # Maintain thread safety for error status
             pipeline_status["status"] = "error"
             pipeline_status["message"] = str(e)
+    finally:
+        logging.info("-" * 80)  # Add separator after each execution
 
 def _build_cors_preflight_response():
     response = jsonify({"status": "preflight"})
