@@ -99,3 +99,6 @@ python -m scripts.run_pipeline config/api_config.yaml
 
 ## To test files individually
 pytest tests\test_file_name.py
+
+## To test all files
+pytest
