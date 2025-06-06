@@ -6,8 +6,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from run_pipeline import run_ingestion
 from src.logging_utils import setup_logging
-
-setup_logging("pipeline.log")  # or setup_logging("my_log_file.log")
+log_file_path = str(Path(__file__).parent.parent / "pipeline.log")
+setup_logging(log_file=log_file_path)
 import threading
 import os
 print("Current working directory:", os.getcwd())
