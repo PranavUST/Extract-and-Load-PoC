@@ -12,6 +12,9 @@ sys.path.insert(0, str(project_root))
 
 def run_ingestion(config_path: str):
     """Run the pipeline with the specified config"""
+    config_path = Path(config_path)
+    if not config_path.is_absolute():
+        config_path = (project_root / config_path).resolve()
     pipeline = DataPipeline(config_path)
     pipeline.run()
 
