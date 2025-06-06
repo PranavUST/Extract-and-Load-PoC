@@ -1,4 +1,5 @@
 import sys
+import logging
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 # ...existing code...
@@ -10,6 +11,7 @@ log_file_path = str(Path(__file__).parent.parent / "pipeline.log")
 setup_logging(log_file=log_file_path)
 import threading
 import os
+execution_cycle = 0
 print("Current working directory:", os.getcwd())
 
 app = Flask(__name__)
@@ -22,6 +24,9 @@ CORS(
 pipeline_status = {"status": "idle", "message": ""}
 
 def run_pipeline_thread(config_file):
+    global execution_cycle
+    execution_cycle += 1
+    logging.info(f"--- Pipeline Execution Cycle: {execution_cycle} ---")
     try:
         if not os.path.isabs(config_file):
             config_file = str(Path(__file__).parent.parent / config_file)
@@ -33,6 +38,7 @@ def run_pipeline_thread(config_file):
     except Exception as e:
         pipeline_status["status"] = "error"
         pipeline_status["message"] = str(e)
+    logging.info("-" * 80)
 
 @app.route('/run-pipeline', methods=['POST'])
 def run_pipeline_api():
