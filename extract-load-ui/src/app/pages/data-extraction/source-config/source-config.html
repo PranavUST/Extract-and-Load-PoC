@@ -27,11 +27,27 @@
             <mat-label>Auth Token</mat-label>
             <input matInput formControlName="authToken">
           </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Retries</mat-label>
+            <input matInput type="number" formControlName="retries" min="0">
+          </mat-form-field>
         </div>
         <div *ngSwitchCase="'FTP'">
           <mat-form-field appearance="fill">
             <mat-label>FTP Host</mat-label>
             <input matInput formControlName="ftpHost" required>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>FTP Username</mat-label>
+            <input matInput formControlName="ftpUsername">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>FTP Password</mat-label>
+            <input matInput formControlName="ftpPassword" type="password">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Retries</mat-label>
+            <input matInput type="number" formControlName="retries" min="0">
           </mat-form-field>
         </div>
       </ng-container>

@@ -33,15 +33,36 @@ export class SourceConfig {
     type: ['API', Validators.required],
     endpoint: [''],
     authToken: [''],
-    ftpHost: ['']
+    ftpHost: [''],
+    ftpUsername: [''],
+    ftpPassword: [''],
+    retries: [3] 
   });
-
+  constructor() {
+    this.sourceForm.get('type')?.valueChanges.subscribe(type => {
+      if (type === 'API') {
+        this.sourceForm.get('endpoint')?.setValidators([Validators.required]);
+        this.sourceForm.get('ftpHost')?.clearValidators();
+        this.sourceForm.get('ftpUsername')?.clearValidators();
+        this.sourceForm.get('ftpPassword')?.clearValidators();
+      } else if (type === 'FTP') {
+        this.sourceForm.get('ftpHost')?.setValidators([Validators.required]);
+        this.sourceForm.get('endpoint')?.clearValidators();
+        this.sourceForm.get('authToken')?.clearValidators();
+      }
+      this.sourceForm.get('endpoint')?.updateValueAndValidity();
+      this.sourceForm.get('ftpHost')?.updateValueAndValidity();
+      this.sourceForm.get('ftpUsername')?.updateValueAndValidity();
+      this.sourceForm.get('ftpPassword')?.updateValueAndValidity();
+      this.sourceForm.get('authToken')?.updateValueAndValidity();
+    });
+  }
   saveConfig() {
     if (this.sourceForm.valid) {
       this.api.saveSourceConfig(this.sourceForm.value).subscribe({
         next: (res) => alert('Source config saved!'),
         error: (err) => alert('Save failed: ' + err.message)
       });
-    }
+    } 
   }
 }

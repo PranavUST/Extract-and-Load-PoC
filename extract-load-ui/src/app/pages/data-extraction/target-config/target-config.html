@@ -7,7 +7,6 @@
       <mat-form-field appearance="fill">
         <mat-label>Name</mat-label>
         <input matInput formControlName="name" required>
-        <mat-error *ngIf="targetForm.get('name')?.invalid">Name is required</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="fill">
@@ -17,20 +16,10 @@
         </mat-select>
       </mat-form-field>
 
-      <ng-container [ngSwitch]="targetForm.get('type')?.value">
-        <div *ngSwitchCase="'CSV'">
-          <mat-form-field appearance="fill">
-            <mat-label>CSV Path</mat-label>
-            <input matInput formControlName="path" required>
-          </mat-form-field>
-        </div>
-        <div *ngSwitchCase="'Database'">
-          <mat-form-field appearance="fill">
-            <mat-label>Connection String</mat-label>
-            <input matInput formControlName="connectionString" required>
-          </mat-form-field>
-        </div>
-      </ng-container>
+      <mat-form-field appearance="fill">
+        <mat-label>Table Name</mat-label>
+        <input matInput formControlName="tableName" required>
+      </mat-form-field>
 
       <button mat-raised-button color="primary" type="submit" [disabled]="targetForm.invalid">
         Save Target Config

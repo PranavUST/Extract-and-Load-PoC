@@ -1,32 +1,28 @@
-version: 1.0
-
-source:
-  type: FTP
-  ftp:
-    host: ftp.example.com
-    username: your_ftp_username
-    password: your_ftp_password
-    remote_dir: /data
-    local_dir: ftp_downloads   # Just the folder, not a file path!
-    file_types:
-      - .csv
-      - .json
-      - .parquet
-    retries: 3
-
 destination:
   csv:
-    output_path: data/output.csv   # Just a relative folder/file path
+    output_path: data/output.csv
     write_mode: overwrite
   database:
-    enabled: true
-    type: postgresql
-    table: ftp_data
     auto_create_table: true
+    enabled: true
     handle_conflicts: true
-
+    table: afc
+    type: postgresql
 execution:
   time_window:
     enabled: false
-
 secrets: []
+source:
+  ftp:
+    file_types:
+    - .csv
+    - .json
+    - .parquet
+    host: localhost
+    local_dir: ftp_downloads
+    password: ''
+    remote_dir: /data
+    retries: 5
+    username: ''
+  type: FTP
+version: 1.0

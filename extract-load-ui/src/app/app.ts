@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, RouterModule } from '@angular/router';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, RouterModule, MatToolbarModule, MatButtonModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
-  protected title = 'extract-load-ui';
+  public title = 'extract-load-ui';
 }

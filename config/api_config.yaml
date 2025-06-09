@@ -1,38 +1,34 @@
-version: 1.0
-
-source:
-  type: REST_API
-  api:
-    url: http://127.0.0.1:5001/v1/data
-    method: GET
-    auth:
-      type: static_token
-      token: "{{API_TOKEN}}"
-    headers: {}
-    pagination:
-      max_pages: 10
-      page_param: page
-      page_size_param: limit
-      page_size: 100
-    timeout: 30
-    data_path: data.items
-    params: {}
-    retries: 3
-
 destination:
   csv:
     output_path: ./data/output.csv
     write_mode: overwrite
   database:
-    enabled: true
-    type: postgresql
-    table: api_data
     auto_create_table: true
+    enabled: true
     handle_conflicts: true
-
+    table: afc
+    type: postgresql
 execution:
   time_window:
     enabled: false
-
 secrets:
-  - API_TOKEN
+- API_TOKEN
+source:
+  api:
+    auth:
+      token: ''
+      type: static_token
+    data_path: data.items
+    headers: {}
+    method: GET
+    pagination:
+      max_pages: 10
+      page_param: page
+      page_size: 100
+      page_size_param: limit
+    params: {}
+    retries: 3
+    timeout: 30
+    url: https://api.example.com/data
+  type: REST_API
+version: 1.0

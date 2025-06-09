@@ -1,0 +1,33 @@
+<mat-card>
+  <mat-card-title>Saved Source Configs</mat-card-title>
+  <mat-table [dataSource]="sourceConfigs" *ngIf="sourceConfigs.length">
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+      <mat-cell *matCellDef="let config">{{ config.name }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="type">
+      <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+      <mat-cell *matCellDef="let config">{{ config.type }}</mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="['name', 'type']"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: ['name', 'type'];"></mat-row>
+  </mat-table>
+  <div *ngIf="!sourceConfigs.length">No source configs saved.</div>
+</mat-card>
+
+<mat-card>
+  <mat-card-title>Saved Target Configs</mat-card-title>
+  <mat-table [dataSource]="targetConfigs" *ngIf="targetConfigs.length">
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+      <mat-cell *matCellDef="let config">{{ config.name }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="tableName">
+      <mat-header-cell *matHeaderCellDef>Table Name</mat-header-cell>
+      <mat-cell *matCellDef="let config">{{ config.tableName }}</mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="['name', 'tableName']"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: ['name', 'tableName'];"></mat-row>
+  </mat-table>
+  <div *ngIf="!targetConfigs.length">No target configs saved.</div>
+</mat-card>

@@ -25,13 +25,13 @@ import { MatCardModule } from '@angular/material/card';
 export class TargetConfig {
   private fb = inject(FormBuilder);
   private api = inject(ApiService);
+  targetTypes = ['Database'];
 
-  targetTypes = ['CSV', 'Database'];
-  targetForm: FormGroup = this.fb.group({
+  targetForm = this.fb.group({
     name: ['', Validators.required],
-    type: ['CSV', Validators.required],
-    path: [''],
-    connectionString: ['']
+    type: ['Database', Validators.required],
+    tableName: ['', Validators.required],
+    //connectionString: ['', Validators.required],
   });
 
   saveConfig() {
