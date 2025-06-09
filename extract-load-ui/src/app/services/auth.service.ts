@@ -63,6 +63,10 @@ export class AuthService {
     return !!this.currentUserSubject.value;
   }
 
+  getCurrentUser() {
+  return this.currentUserSubject.value;
+  }
+
   // Get user role
   getUserRole(): 'Admin' | 'User' | null {
     return this.currentUserSubject.value?.role || null;

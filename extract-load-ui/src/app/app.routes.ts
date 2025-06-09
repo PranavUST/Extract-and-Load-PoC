@@ -9,6 +9,20 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/landing/landing').then(m => m.Landing),
     canActivate: [AuthGuard]
   },
-  // Add canActivate to other protected routes
+  { 
+    path: 'data-extraction',
+    loadComponent: () => import('./pages/data-extraction/data-extraction').then(m => m.DataExtraction),
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'scheduler',
+    loadComponent: () => import('./pages/scheduler/scheduler').then(m => m.Scheduler),
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'user-management',
+    loadComponent: () => import('./pages/user-management/user-management').then(m => m.UserManagement),
+    canActivate: [AuthGuard]
+  },
   { path: '**', redirectTo: 'login' }
 ];

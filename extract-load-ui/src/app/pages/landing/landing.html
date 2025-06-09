@@ -1,5 +1,8 @@
 <div class="landing-container">
-  <h1>Welcome to the Data Pipeline Management System</h1>
+  <h1>Welcome, {{ authService.getCurrentUser()?.username }}!</h1>
+  
+  <button (click)="logout()" class="logout-btn">Logout</button>
+  
   <div class="nav-buttons">
     <button mat-raised-button color="primary" routerLink="/data-extraction">Data Extraction</button>
     <button mat-raised-button color="accent" routerLink="/scheduler">Scheduler</button>
