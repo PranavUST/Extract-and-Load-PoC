@@ -1,0 +1,43 @@
+<div class="register-container">
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <h2>Register</h2>
+
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" formControlName="name" required>
+    </div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" formControlName="email" required>
+    </div>
+
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" formControlName="username" required>
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" formControlName="password" required>
+    </div>
+
+    <div class="form-group">
+      <label>Role</label>
+      <select formControlName="role">
+        <option value="User">User</option>
+        <option value="Admin">Admin</option>
+      </select>
+    </div>
+
+    <button type="submit" [disabled]="registerForm.invalid">Register</button>
+    
+    <div *ngIf="errorMessage" class="error">
+      {{ errorMessage }}
+    </div>
+
+    <div class="login-link">
+      Already have an account? <a routerLink="/login">Login here</a>
+    </div>
+  </form>
+</div>

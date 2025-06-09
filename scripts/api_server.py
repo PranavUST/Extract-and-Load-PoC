@@ -8,6 +8,14 @@ from run_pipeline import run_ingestion
 from src.logging_utils import setup_logging
 import threading
 import os
+from passlib.context import CryptContext
+import psycopg2
+from psycopg2 import sql
+from src.database import get_connection  # Import your connection function
+import logging     # Import logger instance
+from src.database import create_logins_table_if_not_exists
+
+create_logins_table_if_not_exists()
 
 # Configure logging with absolute path
 log_file_path = str(Path(__file__).parent.parent / "pipeline.log")
@@ -22,6 +30,94 @@ CORS(
     resources={r"/*": {"origins": "*"}},
     supports_credentials=True
 )
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def _build_cors_preflight_response():
+    response = jsonify({"status": "preflight"})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "*")
+    response.headers.add("Access-Control-Allow-Methods", "*")
+    return response
+
+@app.route('/api/login', methods=['POST', 'OPTIONS'])
+def login():
+    if request.method == 'OPTIONS':
+        return _build_cors_preflight_response()
+    
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, password, role FROM logins 
+            WHERE username = %s
+        """, (username,))
+        user = cur.fetchone()
+        
+        if user and pwd_context.verify(password, user[1]):
+            # Update last login
+            cur.execute("""
+                UPDATE logins 
+                SET last_login = NOW() 
+                WHERE id = %s
+            """, (user[0],))
+            conn.commit()
+            
+            return jsonify({
+                "success": True,
+                "role": user[2],
+                "username": username
+            })
+            
+        return jsonify({"success": False}), 401
+        
+    except Exception as e:
+        logging.error(f"Login error: {str(e)}")
+        return jsonify({"success": False}), 500
+    finally:
+        if 'cur' in locals(): cur.close()
+        if 'conn' in locals(): conn.close()
+
+@app.route('/api/register', methods=['POST', 'OPTIONS'])
+def register():
+    if request.method == 'OPTIONS':
+        return _build_cors_preflight_response()
+    
+    data = request.get_json()
+    hashed_pwd = pwd_context.hash(data['password'])
+    
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO logins 
+                (name, email, role, username, password)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (
+            data.get('name'),
+            data.get('email'),
+            data.get('role', 'User'),
+            data['username'],
+            hashed_pwd
+        ))
+        conn.commit()
+        return jsonify({"success": True})
+        
+    except psycopg2.errors.UniqueViolation:
+        return jsonify({
+            "success": False,
+            "error": "Username or email already exists"
+        }), 400
+    except Exception as e:
+        logging.error(f"Registration error: {str(e)}")
+        return jsonify({"success": False}), 500
+    finally:
+        if 'cur' in locals(): cur.close()
+        if 'conn' in locals(): conn.close()
 
 # Store status in memory for demo purposes
 pipeline_status = {"status": "idle", "message": ""}
@@ -51,13 +147,6 @@ def run_pipeline_thread(config_file):
             pipeline_status["message"] = str(e)
     finally:
         logging.info("-" * 80)  # Add separator after each execution
-
-def _build_cors_preflight_response():
-    response = jsonify({"status": "preflight"})
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    response.headers.add("Access-Control-Allow-Headers", "*")
-    response.headers.add("Access-Control-Allow-Methods", "*")
-    return response
 
 @app.route('/run-pipeline', methods=['POST', 'OPTIONS'])
 def run_pipeline_api():
