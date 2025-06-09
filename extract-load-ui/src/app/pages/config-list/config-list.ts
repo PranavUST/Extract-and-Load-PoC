@@ -4,9 +4,10 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { HttpClient } from '@angular/common/http';
-
+import { MatDialog } from '@angular/material/dialog';
 // Define interfaces for type safety
 interface SourceConfig {
   name: string;
@@ -34,7 +35,8 @@ interface TargetConfig {
     MatCardModule,
     MatTableModule,
     MatButtonModule,
-    MatListModule
+    MatListModule,
+    MatIconModule
   ]
 })
 export class ConfigListComponent implements OnInit {
@@ -68,5 +70,31 @@ export class ConfigListComponent implements OnInit {
         this.targetConfigs = [];
       }
     });
+  }
+  deleteSourceConfig(config: SourceConfig) {
+    if (confirm(`Delete source config "${config.name}"?`)) {
+      // Call your API to delete, then reload the list
+      this.http.delete(`http://localhost:5000/saved-source-configs/${config.name}`).subscribe({
+        next: () => this.loadSourceConfigs(),
+        error: (err) => alert('Delete failed: ' + err.message)
+      });
+    }
+  }
+  editSourceConfig(config: SourceConfig) {
+    // You can open a dialog with a form, or navigate to an edit page
+    alert('Edit not implemented yet for: ' + config.name);
+    // Or implement your edit logic here
+  }
+  deleteTargetConfig(config: TargetConfig) {
+    if (confirm(`Delete target config "${config.name}"?`)) {
+      this.http.delete(`http://localhost:5000/saved-target-configs/${config.name}`).subscribe({
+        next: () => this.loadTargetConfigs(),
+        error: (err) => alert('Delete failed: ' + err.message)
+      });
+    }
+  }
+  editTargetConfig(config: TargetConfig) {
+    alert('Edit not implemented yet for: ' + config.name);
+    // Implement edit logic here
   }
 }

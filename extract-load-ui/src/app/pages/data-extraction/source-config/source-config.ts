@@ -28,14 +28,14 @@ export class SourceConfig {
   private api = inject(ApiService);
 
   sourceTypes = ['API', 'FTP'];
-  sourceForm: FormGroup = this.fb.group({
+  public sourceForm: FormGroup = this.fb.group({
     name: ['', Validators.required],
     type: ['API', Validators.required],
     endpoint: [''],
     authToken: [''],
     ftpHost: [''],
-    ftpUsername: [''],
-    ftpPassword: [''],
+    ftpUsername: ['your_username'],
+    ftpPassword: ['your_password'],
     retries: [3] 
   });
   constructor() {

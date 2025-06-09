@@ -6,7 +6,7 @@ destination:
     auto_create_table: true
     enabled: true
     handle_conflicts: true
-    table: afc
+    table: ftp_data
     type: postgresql
 execution:
   time_window:
@@ -20,9 +20,9 @@ source:
     - .parquet
     host: localhost
     local_dir: ftp_downloads
-    password: ''
+    password: your_password
     remote_dir: /data
     retries: 5
-    username: ''
+    username: your_username
   type: FTP
 version: 1.0

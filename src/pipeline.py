@@ -89,7 +89,9 @@ class DataPipeline:
                     password=self.ftp_config['password'],
                     remote_dir=self.ftp_config['remote_dir'],
                     local_dir=self.ftp_config['local_dir'],
-                    file_types=self.ftp_config.get('file_types', ['.csv', '.json', '.parquet'])
+                    file_types=self.ftp_config.get('file_types', ['.csv', '.json', '.parquet']),
+                    retries=self.ftp_config.get('retries', 3),  # <-- add this line
+                    delay=self.ftp_config.get('retry_delay', 5)
                 )
                 if not downloaded_files:
                     logger.error("FTP download failed. Will attempt to load files from local directory anyway.")

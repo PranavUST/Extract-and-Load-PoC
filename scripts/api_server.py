@@ -107,7 +107,48 @@ def get_saved_source_configs():
     except Exception as e:
         logger.error(f"Error reading saved source configs: {str(e)}")
         return jsonify({"status": "error", "message": "Failed to read configurations"}), 500
+
+@app.route('/saved-source-configs/<name>', methods=['DELETE'])
+def delete_saved_source_config(name):
+    try:
+        path = os.path.join(BASE_DIR, '../config/saved_source_configs.json')
+        if not os.path.exists(path):
+            return jsonify({"status": "error", "message": "No configs found"}), 404
+        with open(path, 'r') as f:
+            configs = json.load(f)
+        # Remove by name (adjust key if needed)
+        configs = [c for c in configs if c.get('name') != name]
+        with open(path, 'w') as f:
+            json.dump(configs, f)
+        return jsonify({"status": "success"})
+    except Exception as e:
+        logger.error(f"Error deleting source config: {str(e)}")
+        return jsonify({"status": "error", "message": "Failed to delete configuration"}), 500
         
+@app.route('/saved-source-configs/<name>', methods=['PUT'])
+def edit_saved_source_config(name):
+    try:
+        data = request.get_json()
+        path = os.path.join(BASE_DIR, '../config/saved_source_configs.json')
+        if not os.path.exists(path):
+            return jsonify({"status": "error", "message": "No configs found"}), 404
+        with open(path, 'r') as f:
+            configs = json.load(f)
+        updated = False
+        for i, c in enumerate(configs):
+            if c.get('name') == name:
+                configs[i] = data
+                updated = True
+                break
+        if not updated:
+            return jsonify({"status": "error", "message": "Config not found"}), 404
+        with open(path, 'w') as f:
+            json.dump(configs, f)
+        return jsonify({"status": "success"})
+    except Exception as e:
+        logger.error(f"Error editing source config: {str(e)}")
+        return jsonify({"status": "error", "message": "Failed to edit configuration"}), 500
+    
 @app.route('/source-configs', methods=['POST'])
 def save_source_config():
     try:
@@ -212,6 +253,46 @@ def get_saved_target_configs():
     except Exception as e:
         logger.error(f"Error reading saved target configs: {str(e)}")
         return jsonify({"status": "error", "message": "Failed to read configurations"}), 500
+    
+@app.route('/saved-target-configs/<name>', methods=['PUT'])
+def edit_saved_target_config(name):
+    try:
+        data = request.get_json()
+        path = os.path.join(BASE_DIR, '../config/saved_target_configs.json')
+        if not os.path.exists(path):
+            return jsonify({"status": "error", "message": "No configs found"}), 404
+        with open(path, 'r') as f:
+            configs = json.load(f)
+        updated = False
+        for i, c in enumerate(configs):
+            if c.get('name') == name:
+                configs[i] = data
+                updated = True
+                break
+        if not updated:
+            return jsonify({"status": "error", "message": "Config not found"}), 404
+        with open(path, 'w') as f:
+            json.dump(configs, f)
+        return jsonify({"status": "success"})
+    except Exception as e:
+        logger.error(f"Error editing target config: {str(e)}")
+        return jsonify({"status": "error", "message": "Failed to edit configuration"}), 500
+
+@app.route('/saved-target-configs/<name>', methods=['DELETE'])
+def delete_saved_target_config(name):
+    try:
+        path = os.path.join(BASE_DIR, '../config/saved_target_configs.json')
+        if not os.path.exists(path):
+            return jsonify({"status": "error", "message": "No configs found"}), 404
+        with open(path, 'r') as f:
+            configs = json.load(f)
+        configs = [c for c in configs if c.get('name') != name]
+        with open(path, 'w') as f:
+            json.dump(configs, f)
+        return jsonify({"status": "success"})
+    except Exception as e:
+        logger.error(f"Error deleting target config: {str(e)}")
+        return jsonify({"status": "error", "message": "Failed to delete configuration"}), 500
 
 @app.route('/target-configs', methods=['POST'])
 def save_target_config():

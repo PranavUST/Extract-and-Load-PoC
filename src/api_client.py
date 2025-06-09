@@ -2,7 +2,7 @@ import requests
 import time
 import logging
 from typing import Dict, Any, List
-from src.retry_utils import retry
+from src.retry_utils import retry_call
 logger = logging.getLogger(__name__)
 
 class APIClient:
@@ -24,7 +24,7 @@ class APIClient:
 
         if not (page_param and page_size_param and page_size):
             logger.warning("Pagination parameters missing, fetching only first page.")
-            response = self._make_request(params)
+            response = self._make_request_with_retries(params)
             return self._extract_records(response)
 
         for page in range(1, max_pages + 1):
@@ -34,7 +34,7 @@ class APIClient:
                 page_size_param: page_size
             })
             logger.debug("Requesting page %d with params: %s", page, page_params)
-            response = self._make_request(page_params)
+            response = self._make_request_with_retries(page_params)
             records = self._extract_records(response)
             logger.info("Fetched %d records from page %d", len(records), page)
             if not records:
@@ -44,7 +44,7 @@ class APIClient:
 
         logger.info("Total records fetched: %d", len(all_records))
         return all_records
-    @retry(retries=3, delay=2, exceptions=(requests.exceptions.RequestException,))
+
     def _make_request(self, params: Dict) -> Dict:
         resp = self.session.request(
             method=self.config.get('method', 'GET'),
@@ -56,6 +56,16 @@ class APIClient:
         resp.raise_for_status()
         logger.debug("Request successful: %s %s", self.config.get('method', 'GET'), self.config.get('url', ''))
         return resp.json()
+
+    def _make_request_with_retries(self, params: Dict) -> Dict:
+        retries = self.config.get('retries', 3)
+        delay = self.config.get('retry_delay', 2)
+        return retry_call(
+            lambda: self._make_request(params),
+            retries=retries,
+            delay=delay,
+            exceptions=(requests.exceptions.RequestException,)
+        )
 
     def _extract_records(self, response: Dict) -> List[Dict]:
         """Extracts records from the API response using the configured data path."""
