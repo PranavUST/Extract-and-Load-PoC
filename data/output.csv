@@ -1,3 +1,3 @@
 author_id,body,category,created_at,id,is_published,tags,title,view_count
-115,How to monitor and alert on data pipeline failures.,reference,2024-06-09T10:00:00,15,False,"[""monitoring"", ""pipelines""]",Monitoring Data Pipeline Health,95
-116,Techniques for handling schema changes in production.,how-to,2024-06-09T16:30:00,16,True,"[""schema"", ""automation""]",Automating Schema Evolution,122
+117,Best practices for improving batch and streaming data load speeds.,reference,2024-06-10T09:15:00,17,True,"[""performance"", ""data loading""]",Optimizing Data Load Performance,88
+118,Approaches to protect data pipeline APIs from unauthorized access.,how-to,2024-06-10T11:40:00,18,False,"[""security"", ""api""]",Securing API Endpoints in Data Pipelines,57
