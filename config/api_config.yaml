@@ -6,7 +6,7 @@ destination:
     auto_create_table: true
     enabled: true
     handle_conflicts: true
-    table: ftp_data
+    table: bye
     type: postgresql
 execution:
   time_window:
@@ -29,6 +29,6 @@ source:
     params: {}
     retries: 3
     timeout: 30
-    url: cascwc
+    url: svs
   type: REST_API
 version: 1.0

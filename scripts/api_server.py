@@ -116,10 +116,22 @@ def delete_saved_source_config(name):
             return jsonify({"status": "error", "message": "No configs found"}), 404
         with open(path, 'r') as f:
             configs = json.load(f)
-        # Remove by name (adjust key if needed)
         configs = [c for c in configs if c.get('name') != name]
         with open(path, 'w') as f:
             json.dump(configs, f)
+
+        # --- NEW: Clear current source if deleted ---
+        current_path = os.path.join(BASE_DIR, '../config/current_config.json')
+        if os.path.exists(current_path):
+            with open(current_path, 'r') as f:
+                current = json.load(f)
+            print(f"Deleting: {name}, Current source: {current.get('source')}")
+            if current.get('source') == name:
+                current['source'] = None
+                with open(current_path, 'w') as f:
+                    json.dump(current, f)
+        # --- END NEW ---
+
         return jsonify({"status": "success"})
     except Exception as e:
         logger.error(f"Error deleting source config: {str(e)}")
@@ -144,6 +156,43 @@ def edit_saved_source_config(name):
             return jsonify({"status": "error", "message": "Config not found"}), 404
         with open(path, 'w') as f:
             json.dump(configs, f)
+
+        source_type = data.get('type', '').upper()
+        if source_type == 'API':
+            config_path = os.path.join(BASE_DIR, '../config/api_config.yaml')
+            if os.path.exists(config_path):
+                with open(config_path, 'r') as f:
+                    config = yaml.safe_load(f)
+                if 'source' not in config:
+                    config['source'] = {}
+                if 'api' not in config['source']:
+                    config['source']['api'] = {}
+                if 'auth' not in config['source']['api']:
+                    config['source']['api']['auth'] = {}
+                config['source']['api']['url'] = data.get('endpoint', '')
+                config['source']['api']['auth']['token'] = data.get('authToken', '')
+                retries = data.get('retries')
+                if retries is not None:
+                    config['source']['api']['retries'] = int(retries)
+                with open(config_path, 'w') as f:
+                    yaml.safe_dump(config, f)
+        elif source_type == 'FTP':
+            config_path = os.path.join(BASE_DIR, '../config/ftp_config.yaml')
+            if os.path.exists(config_path):
+                with open(config_path, 'r') as f:
+                    config = yaml.safe_load(f)
+                    if 'source' not in config:
+                        config['source'] = {}
+                    if 'ftp' not in config['source']:
+                        config['source']['ftp'] = {}
+                    config['source']['ftp']['host'] = data.get('ftpHost', '')
+                    config['source']['ftp']['username'] = data.get('ftpUsername', '')
+                    config['source']['ftp']['password'] = data.get('ftpPassword', '')
+                    retries = data.get('retries')
+                    if retries is not None:
+                        config['source']['ftp']['retries'] = int(retries)
+                    with open(config_path, 'w') as f:
+                        yaml.safe_dump(config, f)
         return jsonify({"status": "success"})
     except Exception as e:
         logger.error(f"Error editing source config: {str(e)}")
@@ -273,6 +322,21 @@ def edit_saved_target_config(name):
             return jsonify({"status": "error", "message": "Config not found"}), 404
         with open(path, 'w') as f:
             json.dump(configs, f)
+
+        # --- NEW: Update YAML files ---
+        table_name = data.get('tableName')
+        if data.get('type') == 'Database' and table_name:
+            for yaml_file in ['../config/api_config.yaml', '../config/ftp_config.yaml']:
+                config_path = os.path.join(BASE_DIR, yaml_file)
+                if os.path.exists(config_path):
+                    with open(config_path, 'r') as f:
+                        config = yaml.safe_load(f)
+                    if 'destination' in config and 'database' in config['destination']:
+                        config['destination']['database']['table'] = table_name
+                        with open(config_path, 'w') as f:
+                            yaml.safe_dump(config, f)
+        # --- END NEW ---
+
         return jsonify({"status": "success"})
     except Exception as e:
         logger.error(f"Error editing target config: {str(e)}")
@@ -289,6 +353,18 @@ def delete_saved_target_config(name):
         configs = [c for c in configs if c.get('name') != name]
         with open(path, 'w') as f:
             json.dump(configs, f)
+
+        # --- NEW: Clear current target if deleted ---
+        current_path = os.path.join(BASE_DIR, '../config/current_config.json')
+        if os.path.exists(current_path):
+            with open(current_path, 'r') as f:
+                current = json.load(f)
+            if current.get('target') == name:
+                current['target'] = None
+                with open(current_path, 'w') as f:
+                    json.dump(current, f)
+        # --- END NEW ---
+
         return jsonify({"status": "success"})
     except Exception as e:
         logger.error(f"Error deleting target config: {str(e)}")
@@ -338,6 +414,91 @@ def save_target_config():
     except Exception as e:
         logger.error(f"Error saving target config: {str(e)}")
         return jsonify({"status": "error", "message": "Failed to save target configuration"}), 500
+
+@app.route('/current-config', methods=['GET'])
+def get_current_config():
+    path = os.path.join(BASE_DIR, '../config/current_config.json')
+    if not os.path.exists(path):
+        return jsonify({"source": None, "target": None})
+    with open(path, 'r') as f:
+        return jsonify(json.load(f))
+
+@app.route('/current-config', methods=['POST'])
+def set_current_config():
+    data = request.get_json()
+    path = os.path.join(BASE_DIR, '../config/current_config.json')
+    with open(path, 'w') as f:
+        json.dump(data, f)
+
+    # --- Update YAML for current source ---
+    source_name = data.get('source')
+    if source_name:
+        source_configs_path = os.path.join(BASE_DIR, '../config/saved_source_configs.json')
+        if os.path.exists(source_configs_path):
+            with open(source_configs_path, 'r') as f:
+                source_configs = json.load(f)
+            current_source = next((c for c in source_configs if c.get('name') == source_name), None)
+            if current_source:
+                source_type = current_source.get('type', '').upper()
+                if source_type == 'API':
+                    config_path = os.path.join(BASE_DIR, '../config/api_config.yaml')
+                    if os.path.exists(config_path):
+                        with open(config_path, 'r') as f:
+                            config = yaml.safe_load(f)
+                        if 'source' not in config:
+                            config['source'] = {}
+                        if 'api' not in config['source']:
+                            config['source']['api'] = {}
+                        if 'auth' not in config['source']['api']:
+                            config['source']['api']['auth'] = {}
+                        config['source']['api']['url'] = current_source.get('endpoint', '')
+                        config['source']['api']['auth']['token'] = current_source.get('authToken', '')
+                        retries = current_source.get('retries')
+                        if retries is not None:
+                            config['source']['api']['retries'] = int(retries)
+                        with open(config_path, 'w') as f:
+                            yaml.safe_dump(config, f)
+                elif source_type == 'FTP':
+                    config_path = os.path.join(BASE_DIR, '../config/ftp_config.yaml')
+                    if os.path.exists(config_path):
+                        with open(config_path, 'r') as f:
+                            config = yaml.safe_load(f)
+                        if 'source' not in config:
+                            config['source'] = {}
+                        if 'ftp' not in config['source']:
+                            config['source']['ftp'] = {}
+                        config['source']['ftp']['host'] = current_source.get('ftpHost', '')
+                        config['source']['ftp']['username'] = current_source.get('ftpUsername', '')
+                        config['source']['ftp']['password'] = current_source.get('ftpPassword', '')
+                        retries = current_source.get('retries')
+                        if retries is not None:
+                            config['source']['ftp']['retries'] = int(retries)
+                        with open(config_path, 'w') as f:
+                            yaml.safe_dump(config, f)
+
+    # --- Update YAML for current target ---
+    target_name = data.get('target')
+    if target_name:
+        target_configs_path = os.path.join(BASE_DIR, '../config/saved_target_configs.json')
+        if os.path.exists(target_configs_path):
+            with open(target_configs_path, 'r') as f:
+                target_configs = json.load(f)
+            current_target = next((c for c in target_configs if c.get('name') == target_name), None)
+            if current_target:
+                table_name = current_target.get('tableName')
+                target_type = current_target.get('type')
+                if target_type == 'Database' and table_name:
+                    for yaml_file in ['../config/api_config.yaml', '../config/ftp_config.yaml']:
+                        config_path = os.path.join(BASE_DIR, yaml_file)
+                        if os.path.exists(config_path):
+                            with open(config_path, 'r') as f:
+                                config = yaml.safe_load(f)
+                            if 'destination' in config and 'database' in config['destination']:
+                                config['destination']['database']['table'] = table_name
+                                with open(config_path, 'w') as f:
+                                    yaml.safe_dump(config, f)
+
+    return jsonify({"status": "success"})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=False)

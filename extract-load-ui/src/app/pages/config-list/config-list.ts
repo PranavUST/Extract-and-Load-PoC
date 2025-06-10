@@ -7,21 +7,24 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { HttpClient } from '@angular/common/http';
+import { EditSourceConfigDialogComponent } from './edit-source-config-dialog';
+import { EditTargetConfigDialogComponent } from './edit-target-config-dialog';
 import { MatDialog } from '@angular/material/dialog';
 // Define interfaces for type safety
-interface SourceConfig {
+export interface SourceConfig {
   name: string;
   type: string;
   endpoint?: string;
   authToken?: string;
   ftpHost?: string;
   ftpUsername?: string;
+  ftpPassword?: string;
   retries?: number;
 }
 
 interface TargetConfig {
   name: string;
-  tableName: string;
+  tableName?: string;
   type?: string;
 }
 
@@ -36,18 +39,23 @@ interface TargetConfig {
     MatTableModule,
     MatButtonModule,
     MatListModule,
-    MatIconModule
+    MatIconModule,
+    EditSourceConfigDialogComponent,
+    EditTargetConfigDialogComponent
   ]
 })
 export class ConfigListComponent implements OnInit {
   sourceConfigs: SourceConfig[] = [];
   targetConfigs: TargetConfig[] = [];
+  currentSource: string | null = null;
+  currentTarget: string | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.loadSourceConfigs();
     this.loadTargetConfigs();
+    this.loadCurrentConfig();
   }
 
   private loadSourceConfigs(): void {
@@ -71,30 +79,74 @@ export class ConfigListComponent implements OnInit {
       }
     });
   }
+  loadCurrentConfig() {
+    this.http.get<{source: string, target: string}>('http://localhost:5000/current-config').subscribe({
+      next: (data) => {
+        this.currentSource = data.source;
+        this.currentTarget = data.target;
+      }
+    });
+  }
+  setCurrentSource(name: string) {
+    this.http.post('http://localhost:5000/current-config', { source: name, target: this.currentTarget }).subscribe(() => {
+      this.currentSource = name;
+    });
+  }
+
+  setCurrentTarget(name: string) {
+    this.http.post('http://localhost:5000/current-config', { source: this.currentSource, target: name }).subscribe(() => {
+      this.currentTarget = name;
+    });
+  }
   deleteSourceConfig(config: SourceConfig) {
     if (confirm(`Delete source config "${config.name}"?`)) {
-      // Call your API to delete, then reload the list
       this.http.delete(`http://localhost:5000/saved-source-configs/${config.name}`).subscribe({
-        next: () => this.loadSourceConfigs(),
+        next: () => {
+          this.loadSourceConfigs();
+          this.loadCurrentConfig(); // <-- Add this line
+        },
         error: (err) => alert('Delete failed: ' + err.message)
       });
     }
-  }
+  } 
   editSourceConfig(config: SourceConfig) {
-    // You can open a dialog with a form, or navigate to an edit page
-    alert('Edit not implemented yet for: ' + config.name);
-    // Or implement your edit logic here
+    const dialogRef = this.dialog.open(EditSourceConfigDialogComponent, {
+      width: '400px',
+      data: { ...config }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Send PUT/PATCH request to update config
+        this.http.put(`http://localhost:5000/saved-source-configs/${config.name}`, result).subscribe({
+          next: () => this.loadSourceConfigs(),
+          error: (err) => alert('Update failed: ' + err.message)
+        });
+      }
+    });
   }
   deleteTargetConfig(config: TargetConfig) {
     if (confirm(`Delete target config "${config.name}"?`)) {
       this.http.delete(`http://localhost:5000/saved-target-configs/${config.name}`).subscribe({
-        next: () => this.loadTargetConfigs(),
+        next: () => {
+          this.loadTargetConfigs();
+          this.loadCurrentConfig(); // <-- Add this line
+        },
         error: (err) => alert('Delete failed: ' + err.message)
       });
     }
   }
   editTargetConfig(config: TargetConfig) {
-    alert('Edit not implemented yet for: ' + config.name);
-    // Implement edit logic here
+    const dialogRef = this.dialog.open(EditTargetConfigDialogComponent, {
+      width: '400px',
+      data: { ...config }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.http.put(`http://localhost:5000/saved-target-configs/${config.name}`, result).subscribe({
+          next: () => this.loadTargetConfigs(),
+          error: (err) => alert('Update failed: ' + err.message)
+        });
+      }
+    });
   }
 }

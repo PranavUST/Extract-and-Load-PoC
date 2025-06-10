@@ -6,7 +6,7 @@ destination:
     auto_create_table: true
     enabled: true
     handle_conflicts: true
-    table: ftp_data
+    table: bye
     type: postgresql
 execution:
   time_window:
@@ -18,11 +18,11 @@ source:
     - .csv
     - .json
     - .parquet
-    host: localhost
+    host: kl
     local_dir: ftp_downloads
-    password: your_password
+    password: ''
     remote_dir: /data
-    retries: 5
-    username: your_username
+    retries: 3
+    username: ''
   type: FTP
 version: 1.0

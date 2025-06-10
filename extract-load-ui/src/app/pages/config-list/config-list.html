@@ -1,5 +1,13 @@
 <mat-card>
-  <mat-card-title>Saved Source Configs</mat-card-title>
+  <mat-card-title>
+    Saved Source Configs
+    <span *ngIf="currentSource" style="margin-left:2rem; color:green;">
+      Current Source: {{ currentSource }}
+    </span>
+    <ng-template #noSource>
+      <span style="margin-left:2rem; color:gray;">No current source selected.</span>
+    </ng-template>
+  </mat-card-title>
   <mat-table [dataSource]="sourceConfigs" *ngIf="sourceConfigs.length">
     <!-- Define columns for source configs -->
     <ng-container matColumnDef="name">
@@ -13,14 +21,19 @@
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
       <mat-cell *matCellDef="let config">
-        <button mat-icon-button color="primary" (click)="editSourceConfig(config)">
+        <button mat-icon-button color="primary" (click)="editSourceConfig(config)" title="Edit">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="deleteSourceConfig(config)">
+        <button mat-icon-button color="warn" (click)="deleteSourceConfig(config)" title="Delete">
           <mat-icon>delete</mat-icon>
         </button>
+        <button mat-stroked-button color="accent" *ngIf="currentSource !== config.name" (click)="setCurrentSource(config.name)">
+          Set as Current
+        </button>
+        <span *ngIf="currentSource === config.name" style="color:green; font-weight:bold;">Current</span>
       </mat-cell>
     </ng-container>
+    <!-- ... -->
     <mat-header-row *matHeaderRowDef="['name', 'type', 'actions']"></mat-header-row>
     <mat-row *matRowDef="let row; columns: ['name', 'type', 'actions'];"></mat-row>
   </mat-table>
@@ -28,7 +41,15 @@
 </mat-card>
 
 <mat-card style="margin-top: 24px;">
-  <mat-card-title>Saved Target Configs</mat-card-title>
+  <mat-card-title>
+    Saved Target Configs
+    <span *ngIf="currentTarget" style="margin-left:2rem; color:green;">
+      Current Target: {{ currentTarget }}
+    </span>
+    <ng-template #noTarget>
+      <span style="margin-left:2rem; color:gray;">No current target selected.</span>
+    </ng-template>
+  </mat-card-title>
   <mat-table [dataSource]="targetConfigs" *ngIf="targetConfigs.length">
     <!-- Define columns for target configs -->
     <ng-container matColumnDef="name">
@@ -42,12 +63,16 @@
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
       <mat-cell *matCellDef="let config">
-        <button mat-icon-button color="primary" (click)="editTargetConfig(config)">
+        <button mat-icon-button color="primary" (click)="editTargetConfig(config)" title="Edit">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="deleteTargetConfig(config)">
+        <button mat-icon-button color="warn" (click)="deleteTargetConfig(config)" title="Delete">
           <mat-icon>delete</mat-icon>
         </button>
+        <button mat-stroked-button color="accent" *ngIf="currentTarget !== config.name" (click)="setCurrentTarget(config.name)">
+          Set as Current
+        </button>
+        <span *ngIf="currentTarget === config.name" style="color:green; font-weight:bold;">Current</span>
       </mat-cell>
     </ng-container>
     <mat-header-row *matHeaderRowDef="['name', 'type', 'actions']"></mat-header-row>
