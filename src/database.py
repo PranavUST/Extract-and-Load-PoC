@@ -20,6 +20,39 @@ def get_connection():
         password=os.getenv("DB_PASSWORD"),
     )
 
+def create_logins_table_if_not_exists(conn_params: dict = None):
+    """
+    Create the 'logins' table if it does not exist.
+    Columns: Name, E-mail, Role, Username, Password, Last Login
+    """
+    create_table_sql = """
+    CREATE TABLE IF NOT EXISTS logins (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(50) NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        role VARCHAR(20) NOT NULL DEFAULT 'User',
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password VARCHAR(100) NOT NULL,
+        last_login TIMESTAMP
+    );
+    """
+    try:
+        if conn_params:
+            conn = psycopg2.connect(**conn_params)
+        else:
+            conn = get_connection()
+        cur = conn.cursor()
+        cur.execute(create_table_sql)
+        conn.commit()
+        cur.close()
+        conn.close()
+        logger.info("Ensured 'logins' table exists.")
+    except Exception as e:
+        logger.error(f"Failed to create 'logins' table: {e}")
+        if 'conn' in locals():
+            conn.close()
+        raise
+
 def load_csv_to_db(csv_path: str, table_name: str, conn_params: dict):
     """
     Load CSV data into the database using plain INSERTs (no UPSERT, no primary key logic).

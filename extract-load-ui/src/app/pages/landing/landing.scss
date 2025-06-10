@@ -1,7 +1,19 @@
+.landing-container {
+  text-align: center;
+  margin-top: 40px;
+}
+.logout-btn {
+  margin-bottom: 20px;
+  background: #e53935;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
 .nav-buttons {
+  margin-top: 20px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 2rem;
   justify-content: center;
+  gap: 16px;
 }

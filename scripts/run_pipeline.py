@@ -7,6 +7,7 @@ import threading
 from src.logging_utils import setup_logging
 from src.pipeline import DataPipeline
 from src.scheduler import start_simple_scheduler
+from src.database import create_logins_table_if_not_exists  # New import
 
 # Add project root to Python path
 project_root = Path(__file__).parent.parent
@@ -17,6 +18,10 @@ def run_ingestion(config_path: str):
     config_path = Path(config_path)
     if not config_path.is_absolute():
         config_path = (project_root / config_path).resolve()
+    
+    # Auto-create logins table before pipeline execution
+    create_logins_table_if_not_exists()  # Added line
+    
     pipeline = DataPipeline(config_path)
     pipeline.run()
 

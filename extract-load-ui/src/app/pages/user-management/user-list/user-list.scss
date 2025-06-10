@@ -1,0 +1,75 @@
+.mat-mdc-card {
+  margin: 20px 0;
+  max-width: 100%;
+}
+
+table {
+  width: 100%;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 40px;
+  
+  mat-spinner {
+    margin: 0 auto 16px;
+  }
+  
+  p {
+    color: #666;
+    margin: 0;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  
+  mat-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  
+  p {
+    margin: 0;
+  }
+}
+
+.current-user-badge {
+  color: #1976d2;
+  font-size: 0.9em;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.never-logged-in {
+  color: #999;
+  font-style: italic;
+}
+
+.mat-mdc-select {
+  min-width: 100px;
+}
+
+.mat-mdc-icon-button[disabled] {
+  opacity: 0.3;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .mat-mdc-card {
+    margin: 10px 0;
+  }
+  
+  table {
+    font-size: 0.9em;
+  }
+  
+  .mat-mdc-select {
+    min-width: 80px;
+  }
+}
