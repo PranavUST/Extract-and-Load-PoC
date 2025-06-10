@@ -1,19 +1,85 @@
+.landing-background {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f2f5; // very light gray background for subtle contrast
+}
+
 .landing-container {
-  text-align: center;
-  margin-top: 40px;
+  width: 100%;
+  max-width: 420px;
+  margin: auto;
 }
-.logout-btn {
-  margin-bottom: 20px;
-  background: #e53935;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
+
+mat-card {
+  padding: 36px 28px;
+  border-radius: 8px; // sharper corners than login page (12px → 8px)
+  background: rgba(255, 255, 255, 0.85); // subtle transparency
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.08); // layered shadows for depth
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  backdrop-filter: saturate(180%) blur(12px); // modern glass effect
 }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h1.mat-title {
+    margin: 0;
+    font-weight: 700;
+    font-size: 2rem; // slightly bigger than login page
+    color: #0d3b66; // dark blue accent for username and heading
+
+    .username {
+      color: #0d3b66;
+      text-transform: capitalize;
+    }
+  }
+
+  .logout-btn {
+    min-width: 120px;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 8px; // sharper corners
+    padding: 12px 28px;
+    background-color: #0d3b66; // dark blue button
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(13, 59, 102, 0.4);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      background-color: #0a2a4a;
+      box-shadow: 0 6px 16px rgba(10, 42, 74, 0.6);
+    }
+  }
+}
+
 .nav-buttons {
-  margin-top: 20px;
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: 24px;
+
+  .nav-btn {
+    flex: 1;
+    min-width: 150px;
+    font-weight: 600;
+    font-size: 1.125rem;
+    border-radius: 8px; // sharper corners
+    padding: 14px 28px;
+    background-color: #e7eef7; // very light blue-gray background
+    color: #0d3b66;
+    box-shadow: 0 6px 14px rgba(13, 59, 102, 0.15);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      background-color: #c9d9f1;
+      box-shadow: 0 10px 24px rgba(13, 59, 102, 0.3);
+    }
+  }
 }

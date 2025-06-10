@@ -1,15 +1,24 @@
-<div class="landing-container">
-  <h1>Welcome, {{ authService.getCurrentUser()?.username }}!</h1>
-  
-  <button (click)="logout()" class="logout-btn">Logout</button>
-  
-  <div class="nav-buttons">
-    <button mat-raised-button color="primary" routerLink="/data-extraction">Data Extraction</button>
-    <button *ngIf="authService.getUserRole() === 'Admin'" 
-        mat-raised-button 
-        routerLink="/user-management">
-        User Management
-    </button>
+<div class="landing-background">
+  <div class="landing-container">
+    <mat-card>
+      <header class="header">
+        <h1 class="mat-title">
+          Welcome, <span class="username">{{ currentUser?.username }}</span>!
+        </h1>
+        <button (click)="logout()" mat-raised-button class="logout-btn">
+          Logout
+        </button>
+      </header>
 
+      <nav class="nav-buttons">
+        <button mat-raised-button class="nav-btn" routerLink="/data-extraction">
+          Data Extraction
+        </button>
+
+        <button *ngIf="userRole === 'Admin'" mat-raised-button class="nav-btn" routerLink="/user-management">
+          User Management
+        </button>
+      </nav>
+    </mat-card>
   </div>
 </div>
