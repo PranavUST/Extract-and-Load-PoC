@@ -51,6 +51,12 @@ CORS(
             "allow_headers": ["Content-Type"],
             "supports_credentials": True
         },
+        r"/run-pipeline": {
+            "origins": ["http://localhost:4200"],
+            "methods": ["POST", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+            "supports_credentials": True
+        },
         r"/current-config": {
             "origins": ["http://localhost:4200"],
             "methods": ["GET", "POST", "OPTIONS"],

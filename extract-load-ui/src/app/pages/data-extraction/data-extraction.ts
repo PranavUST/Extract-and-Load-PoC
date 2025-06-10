@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { SourceConfig } from './source-config/source-config';
 import { TargetConfig } from './target-config/target-config';
 import { ConfigListComponent } from '../config-list/config-list';
-
+import { HttpClient } from '@angular/common/http';
 @Component({
   standalone: true,
   selector: 'app-data-extraction',
@@ -33,19 +33,34 @@ export class DataExtraction {
   schedulerForm: FormGroup;
   status = '';
 
-  constructor(private fb: FormBuilder, private api: ApiService) {
+  constructor(private fb: FormBuilder, private api: ApiService, private http: HttpClient) {
     this.schedulerForm = this.fb.group({
       interval: [null, [Validators.required, Validators.min(1)]],
       duration: [null, [Validators.required, Validators.min(0.1)]]
     });
   }
   runPipeline() {
-    const sourceType = this.getSelectedSourceType();
-    const config_file = sourceType === 'API' ? 'config/api_config.yaml' : 'config/ftp_config.yaml';
-    const { interval, duration } = this.schedulerForm.value;
-    this.api.runPipeline({ config_file, interval, duration }).subscribe({
-      next: () => this.status = 'Pipeline scheduled successfully',
-      error: (err) => this.status = `Error: ${err.message}`
+    // Always get the current config from backend
+    this.http.get<{source: string, target: string}>('http://localhost:5000/current-config').subscribe({
+      next: (current) => {
+        // Now get the actual source config object
+        this.http.get<any[]>('http://localhost:5000/saved-source-configs').subscribe({
+          next: (sources) => {
+            const sourceObj = sources.find(s => s.name === current.source);
+            let config_file = 'config/api_config.yaml'; // default
+            if (sourceObj && sourceObj.type && sourceObj.type.toUpperCase() === 'FTP') {
+              config_file = 'config/ftp_config.yaml';
+            }
+            const { interval, duration } = this.schedulerForm.value;
+            this.api.runPipeline({ config_file, interval, duration }).subscribe({
+              next: () => this.status = 'Pipeline scheduled successfully',
+              error: (err) => this.status = `Error: ${err.message}`
+            });
+          },
+          error: () => this.status = 'Error: Could not fetch source configs'
+        });
+      },
+      error: () => this.status = 'Error: Could not fetch current config'
     });
   }
   getSelectedSourceType(): string {
