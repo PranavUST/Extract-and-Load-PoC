@@ -35,17 +35,43 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Or 'None' if using HTTPS
 app.config['SESSION_COOKIE_SECURE'] = False    # True in production
 
 # Proper CORS configuration for credentials
+# Updated CORS Configuration
 CORS(
     app,
     resources={
         r"/api/*": {
-            "origins": ["http://localhost:4200"],  # Explicit origin, not wildcard
+            "origins": ["http://localhost:4200"],
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
+        },
+        r"/saved-*": {  # Covers /saved-source-configs and /saved-target-configs
+            "origins": ["http://localhost:4200"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+            "supports_credentials": True
+        },
+        r"/current-config": {
+            "origins": ["http://localhost:4200"],
+            "methods": ["GET", "POST", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+            "supports_credentials": True
+        },
+        r"/source-configs": {
+            "origins": ["http://localhost:4200"],
+            "methods": ["POST", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+            "supports_credentials": True
+        },
+        r"/target-configs": {
+            "origins": ["http://localhost:4200"],
+            "methods": ["POST", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
             "supports_credentials": True
         }
     }
 )
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -331,22 +357,23 @@ def delete_saved_source_config(name):
             return jsonify({"status": "error", "message": "No configs found"}), 404
         with open(path, 'r') as f:
             configs = json.load(f)
-        configs = [c for c in configs if c.get('name') != name]
+        # Compare trimmed names
+        configs = [c for c in configs if c.get('name', '').strip() != name.strip()]
         with open(path, 'w') as f:
             json.dump(configs, f)
-
+ 
         # --- NEW: Clear current source if deleted ---
         current_path = os.path.join(BASE_DIR, '../config/current_config.json')
         if os.path.exists(current_path):
             with open(current_path, 'r') as f:
                 current = json.load(f)
             print(f"Deleting: {name}, Current source: {current.get('source')}")
-            if current.get('source') == name:
+            if current.get('source', '').strip() == name.strip():
                 current['source'] = None
                 with open(current_path, 'w') as f:
                     json.dump(current, f)
         # --- END NEW ---
-
+ 
         return jsonify({"status": "success"})
     except Exception as e:
         logger.error(f"Error deleting source config: {str(e)}")
@@ -565,21 +592,21 @@ def delete_saved_target_config(name):
             return jsonify({"status": "error", "message": "No configs found"}), 404
         with open(path, 'r') as f:
             configs = json.load(f)
-        configs = [c for c in configs if c.get('name') != name]
+        configs = [c for c in configs if c.get('name', '').strip() != name.strip()]
         with open(path, 'w') as f:
             json.dump(configs, f)
-
+ 
         # --- NEW: Clear current target if deleted ---
         current_path = os.path.join(BASE_DIR, '../config/current_config.json')
         if os.path.exists(current_path):
             with open(current_path, 'r') as f:
                 current = json.load(f)
-            if current.get('target') == name:
+            if current.get('target', '').strip() == name.strip():
                 current['target'] = None
                 with open(current_path, 'w') as f:
                     json.dump(current, f)
         # --- END NEW ---
-
+ 
         return jsonify({"status": "success"})
     except Exception as e:
         logger.error(f"Error deleting target config: {str(e)}")

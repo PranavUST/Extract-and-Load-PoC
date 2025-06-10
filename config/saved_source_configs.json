@@ -1,1 +1,1 @@
-[{"name": "vsdv ", "type": "API", "endpoint": "acsas", "authToken": "", "ftpHost": "", "ftpUsername": "your_username", "ftpPassword": "your_password", "retries": 3}]
+[{"name": "test", "type": "FTP", "endpoint": "", "authToken": "", "ftpHost": "localhost", "ftpUsername": "your_username", "ftpPassword": "your_password", "retries": 3}]

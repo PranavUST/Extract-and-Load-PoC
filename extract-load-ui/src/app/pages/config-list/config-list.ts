@@ -88,14 +88,14 @@ export class ConfigListComponent implements OnInit {
     });
   }
   setCurrentSource(name: string) {
-    this.http.post('http://localhost:5000/current-config', { source: name, target: this.currentTarget }).subscribe(() => {
-      this.currentSource = name;
+    this.http.post('http://localhost:5000/current-config', { source: name.trim(), target: this.currentTarget }).subscribe(() => {
+      this.currentSource = name.trim();
     });
   }
 
   setCurrentTarget(name: string) {
-    this.http.post('http://localhost:5000/current-config', { source: this.currentSource, target: name }).subscribe(() => {
-      this.currentTarget = name;
+    this.http.post('http://localhost:5000/current-config', { source: this.currentSource, target: name.trim() }).subscribe(() => {
+      this.currentTarget = name.trim();
     });
   }
   deleteSourceConfig(config: SourceConfig) {
@@ -149,4 +149,20 @@ export class ConfigListComponent implements OnInit {
       }
     });
   }
+
+    // Add to config-list.ts
+  debugConfigs() {
+    console.log('=== CONFIGURATION DEBUG ===');
+    console.log('Current Source:', this.currentSource);
+    console.log('Current Target:', this.currentTarget);
+    console.log('Available Sources:', this.sourceConfigs);
+    console.log('Available Targets:', this.targetConfigs);
+    
+    // Check backend config files
+    this.http.get('http://localhost:5000/debug-configs').subscribe({
+      next: (data) => console.log('Backend configs:', data),
+      error: (err) => console.error('Debug failed:', err)
+    });
+  }
+
 }

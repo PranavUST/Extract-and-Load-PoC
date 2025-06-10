@@ -5,7 +5,6 @@
   
   <div class="nav-buttons">
     <button mat-raised-button color="primary" routerLink="/data-extraction">Data Extraction</button>
-    <button mat-raised-button color="accent" routerLink="/scheduler">Scheduler</button>
     <button *ngIf="authService.getUserRole() === 'Admin'" 
         mat-raised-button 
         routerLink="/user-management">

@@ -6,7 +6,7 @@ destination:
     auto_create_table: true
     enabled: true
     handle_conflicts: true
-    table: bye
+    table: ftp_data
     type: postgresql
 execution:
   time_window:
@@ -27,8 +27,8 @@ source:
       page_size: 100
       page_size_param: limit
     params: {}
-    retries: 3
+    retries: 4
     timeout: 30
-    url: svs
+    url: http://127.0.0.1:5001
   type: REST_API
 version: 1.0
