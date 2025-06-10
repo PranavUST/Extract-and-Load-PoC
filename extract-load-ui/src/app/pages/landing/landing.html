@@ -1,15 +1,10 @@
 <div class="landing-background">
   <div class="landing-container">
-    <mat-card>
-      <header class="header">
-        <h1 class="mat-title">
-          Welcome, <span class="username">{{ currentUser?.username }}</span>!
-        </h1>
-        <button (click)="logout()" mat-raised-button class="logout-btn">
-          Logout
-        </button>
-      </header>
+    <h1 class="welcome-title">
+      Welcome, <span class="username">{{ currentUser?.username }}</span>!
+    </h1>
 
+    <mat-card>
       <nav class="nav-buttons">
         <button mat-raised-button class="nav-btn" routerLink="/data-extraction">
           Data Extraction
@@ -21,4 +16,8 @@
       </nav>
     </mat-card>
   </div>
+
+  <button (click)="logout()" mat-raised-button class="logout-fixed">
+    Logout
+  </button>
 </div>

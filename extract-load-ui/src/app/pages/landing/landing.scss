@@ -1,85 +1,90 @@
 .landing-background {
   min-height: 100vh;
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background: #f0f2f5; // very light gray background for subtle contrast
+  justify-content: flex-start;
+  background: #f0f2f5;
+  padding: 48px 16px 80px;
+  font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 .landing-container {
   width: 100%;
   max-width: 420px;
-  margin: auto;
+  margin: 0 auto;
+}
+
+.welcome-title {
+  font-size: 2.75rem;
+  font-weight: 700;
+  color: #1976d2; /* login page primary blue */
+  margin-bottom: 24px;
+  text-align: center;
+  text-transform: capitalize;
 }
 
 mat-card {
   padding: 36px 28px;
-  border-radius: 8px; // sharper corners than login page (12px → 8px)
-  background: rgba(255, 255, 255, 0.85); // subtle transparency
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.85);
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.12),
-    0 4px 12px rgba(0, 0, 0, 0.08); // layered shadows for depth
+    0 4px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   gap: 32px;
-  backdrop-filter: saturate(180%) blur(12px); // modern glass effect
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  h1.mat-title {
-    margin: 0;
-    font-weight: 700;
-    font-size: 2rem; // slightly bigger than login page
-    color: #0d3b66; // dark blue accent for username and heading
-
-    .username {
-      color: #0d3b66;
-      text-transform: capitalize;
-    }
-  }
-
-  .logout-btn {
-    min-width: 120px;
-    font-weight: 600;
-    font-size: 1rem;
-    border-radius: 8px; // sharper corners
-    padding: 12px 28px;
-    background-color: #0d3b66; // dark blue button
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(13, 59, 102, 0.4);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-
-    &:hover {
-      background-color: #0a2a4a;
-      box-shadow: 0 6px 16px rgba(10, 42, 74, 0.6);
-    }
-  }
+  font-family: inherit;
 }
 
 .nav-buttons {
   display: flex;
   justify-content: center;
-  gap: 24px;
+  gap: 20px;
+}
 
-  .nav-btn {
-    flex: 1;
-    min-width: 150px;
-    font-weight: 600;
-    font-size: 1.125rem;
-    border-radius: 8px; // sharper corners
-    padding: 14px 28px;
-    background-color: #e7eef7; // very light blue-gray background
-    color: #0d3b66;
-    box-shadow: 0 6px 14px rgba(13, 59, 102, 0.15);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+.nav-btn {
+  flex: 1;
+  min-width: 150px;
+  height: 56px;
+  font-weight: 400;
+  font-size: 1.125rem;
+  border-radius: 0;
+  padding: 0 28px;
+  margin: 0 8px;
+  box-shadow: 0 6px 14px rgba(25, 118, 210, 0.15); /* use blue shadow */
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  color: #1976d2;
+  background-color: #e3f2fd; /* very light blue background */
 
-    &:hover {
-      background-color: #c9d9f1;
-      box-shadow: 0 10px 24px rgba(13, 59, 102, 0.3);
-    }
+  &:hover {
+    background-color: #bbdefb; /* lighter blue on hover */
+    color: #0d47a1; /* darker blue text on hover */
+    box-shadow: 0 10px 24px rgba(25, 118, 210, 0.3);
+  }
+}
+
+.logout-fixed {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  min-width: 120px;
+  height: 48px;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 0;
+  padding: 12px 28px;
+  background-color: #1976d2;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  z-index: 1000;
+
+  &:hover {
+    background-color: #1565c0;
+    box-shadow: 0 6px 16px rgba(21, 101, 192, 0.6);
   }
 }
