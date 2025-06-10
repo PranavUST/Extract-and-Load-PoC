@@ -6,6 +6,7 @@ import { UserList } from './user-list/user-list';
   standalone: true,
   selector: 'app-user-management',
   templateUrl: './user-management.html',
+  styleUrls: ['./user-management.scss'],
   imports: [CommonModule, UserList]
 })
 export class UserManagement {}

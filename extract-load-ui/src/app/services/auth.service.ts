@@ -12,23 +12,25 @@ export interface User {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:5000/api'; // Update if your Flask API uses different URL
+  private apiUrl = 'http://localhost:5000/api';
   private currentUserSubject = new BehaviorSubject<User | null>(this.getStoredUser());
-  
+
   constructor(private http: HttpClient, private router: Router) {}
 
   // Login with backend API
   login(username: string, password: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, { username, password }).pipe(
+    return this.http.post(`${this.apiUrl}/login`, { username, password }, { 
+      withCredentials: true 
+    }).pipe(
       tap((response: any) => {
         if (response.success) {
           const user = {
+            name: response.name || '',
+            email: response.email || '',
             username: response.username,
-            role: response.role,
-            name: '', // These will be populated after full profile fetch
-            email: ''
+            role: response.role
           };
-          sessionStorage.setItem('authData', JSON.stringify(user));
+          sessionStorage.setItem('currentUser', JSON.stringify(user));
           this.currentUserSubject.next(user);
         }
       })
@@ -48,9 +50,12 @@ export class AuthService {
 
   // Logout and clear session
   logout(): void {
-    sessionStorage.removeItem('authData');
-    this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
+    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe(() => {
+      sessionStorage.removeItem('currentUser');
+      this.currentUserSubject.next(null);
+      this.router.navigate(['/login']);
+      this.clearCookies();
+    });
   }
 
   // Get current user observable
@@ -63,8 +68,9 @@ export class AuthService {
     return !!this.currentUserSubject.value;
   }
 
-  getCurrentUser() {
-  return this.currentUserSubject.value;
+  // Get current user info
+  getCurrentUser(): User | null {
+    return this.currentUserSubject.value;
   }
 
   // Get user role
@@ -72,9 +78,12 @@ export class AuthService {
     return this.currentUserSubject.value?.role || null;
   }
 
-  // Get stored user from session storage
+  private clearCookies() {
+    document.cookie = 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+  }
+
   private getStoredUser(): User | null {
-    const authData = sessionStorage.getItem('authData');
-    return authData ? JSON.parse(authData) : null;
+    const userData = sessionStorage.getItem('currentUser');
+    return userData ? JSON.parse(userData) : null;
   }
 }

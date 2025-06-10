@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.Login) },
@@ -22,7 +23,7 @@ export const routes: Routes = [
   { 
     path: 'user-management',
     loadComponent: () => import('./pages/user-management/user-management').then(m => m.UserManagement),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, AdminGuard]
   },
   { path: '**', redirectTo: 'login' }
 ];

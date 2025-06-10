@@ -27,6 +27,7 @@ import { CommonModule } from '@angular/common';
 export class Login {
   loginForm: FormGroup;
   errorMessage = '';
+  loginError = false;
 
   constructor(
     private fb: FormBuilder,
@@ -40,20 +41,25 @@ export class Login {
   }
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
-      const { username, password } = this.loginForm.value;
-      this.authService.login(username, password).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.router.navigate(['/landing']);
-          } else {
-            this.errorMessage = response.error || 'Invalid username or password';
-          }
-        },
-        error: (err) => {
-          this.errorMessage = err.error?.error || 'Login failed. Please try again later.';
+  if (this.loginForm.valid) {
+    const { username, password } = this.loginForm.value;
+    
+    this.authService.login(username, password).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.router.navigate(['/landing']);
+        } else {
+          this.loginError = true;
+          this.errorMessage = 'Invalid credentials';
         }
-      });
-    }
+      },
+      error: (err) => {
+        this.loginError = true;
+        this.errorMessage = err.error?.error || 'Login failed. Please try again.';
+      }
+    });
   }
+}
+
+
 }
