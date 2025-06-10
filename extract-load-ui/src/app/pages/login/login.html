@@ -1,25 +1,32 @@
-<div class="login-container">
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <h2>Login</h2>
-    
-    <div class="form-group">
-      <label>Username</label>
-      <input type="text" formControlName="username" required>
-    </div>
-
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" formControlName="password" required>
-    </div>
-
-    <button type="submit" [disabled]="loginForm.invalid">Login</button>
-    
-    <div *ngIf="errorMessage" class="error">
-      {{ errorMessage }}
-    </div>
-
-    <div class="register-link">
-      Don't have an account? <a routerLink="/register">Register here</a>
-    </div>
-  </form>
+<div class="login-background">
+  <div class="login-container">
+    <mat-card>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <h2 class="mat-title text-center mb-4">Sign In</h2>
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username" autocomplete="username" required>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" autocomplete="current-password" required>
+        </mat-form-field>
+        <button mat-raised-button color="primary" class="full-width" type="submit" [disabled]="loginForm.invalid">
+          Sign In
+        </button>
+        
+        <div *ngIf="errorMessage" class="error-message mt-2">
+          {{ errorMessage }}
+        </div>
+        <div class="register-link text-center mt-2">
+          Don't have an account? <a routerLink="/register">Register</a>
+        </div>
+      </form>
+      <div class="text-center mt-2">
+          <a routerLink="/forgot-password" class="forgot-link">Forgot password?</a>
+        </div>
+    </mat-card>
+  </div>
 </div>
+
+

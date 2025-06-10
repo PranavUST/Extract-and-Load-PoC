@@ -1,21 +1,31 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
-  imports: [CommonModule, ReactiveFormsModule, RouterLink]
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    RouterLink
+  ]
 })
 export class Login {
   loginForm: FormGroup;
-  loginError = false;
   errorMessage = '';
 
   constructor(
@@ -37,12 +47,10 @@ export class Login {
           if (response.success) {
             this.router.navigate(['/landing']);
           } else {
-            this.loginError = true;
-            this.errorMessage = 'Invalid username or password';
+            this.errorMessage = response.error || 'Invalid username or password';
           }
         },
         error: (err) => {
-          this.loginError = true;
           this.errorMessage = err.error?.error || 'Login failed. Please try again later.';
         }
       });

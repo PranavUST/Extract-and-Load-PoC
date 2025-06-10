@@ -21,14 +21,15 @@ export class Register {
     private authService: AuthService,
     private router: Router
   ) {
-    this.registerForm = this.fb.group({
-      name: ['', Validators.required],
+      this.registerForm = this.fb.group({
+      name: ['', [Validators.required, Validators.pattern(/^[A-Za-z ]{2,}$/)]],
       email: ['', [Validators.required, Validators.email]],
-      username: ['', Validators.required],
+      username: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^[A-Za-z0-9_]+$/)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       role: ['User', Validators.required]
-    });
-  }
+      });
+
+    }
 
   onSubmit(): void {
     if (this.registerForm.valid) {
