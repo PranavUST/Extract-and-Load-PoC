@@ -1,1 +1,1 @@
-[{"name": "asd", "type": "FTP", "endpoint": "", "authToken": "", "ftpHost": "asd", "ftpUsername": "your_username", "ftpPassword": "your_password", "retries": 3}]
+[{"name": "asd", "type": "FTP", "endpoint": "", "authToken": "", "ftpHost": "asd", "ftpUsername": "your_username", "ftpPassword": "your_password", "retries": 3}, {"name": "API", "type": "API", "endpoint": "http://127.0.0.1:5001/v1/data", "authToken": "", "ftpHost": "", "ftpUsername": "your_username", "ftpPassword": "your_password", "retries": 4}]
