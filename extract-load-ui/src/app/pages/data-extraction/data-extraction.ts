@@ -7,10 +7,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { SourceConfig } from './source-config/source-config';
 import { TargetConfig } from './target-config/target-config';
 import { ConfigListComponent } from '../config-list/config-list';
 import { HttpClient } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 @Component({
   standalone: true,
   selector: 'app-data-extraction',
@@ -23,6 +25,8 @@ import { HttpClient } from '@angular/common/http';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatIconModule,
+    RouterModule,
     SourceConfig,
     TargetConfig,
     ConfigListComponent

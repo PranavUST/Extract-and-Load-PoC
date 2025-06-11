@@ -1,4 +1,11 @@
 <div class="landing-background">
+  <!-- Profile button top right -->
+  <div style="position: absolute; top: 24px; right: 24px;">
+    <button mat-icon-button color="primary" routerLink="/profile" aria-label="Profile">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+  </div>
+
   <div class="landing-container">
     <h1 class="welcome-title">
       Welcome, <span class="username">{{ currentUser?.username }}</span>!

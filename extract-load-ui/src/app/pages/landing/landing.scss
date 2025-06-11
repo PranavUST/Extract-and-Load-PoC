@@ -8,6 +8,7 @@
   background: #f0f2f5;
   padding: 48px 16px 80px;
   font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  overflow: hidden; // Prevent vertical scrolling
 }
 
 .landing-container {
@@ -86,5 +87,12 @@ mat-card {
   &:hover {
     background-color: #1565c0;
     box-shadow: 0 6px 16px rgba(21, 101, 192, 0.6);
+  }
+}
+
+// Prevent scrollbars on the body when this page is active
+:host {
+  ::ng-deep body {
+    overflow: hidden !important;
   }
 }

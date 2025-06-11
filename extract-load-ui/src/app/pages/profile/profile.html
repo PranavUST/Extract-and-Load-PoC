@@ -1,0 +1,17 @@
+<button mat-icon-button color="primary" [routerLink]="['/landing']" aria-label="Home" class="home-btn-fixed">
+  <mat-icon>home</mat-icon>
+</button>
+<div class="profile-container">
+  <h2>User Profile</h2>
+  <div *ngIf="loading">Loading user details...</div>
+  <div *ngIf="error && !loading" class="error-message">{{ error }}</div>
+  <div *ngIf="user && !loading">
+    <p><strong>Name:</strong> {{ user.name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Role:</strong> {{ user.role }}</p>
+    <p><strong>Last Login:</strong> {{ user.last_login ? (user.last_login | date:'medium') : 'Never' }}</p>
+    <p *ngIf="user.id"><strong>ID:</strong> {{ user.id }}</p>
+    <!-- Add more fields as needed -->
+  </div>
+</div>
