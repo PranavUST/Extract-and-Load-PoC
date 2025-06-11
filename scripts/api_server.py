@@ -286,6 +286,28 @@ def delete_user(user_id):
         if 'cur' in locals(): cur.close()
         if 'conn' in locals(): conn.close()
 
+@app.route('/api/users/<int:user_id>', methods=['PUT', 'OPTIONS'])
+def update_user(user_id):
+    if request.method == 'OPTIONS':
+        return _build_cors_preflight_response()
+    data = request.get_json()
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE logins
+            SET name = %s, email = %s, username = %s
+            WHERE id = %s
+        """, (data.get('name'), data.get('email'), data.get('username'), user_id))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Update user error: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        if 'cur' in locals(): cur.close()
+        if 'conn' in locals(): conn.close()
+
 def run_pipeline_thread(config_file):
     global execution_cycle
     execution_cycle += 1
@@ -747,6 +769,39 @@ def set_current_config():
                                     yaml.safe_dump(config, f)
 
     return jsonify({"status": "success"})
+
+@app.route('/api/profile', methods=['GET'])
+def get_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, name, email, username, role, last_login
+            FROM logins WHERE id = %s
+        """, (user_id,))
+        user = cur.fetchone()
+        if not user:
+            return jsonify({'success': False, 'error': 'User not found'}), 404
+        return jsonify({
+            'success': True,
+            'user': {
+                'id': user[0],
+                'name': user[1],
+                'email': user[2],
+                'username': user[3],
+                'role': user[4],
+                'last_login': user[5].isoformat() if user[5] else None
+            }
+        })
+    except Exception as e:
+        logger.error(f"Get profile error: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        if 'cur' in locals(): cur.close()
+        if 'conn' in locals(): conn.close()
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=False)

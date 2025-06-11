@@ -6,7 +6,7 @@ destination:
     auto_create_table: true
     enabled: true
     handle_conflicts: true
-    table: api_data
+    table: asd
     type: postgresql
 execution:
   time_window:
@@ -18,7 +18,7 @@ source:
     - .csv
     - .json
     - .parquet
-    host: localhost
+    host: asd
     local_dir: ftp_downloads
     password: your_password
     remote_dir: /data

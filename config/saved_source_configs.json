@@ -1,1 +1,1 @@
-[]
+[{"name": "asd", "type": "FTP", "endpoint": "", "authToken": "", "ftpHost": "asd", "ftpUsername": "your_username", "ftpPassword": "your_password", "retries": 3}]

@@ -20,4 +20,12 @@ export class ApiService {
   getUsers(): Observable<any> {
     return this.http.get(`${this.apiUrl}/users`);
   }
+
+  updateUser(userId: number, data: { name: string; email: string; username: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/${userId}`, data);
+  }
+
+  getProfile(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/profile`);
+  }
 }
