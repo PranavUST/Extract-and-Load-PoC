@@ -21,6 +21,12 @@ export class ProfileComponent implements OnInit {
   saveError = '';
   editing = false;
   profileForm: FormGroup;
+  passwordForm: FormGroup;
+  passwordChangeSuccess = false;
+  passwordChangeError = '';
+  showPasswordForm = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
 
   constructor(private authService: AuthService, private api: ApiService, private fb: FormBuilder) {
     this.profileForm = this.fb.group({
@@ -28,6 +34,10 @@ export class ProfileComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       username: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^[A-Za-z0-9_]+$/)]]
     });
+    this.passwordForm = this.fb.group({
+      newPassword: ['', [Validators.required, Validators.minLength(6), Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}$/)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: this.passwordsMatchValidator });
   }
 
   ngOnInit() {
@@ -99,5 +109,47 @@ export class ProfileComponent implements OnInit {
         this.saveError = err.error?.error || 'Save failed.';
       }
     });
+  }
+
+  passwordsMatchValidator(form: FormGroup) {
+    return form.get('newPassword')?.value === form.get('confirmPassword')?.value ? null : { mismatch: true };
+  }
+
+  changePassword() {
+    this.passwordChangeSuccess = false;
+    this.passwordChangeError = '';
+    if (this.passwordForm.invalid) {
+      this.passwordForm.markAllAsTouched();
+      return;
+    }
+    const { newPassword, confirmPassword } = this.passwordForm.value;
+    if (newPassword !== confirmPassword) {
+      this.passwordChangeError = 'Passwords do not match.';
+      return;
+    }
+    this.api.changePassword(this.user.id, newPassword).subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.passwordChangeSuccess = true;
+          setTimeout(() => {
+            this.passwordForm.reset();
+            this.showPasswordForm = false;
+            this.passwordChangeSuccess = false;
+          }, 1800);
+        } else {
+          this.passwordChangeError = res.error || 'Password change failed.';
+        }
+      },
+      error: (err: any) => {
+        this.passwordChangeError = err?.error?.error || 'Password change failed.';
+      }
+    });
+  }
+
+  togglePasswordForm() {
+    this.showPasswordForm = !this.showPasswordForm;
+    this.passwordChangeSuccess = false;
+    this.passwordChangeError = '';
+    this.passwordForm.reset();
   }
 }

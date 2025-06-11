@@ -28,4 +28,8 @@ export class ApiService {
   getProfile(): Observable<any> {
     return this.http.get(`${this.apiUrl}/profile`);
   }
+
+  changePassword(userId: number, newPassword: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/${userId}/password`, { password: newPassword });
+  }
 }

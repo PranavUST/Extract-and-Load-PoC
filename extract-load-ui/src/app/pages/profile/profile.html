@@ -51,5 +51,49 @@
         <span *ngIf="saveError" class="profile-error">{{ saveError }}</span>
       </div>
     </form>
+    <div class="password-section">
+      <a class="change-password-link" (click)="togglePasswordForm()" tabindex="0" role="button">
+        <mat-icon>lock</mat-icon> Change Password
+      </a>
+      <form *ngIf="showPasswordForm" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+        <label class="password-label">
+          <span>New Password</span>
+          <div class="password-input-wrapper">
+            <input [type]="showNewPassword ? 'text' : 'password'" formControlName="newPassword" class="profile-input" placeholder="New Password" autocomplete="new-password" />
+            <button type="button" (mousedown)="$event.preventDefault(); showNewPassword = !showNewPassword" tabindex="-1" aria-label="Toggle password visibility">
+              <mat-icon style="color: #222; font-size: 22px;">{{ showNewPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+          <div class="field-error" *ngIf="passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid">
+            <small *ngIf="passwordForm.get('newPassword')?.errors?.['required']">Password is required.</small>
+            <small *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">At least 6 characters.</small>
+            <small *ngIf="passwordForm.get('newPassword')?.errors?.['pattern']">Must contain a letter and a number.</small>
+          </div>
+        </label>
+        <label class="password-label">
+          <span>Confirm Password</span>
+          <div class="password-input-wrapper">
+            <input [type]="showConfirmPassword ? 'text' : 'password'" formControlName="confirmPassword" class="profile-input" placeholder="Confirm Password" autocomplete="new-password" />
+            <button type="button" (mousedown)="$event.preventDefault(); showConfirmPassword = !showConfirmPassword" tabindex="-1" aria-label="Toggle password visibility">
+              <mat-icon style="color: #222; font-size: 22px;">{{ !!showConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+          <div class="field-error" *ngIf="passwordForm.get('confirmPassword')?.touched && (passwordForm.get('confirmPassword')?.invalid || passwordForm.errors?.['mismatch'] || passwordChangeError)">
+            <small *ngIf="passwordForm.get('confirmPassword')?.errors?.['required']">Confirmation is required.</small>
+            <small *ngIf="passwordForm.errors?.['mismatch'] || passwordChangeError === 'Passwords do not match.'">Passwords do not match.</small>
+          </div>
+        </label>
+        <div class="profile-actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="passwordForm.invalid" class="profile-save-btn">
+            <mat-icon>check_circle</mat-icon> Change Password
+          </button>
+          <button mat-flat-button color="basic" type="button" (click)="togglePasswordForm()" class="profile-cancel-btn">
+            <mat-icon>close</mat-icon> Cancel
+          </button>
+        </div>
+        <div *ngIf="passwordChangeSuccess" class="profile-success" style="margin-top: 0.5em; text-align:center;">Password successfully changed!</div>
+        <span *ngIf="passwordChangeError && passwordChangeError !== 'Passwords do not match.'" class="profile-error">{{ passwordChangeError }}</span>
+      </form>
+    </div>
   </div>
 </div>

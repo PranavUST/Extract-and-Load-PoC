@@ -308,6 +308,31 @@ def update_user(user_id):
         if 'cur' in locals(): cur.close()
         if 'conn' in locals(): conn.close()
 
+@app.route('/api/users/<int:user_id>/password', methods=['PUT'])
+def change_password(user_id):
+    user_id_session = session.get('user_id')
+    if not user_id_session or user_id_session != user_id:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    data = request.get_json()
+    new_password = data.get('password')
+    if not new_password or len(new_password) < 6:
+        return jsonify({'success': False, 'error': 'Password must be at least 6 characters.'}), 400
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        from passlib.context import CryptContext
+        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        hashed_pwd = pwd_context.hash(new_password)
+        cur.execute("UPDATE logins SET password = %s WHERE id = %s", (hashed_pwd, user_id))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Change password error: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        if 'cur' in locals(): cur.close()
+        if 'conn' in locals(): conn.close()
+
 def run_pipeline_thread(config_file):
     global execution_cycle
     execution_cycle += 1

@@ -1,10 +1,24 @@
+html, body, app-root {
+  /* Remove global scroll/height settings */
+  min-height: 100vh;
+}
+body {
+  min-height: 100vh;
+  background: #f7fafd;
+  /* Remove global overflow-y */
+}
+
 .profile-container {
-  max-width: 400px;
-  margin: 40px auto;
-  padding: 2rem;
+  max-width: 420px;
+  margin: 48px auto 64px auto;
+  padding: 2rem 1.2rem 2.5rem 1.2rem;
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: 14px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+  overflow-y: auto;
+  max-height: 80vh;
+  width: 100%;
+  box-sizing: border-box;
 }
 .profile-container h2 {
   margin-bottom: 1.5rem;
@@ -27,14 +41,22 @@
   margin-bottom: 1.5rem;
 }
 
+.profile-fields label {
+  width: 100%;
+}
+
 .profile-input {
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 0.5rem 0.75rem;
   border: 1px solid #bdbdbd;
   border-radius: 5px;
   font-size: 1.05rem;
   background: #f8f9fa;
   transition: border-color 0.2s, box-shadow 0.2s;
+  display: block;
+  margin-top: 0.3rem;
 }
 
 .profile-input:focus {
@@ -119,4 +141,78 @@
   font-weight: 500;
   margin-left: 14px;
   font-size: 1.05em;
+}
+
+.password-section {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+.password-section h3 {
+  margin-bottom: 1.2rem;
+  color: #2c3e50;
+  font-size: 1.18rem;
+  font-weight: 600;
+}
+.password-section form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.password-section label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.change-password-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  color: #1976d2;
+  font-weight: 500;
+  font-size: 1.05em;
+  cursor: pointer;
+  margin-bottom: 1.2rem;
+  text-decoration: underline dotted;
+  transition: color 0.18s;
+}
+.change-password-link:hover, .change-password-link:focus {
+  color: #1251a3;
+  text-decoration: underline solid;
+}
+
+.password-label {
+  width: 100%;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.password-input-wrapper .profile-input {
+  width: 100%;
+  padding-right: 2.2em; /* space for the icon */
+  box-sizing: border-box;
+}
+.password-input-wrapper button[type="button"] {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+  height: 28px;
+}
+.password-input-wrapper mat-icon {
+  color: #222;
+  font-size: 22px;
+  user-select: none;
+  pointer-events: none;
 }
