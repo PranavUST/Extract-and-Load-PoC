@@ -2,6 +2,7 @@ import sys
 import yaml
 import json
 import logging
+import uuid
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from flask import Flask, request, jsonify, session
@@ -21,11 +22,12 @@ from psycopg2 import sql
 from src.database import get_connection  # Import your connection function
 import logging     # Import logger instan   ce
 from src.database import create_logins_table_if_not_exists
+from src.database import create_pipeline_status_table_if_not_exists
+create_pipeline_status_table_if_not_exists()
 from functools import wraps
 from run_pipeline import run_ingestion, main as run_pipeline_main
 
 create_logins_table_if_not_exists()
-
 # Set up logger
 logger = logging.getLogger(__name__)
 
@@ -66,6 +68,12 @@ CORS(
         r"/run-pipeline-once": {
             "origins": ["http://localhost:4200"],
             "methods": ["POST", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+            "supports_credentials": True
+        },
+        r"/pipeline-status": {
+            "origins": ["http://localhost:4200"],
+            "methods": ["GET", "OPTIONS"],
             "allow_headers": ["Content-Type"],
             "supports_credentials": True
         },
@@ -304,31 +312,27 @@ def delete_user(user_id):
         if 'cur' in locals(): cur.close()
         if 'conn' in locals(): conn.close()
 
-def run_pipeline_thread(config_file):
+def run_pipeline_thread(config_file, run_id=None):
     global execution_cycle
     execution_cycle += 1
     logging.info(f"--- Pipeline Execution Cycle: {execution_cycle} ---")
-    
     try:
         if not os.path.isabs(config_file):
             config_file = str(Path(__file__).parent.parent / config_file)
-        
         with status_lock:
             pipeline_status["status"] = "running"
             pipeline_status["message"] = "Pipeline is running"
-        
-        run_ingestion(config_file)
-        
+        run_ingestion(config_file, run_id=run_id)  # Pass run_id to ingestion
         with status_lock:
             pipeline_status["status"] = "success"
             pipeline_status["message"] = "Pipeline completed successfully"
     except Exception as e:
         logger.error(f"Pipeline execution failed: {str(e)}")
-        with status_lock:  # Maintain thread safety for error status
+        with status_lock:
             pipeline_status["status"] = "error"
             pipeline_status["message"] = str(e)
     finally:
-        logging.info("-" * 80)  # Add separator after each execution
+        logging.info("-" * 80)
 
 @app.route('/run-pipeline', methods=['POST', 'OPTIONS'])
 def run_pipeline_api():
@@ -378,13 +382,25 @@ def run_pipeline_once_api():
         if not config_file:
             return jsonify({"status": "error", "message": "No config file provided"}), 400
 
+        run_id = str(uuid.uuid4())
+
         def run_once():
-            run_pipeline_thread(config_file)
+            run_pipeline_thread(config_file, run_id)  # Pass run_id to thread
         threading.Thread(target=run_once, daemon=True).start()
-        return jsonify({"status": "started"})
+        return jsonify({"status": "started", "run_id": run_id})  # Return run_id to frontend
     except Exception as e:
         logger.error(f"Error running pipeline once: {str(e)}")
         return jsonify({"status": "error", "message": "Failed to run pipeline once"}), 500
+    
+@app.route('/latest-scheduled-run-id', methods=['GET'])
+def get_latest_scheduled_run_id():
+    try:
+        with open('latest_scheduled_run_id.txt') as f:
+            run_id = f.read().strip()
+        return jsonify({"run_id": run_id})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/stop-pipeline', methods=['POST'])
 def stop_pipeline():
     try:
@@ -399,9 +415,18 @@ def stop_pipeline():
         logger.error(f"Error stopping pipeline: {str(e)}")
         return jsonify({"status": "error", "message": "Failed to stop pipeline"}), 500
 @app.route('/pipeline-status', methods=['GET'])
-def get_status():
-    with status_lock:
-        return jsonify(pipeline_status)
+def get_pipeline_status():
+    run_id = request.args.get('run_id')
+    conn = get_connection()
+    with conn.cursor() as cur:
+        if run_id:
+            cur.execute("SELECT timestamp, message FROM pipeline_status WHERE run_id = %s ORDER BY id DESC LIMIT 20", (run_id,))
+        else:
+            cur.execute("SELECT timestamp, message FROM pipeline_status ORDER BY id DESC LIMIT 20")
+        rows = cur.fetchall()
+    conn.close()
+    status = [{"timestamp": str(row[0]), "message": row[1]} for row in rows]
+    return jsonify({"status": status})
 
 @app.route('/v1/data', methods=['GET'])
 def get_data():

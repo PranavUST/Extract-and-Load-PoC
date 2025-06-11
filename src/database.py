@@ -172,3 +172,65 @@ def log_pipeline_stats(stats: dict, conn_params: dict):
         logger.info("Stats logged: %s", stats)
     except Exception as e:
         logger.error("Stats logging failed: %s", str(e))
+def create_pipeline_status_table_if_not_exists(conn_params: dict = None):
+    """Create the pipeline_status table if it does not exist, with run_id column."""
+    create_table_sql = """
+    CREATE TABLE IF NOT EXISTS pipeline_status (
+        id SERIAL PRIMARY KEY,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        message TEXT NOT NULL,
+        run_id UUID
+    );
+    """
+    try:
+        if conn_params:
+            conn = psycopg2.connect(**conn_params)
+        else:
+            conn = get_connection()
+        cur = conn.cursor()
+        cur.execute(create_table_sql)
+        conn.commit()
+        # Ensure run_id column exists even if table already existed
+        cur.execute("""
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM information_schema.columns
+                    WHERE table_name='pipeline_status' AND column_name='run_id'
+                ) THEN
+                    ALTER TABLE pipeline_status ADD COLUMN run_id UUID;
+                END IF;
+            END
+            $$;
+        """)
+        conn.commit()   
+        cur.close()
+        conn.close()
+        logger.info("Ensured 'pipeline_status' table exists.")
+    except Exception as e:
+        logger.error(f"Failed to create 'pipeline_status' table: {e}")
+        if 'conn' in locals():
+            conn.close()
+        raise
+
+def insert_pipeline_status(message: str, run_id: str = None, conn_params: dict = None):
+    """Insert a pipeline status message into the database."""
+    try:
+        if conn_params:
+            conn = psycopg2.connect(**conn_params)
+        else:
+            conn = get_connection()
+        cur = conn.cursor()
+        if run_id:
+            cur.execute("INSERT INTO pipeline_status (message, run_id) VALUES (%s, %s)", (message, run_id))
+        else:
+            cur.execute("INSERT INTO pipeline_status (message) VALUES (%s)", (message,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        logger.info(f"Inserted pipeline status: {message}")
+    except Exception as e:
+        logger.error(f"Failed to insert pipeline status: {e}")
+        if 'conn' in locals():
+            conn.close()
+        raise

@@ -29,6 +29,16 @@
       <div *ngIf="status" class="status-message" style="margin-top:1rem;">
         {{ status }}
       </div>
+      <div>Log count: {{ statusDetails.length }}</div>
+      <div *ngIf="statusDetails.length" style="margin-top: 1rem; background: #f5f5f5; border: 1px solid #ccc; padding: 8px;">
+        <strong>Pipeline Details:</strong>
+        <ul>
+          <li *ngFor="let s of statusDetails">
+            <span style="color:gray">{{ s.timestamp }}:</span> {{ s.message }}
+          </li>
+        </ul>
+      </div>
+      <div>Current runId: {{ runId }}</div>
       <button mat-raised-button color="warn" type="button" (click)="stopPipeline()" style="margin-top: 1rem;">
         Stop Pipeline
       </button>

@@ -12,6 +12,7 @@ from src.config_loader import load_config, resolve_config_vars
 from src.database import load_csv_to_db, log_pipeline_stats
 from src.schema_generator import CSVSchemaGenerator
 from src.ftp_client import download_ftp_files
+from src.database import insert_pipeline_status
 
 logger = logging.getLogger(__name__)
 def get_project_root():
@@ -134,8 +135,9 @@ class DataPipeline:
         logger.info("Total records loaded from local: %d", len(all_data))
         return all_data
 
-    def run(self, csv_only=False):
+    def run(self, run_id=None, csv_only=False):
         logger.info("Starting DataPipeline execution")
+        insert_pipeline_status("Pipeline started.", run_id)
         stats = {
             'records_fetched': 0,
             'records_inserted': 0,
@@ -162,40 +164,49 @@ class DataPipeline:
 
         try:
             logger.info("Fetching data")
+            insert_pipeline_status("Fetching data...", run_id)
             raw_data = self.fetch_data() or []
             stats['records_fetched'] = len(raw_data)
             logger.info("Data fetch completed. Records retrieved: %d", stats['records_fetched'])
+            insert_pipeline_status(f"Data fetch completed. Records retrieved: {stats['records_fetched']}", run_id)
 
             # Always export to CSV
             csv_output_path = self.config['destination']['csv']['output_path']
-           # Convert to absolute path if not already
             csv_output_path = str((Path(__file__).parent.parent / csv_output_path).resolve())
             logger.info("Exporting all data to CSV: %s", csv_output_path)
+            insert_pipeline_status(f"Exporting all data to CSV: {csv_output_path}", run_id)
             self.export_to_csv(raw_data, csv_output_path)
             stats['records_inserted'] = len(raw_data)
+            insert_pipeline_status(f"Exported {len(raw_data)} records to CSV.", run_id)
 
             # Conditionally run database operations
             if csv_only:
                 logger.info("CSV-only mode: Skipping database operations")
+                insert_pipeline_status("CSV-only mode: Skipping database operations", run_id)
             elif self.config['destination']['database'].get('enabled'):
                 logger.info("Database integration enabled, running INSERT operations...")
+                insert_pipeline_status("Database integration enabled, running INSERT operations...", run_id)
                 db_config = self.config['destination']['database']
                 table_name = db_config.get('table', 'data')
 
                 # Create main data table
                 logger.info("Creating/updating table '%s'", table_name)
+                insert_pipeline_status(f"Creating/updating table '{table_name}'", run_id)
                 self.schema_generator.create_table_from_csv(csv_output_path, table_name, conn_params)
                 
                 # Load data
                 logger.info("Loading CSV data into table '%s'", table_name)
+                insert_pipeline_status(f"Loading CSV data into table '{table_name}'", run_id)
                 load_csv_to_db(csv_output_path, table_name, conn_params)
 
             logger.info("DataPipeline execution completed successfully")
+            insert_pipeline_status("Pipeline completed successfully.", run_id)
 
         except Exception as e:
             stats['error_count'] = 1
             stats['status'] = 'failed'
             logger.error("Pipeline execution failed: %s", str(e))
+            insert_pipeline_status(f"Pipeline execution failed: {str(e)}", run_id)
             raise
         finally:
             # Stats logging with guaranteed conn_params availability
