@@ -14,6 +14,9 @@ export class ApiService {
   getPipelineStatus(): Observable<any> {
     return this.http.get(`${this.apiUrl}/pipeline-status`);
   }
+  stopPipeline(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/stop-pipeline`, {});
+  }
   saveSourceConfig(config: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/source-configs`, config);
   }

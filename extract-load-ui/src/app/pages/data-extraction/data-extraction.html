@@ -4,7 +4,8 @@
   </mat-tab>
   <mat-tab label="Target Config">
     <app-target-config></app-target-config>
-    <!-- Place the scheduler form here -->
+  </mat-tab>
+  <mat-tab label="Schedule">
     <mat-card style="margin-top: 24px;">
       <mat-card-title>Schedule Pipeline Run</mat-card-title>
       <form [formGroup]="schedulerForm" (ngSubmit)="runPipeline()">
@@ -18,13 +19,19 @@
             <input matInput type="number" formControlName="duration" min="0.1" step="0.1" required>
           </mat-form-field>
           <button mat-raised-button color="primary" type="submit" [disabled]="schedulerForm.invalid">
-            Run Pipeline
+            Run Pipeline (Schedule)
+          </button>
+          <button mat-raised-button color="accent" type="button" (click)="runPipelineOnce()">
+            Run Once
           </button>
         </div>
       </form>
       <div *ngIf="status" class="status-message" style="margin-top:1rem;">
         {{ status }}
       </div>
+      <button mat-raised-button color="warn" type="button" (click)="stopPipeline()" style="margin-top: 1rem;">
+        Stop Pipeline
+      </button>
     </mat-card>
   </mat-tab>
   <mat-tab label="Saved Configs">

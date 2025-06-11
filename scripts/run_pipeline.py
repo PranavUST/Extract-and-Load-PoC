@@ -1,5 +1,8 @@
 import sys
 from pathlib import Path
+# Add project root to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 from dotenv import load_dotenv
 import argparse
 from datetime import datetime, timedelta
@@ -8,10 +11,6 @@ from src.logging_utils import setup_logging
 from src.pipeline import DataPipeline
 from src.scheduler import start_simple_scheduler
 from src.database import create_logins_table_if_not_exists  # New import
-
-# Add project root to Python path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
 
 def run_ingestion(config_path: str):
     """Run the pipeline with the specified config"""

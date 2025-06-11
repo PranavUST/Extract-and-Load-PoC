@@ -47,8 +47,12 @@ export class DataExtraction {
         this.http.get<any[]>('http://localhost:5000/saved-source-configs').subscribe({
           next: (sources) => {
             const sourceObj = sources.find(s => s.name === current.source);
+            if (!current.source || !sourceObj) {
+              this.status = 'Error: No valid source config selected. Please select or create a source config.';
+              return;
+            }
             let config_file = 'config/api_config.yaml'; // default
-            if (sourceObj && sourceObj.type && sourceObj.type.toUpperCase() === 'FTP') {
+            if (sourceObj.type && sourceObj.type.toUpperCase() === 'FTP') {
               config_file = 'config/ftp_config.yaml';
             }
             const { interval, duration } = this.schedulerForm.value;
@@ -61,6 +65,38 @@ export class DataExtraction {
         });
       },
       error: () => this.status = 'Error: Could not fetch current config'
+    });
+  }
+  runPipelineOnce() {
+    this.http.get<{source: string, target: string}>('http://localhost:5000/current-config').subscribe({
+      next: (current) => {
+        this.http.get<any[]>('http://localhost:5000/saved-source-configs').subscribe({
+          next: (sources) => {
+            const sourceObj = sources.find(s => s.name === current.source);
+            if (!current.source || !sourceObj) {
+              this.status = 'Error: No valid source config selected. Please select or create a source config.';
+              return;
+            }
+            let config_file = 'config/api_config.yaml';
+            if (sourceObj.type && sourceObj.type.toUpperCase() === 'FTP') {
+              config_file = 'config/ftp_config.yaml';
+            }
+            // FIX: Call /run-pipeline-once instead of /run-pipeline
+            this.http.post('http://localhost:5000/run-pipeline-once', { config_file }).subscribe({
+              next: () => this.status = 'Pipeline started (run once)',
+              error: (err) => this.status = `Error: ${err.message}`
+            });
+          },
+          error: () => this.status = 'Error: Could not fetch source configs'
+        });
+      },
+      error: () => this.status = 'Error: Could not fetch current config'
+    });
+  }
+  stopPipeline() {
+    this.api.stopPipeline().subscribe({
+      next: () => this.status = 'Pipeline stopped',
+      error: (err) => this.status = `Error: ${err.error?.message || err.message || 'Failed to stop pipeline'}`
     });
   }
   getSelectedSourceType(): string {

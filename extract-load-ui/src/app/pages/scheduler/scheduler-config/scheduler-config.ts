@@ -35,7 +35,13 @@ export class SchedulerConfig {
 
   runPipeline() {
     if (this.schedulerForm.valid) {
-      const { configFile, interval, duration } = this.schedulerForm.value;
+      const { sourceType, interval, duration } = this.schedulerForm.value;
+      let configFile = '';
+      if (sourceType === 'API') {
+        configFile = 'config/api_config.yaml';
+      } else if (sourceType === 'FTP') {
+        configFile = 'config/ftp_config.yaml';
+      }
       this.api.runPipeline({
         config_file: configFile,
         interval,
@@ -45,5 +51,11 @@ export class SchedulerConfig {
         error: (err) => this.status = `Error: ${err.message}`
       });
     }
+  }
+  stopPipeline() {
+    this.api.stopPipeline().subscribe({
+      next: () => this.status = 'Pipeline stopped',
+      error: (err: any) => this.status = `Error: ${err.message}`
+    });
   }
 }
