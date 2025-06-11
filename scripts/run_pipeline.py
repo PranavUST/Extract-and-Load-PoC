@@ -1,5 +1,9 @@
 import sys
+import uuid
 from pathlib import Path
+# Add project root to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 from dotenv import load_dotenv
 import argparse
 from datetime import datetime, timedelta
@@ -8,22 +12,27 @@ from src.logging_utils import setup_logging
 from src.pipeline import DataPipeline
 from src.scheduler import start_simple_scheduler
 from src.database import create_logins_table_if_not_exists  # New import
+from src.database import create_logins_table_if_not_exists, create_pipeline_status_table_if_not_exists
 
-# Add project root to Python path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-
-def run_ingestion(config_path: str):
+def run_ingestion(config_path: str, run_id: str = None):
     """Run the pipeline with the specified config"""
     config_path = Path(config_path)
     if not config_path.is_absolute():
         config_path = (project_root / config_path).resolve()
     
-    # Auto-create logins table before pipeline execution
-    create_logins_table_if_not_exists()  # Added line
+    # Auto-create logins and pipeline_status tables before pipeline execution
+    create_logins_table_if_not_exists()
+    create_pipeline_status_table_if_not_exists()
+
+    if run_id is None:
+        run_id = str(uuid.uuid4())
+
+    run_id_path = project_root / "latest_scheduled_run_id.txt"
+    with open(run_id_path, "w") as f:
+        f.write(run_id)
     
     pipeline = DataPipeline(config_path)
-    pipeline.run()
+    pipeline.run(run_id=run_id)
 
 def main():
     """Entry point for command-line execution."""

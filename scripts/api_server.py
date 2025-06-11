@@ -2,6 +2,7 @@ import sys
 import yaml
 import json
 import logging
+import uuid
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from flask import Flask, request, jsonify, session
@@ -10,16 +11,23 @@ from run_pipeline import run_ingestion
 from src.logging_utils import setup_logging
 import threading
 import os
+import signal
+import subprocess
+import threading
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PIPELINE_PID_FILE = os.path.join(BASE_DIR, '../pipeline.pid')
 from passlib.context import CryptContext
 import psycopg2
 from psycopg2 import sql
 from src.database import get_connection  # Import your connection function
 import logging     # Import logger instan   ce
 from src.database import create_logins_table_if_not_exists
+from src.database import create_pipeline_status_table_if_not_exists
+create_pipeline_status_table_if_not_exists()
 from functools import wraps
+from run_pipeline import run_ingestion, main as run_pipeline_main
 
 create_logins_table_if_not_exists()
-
 # Set up logger
 logger = logging.getLogger(__name__)
 
@@ -52,6 +60,24 @@ CORS(
             "supports_credentials": True
         },
         r"/run-pipeline": {
+            "origins": ["http://localhost:4200"],
+            "methods": ["POST", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+            "supports_credentials": True
+        },
+        r"/run-pipeline-once": {
+            "origins": ["http://localhost:4200"],
+            "methods": ["POST", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+            "supports_credentials": True
+        },
+        r"/pipeline-status": {
+            "origins": ["http://localhost:4200"],
+            "methods": ["GET", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+            "supports_credentials": True
+        },
+        r"/stop-pipeline": {
             "origins": ["http://localhost:4200"],
             "methods": ["POST", "OPTIONS"],
             "allow_headers": ["Content-Type"],
@@ -333,31 +359,27 @@ def change_password(user_id):
         if 'cur' in locals(): cur.close()
         if 'conn' in locals(): conn.close()
 
-def run_pipeline_thread(config_file):
+def run_pipeline_thread(config_file, run_id=None):
     global execution_cycle
     execution_cycle += 1
     logging.info(f"--- Pipeline Execution Cycle: {execution_cycle} ---")
-    
     try:
         if not os.path.isabs(config_file):
             config_file = str(Path(__file__).parent.parent / config_file)
-        
         with status_lock:
             pipeline_status["status"] = "running"
             pipeline_status["message"] = "Pipeline is running"
-        
-        run_ingestion(config_file)
-        
+        run_ingestion(config_file, run_id=run_id)  # Pass run_id to ingestion
         with status_lock:
             pipeline_status["status"] = "success"
             pipeline_status["message"] = "Pipeline completed successfully"
     except Exception as e:
         logger.error(f"Pipeline execution failed: {str(e)}")
-        with status_lock:  # Maintain thread safety for error status
+        with status_lock:
             pipeline_status["status"] = "error"
             pipeline_status["message"] = str(e)
     finally:
-        logging.info("-" * 80)  # Add separator after each execution
+        logging.info("-" * 80)
 
 @app.route('/run-pipeline', methods=['POST', 'OPTIONS'])
 def run_pipeline_api():
@@ -370,19 +392,88 @@ def run_pipeline_api():
             return jsonify({"status": "error", "message": "No JSON data provided"}), 400
             
         config_file = data.get("config_file")
+        interval = data.get("interval")
+        duration = data.get("duration")
         if not config_file:
             return jsonify({"status": "error", "message": "No config file provided"}), 400
-        
-        threading.Thread(target=run_pipeline_thread, args=(config_file,), daemon=True).start()
+        if not interval or not duration:
+            return jsonify({"status": "error", "message": "Interval and duration required"}), 400
+
+        # Start the scheduler in a thread
+        import subprocess
+        import sys
+        def run_scheduler():
+            script_path = os.path.join(os.path.dirname(__file__), "run_pipeline.py")
+            project_root = os.path.dirname(os.path.dirname(__file__))
+            proc = subprocess.Popen([
+                sys.executable, script_path,
+                config_file,
+                "--interval", str(interval),
+                "--duration", str(duration)
+            ], cwd=project_root)
+            # Save the PID
+            with open(PIPELINE_PID_FILE, 'w') as f:
+                f.write(str(proc.pid))
+        threading.Thread(target=run_scheduler, daemon=True).start()
         return jsonify({"status": "started"})
     except Exception as e:
         logger.error(f"Error starting pipeline: {str(e)}")
         return jsonify({"status": "error", "message": "Failed to start pipeline"}), 500
+@app.route('/run-pipeline-once', methods=['POST', 'OPTIONS'])
+def run_pipeline_once_api():
+    if request.method == 'OPTIONS':
+        return _build_cors_preflight_response()
+    try:
+        data = request.get_json()
+        config_file = data.get("config_file")
+        if not config_file:
+            return jsonify({"status": "error", "message": "No config file provided"}), 400
 
+        run_id = str(uuid.uuid4())
+
+        def run_once():
+            run_pipeline_thread(config_file, run_id)  # Pass run_id to thread
+        threading.Thread(target=run_once, daemon=True).start()
+        return jsonify({"status": "started", "run_id": run_id})  # Return run_id to frontend
+    except Exception as e:
+        logger.error(f"Error running pipeline once: {str(e)}")
+        return jsonify({"status": "error", "message": "Failed to run pipeline once"}), 500
+    
+@app.route('/latest-scheduled-run-id', methods=['GET'])
+def get_latest_scheduled_run_id():
+    try:
+        with open('latest_scheduled_run_id.txt') as f:
+            run_id = f.read().strip()
+        return jsonify({"run_id": run_id})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/stop-pipeline', methods=['POST'])
+def stop_pipeline():
+    try:
+        if not os.path.exists(PIPELINE_PID_FILE):
+            return jsonify({"status": "error", "message": "No running pipeline found"}), 404
+        with open(PIPELINE_PID_FILE, 'r') as f:
+            pid = int(f.read())
+        os.kill(pid, signal.SIGTERM)
+        os.remove(PIPELINE_PID_FILE)
+        return jsonify({"status": "stopped"})
+    except Exception as e:
+        logger.error(f"Error stopping pipeline: {str(e)}")
+        return jsonify({"status": "error", "message": "Failed to stop pipeline"}), 500
 @app.route('/pipeline-status', methods=['GET'])
-def get_status():
-    with status_lock:
-        return jsonify(pipeline_status)
+def get_pipeline_status():
+    run_id = request.args.get('run_id')
+    conn = get_connection()
+    with conn.cursor() as cur:
+        if run_id:
+            cur.execute("SELECT timestamp, message FROM pipeline_status WHERE run_id = %s ORDER BY id DESC LIMIT 20", (run_id,))
+        else:
+            cur.execute("SELECT timestamp, message FROM pipeline_status ORDER BY id DESC LIMIT 20")
+        rows = cur.fetchall()
+    conn.close()
+    status = [{"timestamp": str(row[0]), "message": row[1]} for row in rows]
+    return jsonify({"status": status})
 
 @app.route('/v1/data', methods=['GET'])
 def get_data():
@@ -421,7 +512,7 @@ def delete_saved_source_config(name):
             with open(current_path, 'r') as f:
                 current = json.load(f)
             print(f"Deleting: {name}, Current source: {current.get('source')}")
-            if current.get('source', '').strip() == name.strip():
+            if (current.get('source') or '').strip() == name.strip():
                 current['source'] = None
                 with open(current_path, 'w') as f:
                     json.dump(current, f)
@@ -654,7 +745,7 @@ def delete_saved_target_config(name):
         if os.path.exists(current_path):
             with open(current_path, 'r') as f:
                 current = json.load(f)
-            if current.get('target', '').strip() == name.strip():
+            if (current.get('target') or '').strip() == name.strip():
                 current['target'] = None
                 with open(current_path, 'w') as f:
                     json.dump(current, f)
