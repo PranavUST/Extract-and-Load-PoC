@@ -33,46 +33,50 @@ import { RouterModule } from '@angular/router';
   ]
 })
 export class DataExtraction implements OnInit, OnDestroy {
+  @ViewChild(ConfigListComponent) configList!: ConfigListComponent;
   @ViewChild(SourceConfig) sourceConfigComponent!: SourceConfig;
   schedulerForm: FormGroup;
   status = '';
+  runIdPollInterval: any;
+  latestPolledRunId: string = '';
   statusDetails: {timestamp: string, message: string}[] = [];
   private pollInterval: any;
+  waitingForScheduledRun: boolean = false;
   ngOnInit() {
-    // Fetch the latest scheduled runId on load
-    this.fetchLatestScheduledRunId();
-    // Start polling for status if runId exists
-    setTimeout(() => {
-      if (this.runId) {
-        this.pollStatus();
-      }
-    }, 500);
+    this.startRunIdPolling();
+  }
+  refreshConfigs() {
+    window.location.reload();
   }
   ngOnDestroy() {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
     }
-  }
-  startScheduledPolling() {
-    if (this.pollInterval) {
-      clearInterval(this.pollInterval);
-      this.pollInterval = null;
+    if (this.runIdPollInterval) {
+      clearInterval(this.runIdPollInterval);
     }
-    this.statusDetails = [];
-    this.runId = '';
-    // Poll for run_id every 2 seconds until found, then start status polling
-    const runIdInterval = setInterval(() => {
+  }
+  startRunIdPolling() {
+    if (this.runIdPollInterval) {
+      clearInterval(this.runIdPollInterval);
+    }
+    this.runIdPollInterval = setInterval(() => {
       this.http.get<{run_id: string}>('http://localhost:5000/latest-scheduled-run-id').subscribe({
         next: (res) => {
-          console.log('Fetched run_id:', res.run_id);
-          if (res.run_id) {
+          if (res.run_id && res.run_id !== this.latestPolledRunId) {
+            this.latestPolledRunId = res.run_id;
             this.runId = res.run_id;
-            clearInterval(runIdInterval);
-            this.pollStatus(); // Start polling for status only after runId is available
+            this.waitingForScheduledRun = false;
+            this.pollStatus(); // Start polling for logs for the new run
+          } else if (!res.run_id) {
+            this.waitingForScheduledRun = true;
           }
+        },
+        error: () => {
+          this.waitingForScheduledRun = true;
         }
       });
-    }, 2000);
+    }, 5000); // Poll every 5 seconds
   }
   pollStatus() {
     // Clear any previous polling intervals
@@ -88,7 +92,14 @@ export class DataExtraction implements OnInit, OnDestroy {
       this.http.get<{status: {timestamp: string, message: string}[]}>(
         `http://localhost:5000/pipeline-status?run_id=${this.runId}`
       ).subscribe({
-        next: (res) => this.statusDetails = res.status,
+        next: (res) => {
+          console.log('Pipeline status response:', res);
+          this.statusDetails = res.status;
+          if (this.statusDetails.some(s => s.message.includes('Pipeline completed successfully'))) {
+            clearInterval(this.pollInterval);
+            this.pollInterval = null;
+          }
+        },
         error: () => this.statusDetails = []
       });
     }, 2000);
@@ -104,7 +115,6 @@ export class DataExtraction implements OnInit, OnDestroy {
     // Always get the current config from backend
     this.http.get<{source: string, target: string}>('http://localhost:5000/current-config').subscribe({
       next: (current) => {
-        // Now get the actual source config object
         this.http.get<any[]>('http://localhost:5000/saved-source-configs').subscribe({
           next: (sources) => {
             const sourceObj = sources.find(s => s.name === current.source);
@@ -119,10 +129,13 @@ export class DataExtraction implements OnInit, OnDestroy {
             const { interval, duration } = this.schedulerForm.value;
             this.api.runPipeline({ config_file, interval, duration }).subscribe({
               next: () => {
-                this.status = 'Pipeline scheduled successfully',
-                this.startScheduledPolling();
+                this.status = 'Pipeline scheduled successfully';
+                this.startRunIdPolling();
+                // No need to call startScheduledPolling or pollStatus here
               },
-              error: (err) => this.status = `Error: ${err.message}`
+              error: (err) => {
+                this.status = `Error: ${err.error?.message || err.message || 'Failed to schedule pipeline'}`;
+              }
             });
           },
           error: () => this.status = 'Error: Could not fetch source configs'
@@ -171,12 +184,25 @@ export class DataExtraction implements OnInit, OnDestroy {
     });
   }
   stopPipeline() {
+    // Stop polling for runId and logs
+    if (this.runIdPollInterval) {
+      clearInterval(this.runIdPollInterval);
+      this.runIdPollInterval = null;
+    }
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
+    }
+    this.status = 'Pipeline stopped';
+    // Optionally clear logs and runId
+    this.statusDetails = [];
+    this.runId = '';
+    this.waitingForScheduledRun = false;
+
+    // Call backend to stop scheduler
     this.api.stopPipeline().subscribe({
-      next: () => this.status = 'Pipeline stopped',
+      next: () => {},
       error: (err) => this.status = `Error: ${err.error?.message || err.message || 'Failed to stop pipeline'}`
     });
-  }
-  getSelectedSourceType(): string {
-    return this.sourceConfigComponent?.sourceForm?.get('type')?.value || 'API';
   }
 }

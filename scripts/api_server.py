@@ -6,7 +6,7 @@ import uuid
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from flask import Flask, request, jsonify, session
-from flask_cors import CORS
+from flask_cors import CORS,cross_origin
 from run_pipeline import run_ingestion
 from src.logging_utils import setup_logging
 import threading
@@ -439,10 +439,14 @@ def run_pipeline_once_api():
         logger.error(f"Error running pipeline once: {str(e)}")
         return jsonify({"status": "error", "message": "Failed to run pipeline once"}), 500
     
-@app.route('/latest-scheduled-run-id', methods=['GET'])
+@app.route('/latest-scheduled-run-id', methods=['GET', 'OPTIONS'])
+@cross_origin(origins="http://localhost:4200", supports_credentials=True)
 def get_latest_scheduled_run_id():
     try:
-        with open('latest_scheduled_run_id.txt') as f:
+        # Use project root for absolute path
+        project_root = Path(__file__).parent.parent
+        file_path = project_root/ 'latest_scheduled_run_id.txt'
+        with open(file_path) as f:
             run_id = f.read().strip()
         return jsonify({"run_id": run_id})
     except Exception as e:
@@ -450,14 +454,25 @@ def get_latest_scheduled_run_id():
 
 @app.route('/stop-pipeline', methods=['POST'])
 def stop_pipeline():
+    project_root = Path(__file__).parent.parent
+    file_path = project_root / 'latest_scheduled_run_id.txt'
+    # Always clear the run id file
     try:
-        if not os.path.exists(PIPELINE_PID_FILE):
-            return jsonify({"status": "error", "message": "No running pipeline found"}), 404
-        with open(PIPELINE_PID_FILE, 'r') as f:
-            pid = int(f.read())
-        os.kill(pid, signal.SIGTERM)
-        os.remove(PIPELINE_PID_FILE)
-        return jsonify({"status": "stopped"})
+        with open(file_path, 'w') as f:
+            f.write('')
+    except Exception as e:
+        logger.error(f"Error clearing latest_scheduled_run_id.txt: {str(e)}")
+    # Try to stop the scheduled pipeline if running
+    try:
+        if os.path.exists(PIPELINE_PID_FILE):
+            with open(PIPELINE_PID_FILE, 'r') as f:
+                pid = int(f.read())
+            os.kill(pid, signal.SIGTERM)
+            os.remove(PIPELINE_PID_FILE)
+            return jsonify({"status": "stopped"})
+        else:
+            # No running pipeline, but we still cleared the file
+            return jsonify({"status": "stopped", "message": "No running pipeline found, but run id cleared."})
     except Exception as e:
         logger.error(f"Error stopping pipeline: {str(e)}")
         return jsonify({"status": "error", "message": "Failed to stop pipeline"}), 500

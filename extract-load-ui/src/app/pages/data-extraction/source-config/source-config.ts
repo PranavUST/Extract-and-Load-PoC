@@ -7,6 +7,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { ApiService } from '../../../services/api.service';
 import { MatCardModule } from '@angular/material/card';
+import { Output, EventEmitter } from '@angular/core';
 
 
 @Component({
@@ -26,7 +27,7 @@ import { MatCardModule } from '@angular/material/card';
 export class SourceConfig {
   private fb = inject(FormBuilder);
   private api = inject(ApiService);
-
+  @Output() configSaved = new EventEmitter<void>();
   sourceTypes = ['API', 'FTP'];
   public sourceForm: FormGroup = this.fb.group({
     name: ['', Validators.required],
@@ -60,7 +61,10 @@ export class SourceConfig {
   saveConfig() {
     if (this.sourceForm.valid) {
       this.api.saveSourceConfig(this.sourceForm.value).subscribe({
-        next: (res) => alert('Source config saved!'),
+        next: (res) => {
+          alert('Source config saved!'),
+          this.configSaved.emit();
+        },
         error: (err) => alert('Save failed: ' + err.message)
       });
     } 

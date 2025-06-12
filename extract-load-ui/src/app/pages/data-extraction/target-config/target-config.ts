@@ -7,6 +7,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { ApiService } from '../../../services/api.service';
 import { MatCardModule } from '@angular/material/card';
+import { Output, EventEmitter } from '@angular/core';
 
 @Component({
   standalone: true,
@@ -26,7 +27,7 @@ export class TargetConfig {
   private fb = inject(FormBuilder);
   private api = inject(ApiService);
   targetTypes = ['Database'];
-
+  @Output() configSaved = new EventEmitter<void>();
   targetForm = this.fb.group({
     name: ['', Validators.required],
     type: ['Database', Validators.required],
@@ -37,7 +38,10 @@ export class TargetConfig {
   saveConfig() {
     if (this.targetForm.valid) {
       this.api.saveTargetConfig(this.targetForm.value).subscribe({
-        next: (res) => alert('Target config saved!'),
+        next: (res) => {
+          alert('Target config saved!');
+          this.configSaved.emit();
+        },
         error: (err) => alert('Save failed: ' + err.message)
       });
     }
