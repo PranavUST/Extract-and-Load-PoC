@@ -25,6 +25,7 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
+    // If your App template does not have <mat-toolbar>, update this selector accordingly
     expect(compiled.querySelector('mat-toolbar')).toBeTruthy();
   });
 });

@@ -1,19 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Login } from './login';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ActivatedRoute } from '@angular/router';
 
-import { DataTemplateComponent } from './data-template';
-
-describe('DataTemplate', () => {
-  let component: DataTemplateComponent;
-  let fixture: ComponentFixture<DataTemplateComponent>;
+describe('Login', () => {
+  let component: Login;
+  let fixture: ComponentFixture<Login>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, DataTemplateComponent]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(DataTemplateComponent);
+      imports: [HttpClientTestingModule, Login],
+      providers: [{ provide: ActivatedRoute, useValue: {} }]
+    }).compileComponents();
+    fixture = TestBed.createComponent(Login);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
