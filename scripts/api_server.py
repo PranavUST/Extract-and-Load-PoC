@@ -7,7 +7,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS,cross_origin
-from run_pipeline import run_ingestion
 from src.logging_utils import setup_logging
 import threading
 import os
@@ -25,7 +24,8 @@ from src.database import create_logins_table_if_not_exists
 from src.database import create_pipeline_status_table_if_not_exists
 create_pipeline_status_table_if_not_exists()
 from functools import wraps
-from run_pipeline import run_ingestion, main as run_pipeline_main
+from scripts.run_pipeline import run_ingestion
+from scripts.run_pipeline import run_ingestion, main as run_pipeline_main
 
 create_logins_table_if_not_exists()
 # Set up logger

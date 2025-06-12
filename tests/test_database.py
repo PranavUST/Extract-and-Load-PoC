@@ -124,9 +124,73 @@ def test_get_table_row_count_exception(monkeypatch, conn_params):
 def test_log_pipeline_stats(monkeypatch, conn_params):
     mock_execute = MagicMock()
     monkeypatch.setattr(db, "execute_query", mock_execute)
-    # Patch CSVSchemaGenerator to avoid import error and method call
+    # Patch CSVSchemaGenerator and its method at the correct import path
     mock_schema_gen = MagicMock()
-    monkeypatch.setattr("schema_generator.CSVSchemaGenerator", lambda: mock_schema_gen)
+    mock_schema_gen.create_pipeline_stats_table = MagicMock()
+    monkeypatch.setattr("src.schema_generator.CSVSchemaGenerator", lambda *a, **kw: mock_schema_gen)
     stats = {"records_fetched": 1, "records_inserted": 2, "error_count": 0, "status": "ok"}
     db.log_pipeline_stats(stats, conn_params)
     assert mock_execute.called
+
+def test_log_pipeline_stats_no_conn_params(caplog):
+    stats = {"records_fetched": 1, "records_inserted": 2, "error_count": 0, "status": "ok"}
+    db.log_pipeline_stats(stats, None)
+    assert "No connection parameters provided for stats logging" in caplog.text
+
+def test_log_pipeline_stats_exception(monkeypatch, conn_params, caplog):
+    # Patch CSVSchemaGenerator to raise
+    monkeypatch.setattr("src.schema_generator.CSVSchemaGenerator", MagicMock(side_effect=Exception("fail")))
+    stats = {"records_fetched": 1, "records_inserted": 2, "error_count": 0, "status": "ok"}
+    db.log_pipeline_stats(stats, conn_params)
+    assert "Stats logging failed: fail" in caplog.text
+
+def test_create_logins_table_if_not_exists(monkeypatch, conn_params):
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+    monkeypatch.setattr(db.psycopg2, "connect", MagicMock(return_value=mock_conn))
+    mock_conn.cursor.return_value = mock_cursor
+    db.create_logins_table_if_not_exists(conn_params)
+    mock_conn.commit.assert_called()
+    mock_conn.close.assert_called()
+
+def test_create_logins_table_if_not_exists_exception(monkeypatch, conn_params):
+    monkeypatch.setattr(db.psycopg2, "connect", MagicMock(side_effect=Exception("fail")))
+    with pytest.raises(Exception):
+        db.create_logins_table_if_not_exists(conn_params)
+
+def test_create_pipeline_status_table_if_not_exists(monkeypatch, conn_params):
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+    monkeypatch.setattr(db.psycopg2, "connect", MagicMock(return_value=mock_conn))
+    mock_conn.cursor.return_value = mock_cursor
+    db.create_pipeline_status_table_if_not_exists(conn_params)
+    mock_conn.commit.assert_called()
+    mock_conn.close.assert_called()
+
+def test_create_pipeline_status_table_if_not_exists_exception(monkeypatch, conn_params):
+    monkeypatch.setattr(db.psycopg2, "connect", MagicMock(side_effect=Exception("fail")))
+    with pytest.raises(Exception):
+        db.create_pipeline_status_table_if_not_exists(conn_params)
+
+def test_insert_pipeline_status(monkeypatch, conn_params):
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+    monkeypatch.setattr(db.psycopg2, "connect", MagicMock(return_value=mock_conn))
+    mock_conn.cursor.return_value = mock_cursor
+    db.insert_pipeline_status("msg", "runid", conn_params)
+    mock_conn.commit.assert_called()
+    mock_conn.close.assert_called()
+
+def test_insert_pipeline_status_no_runid(monkeypatch, conn_params):
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+    monkeypatch.setattr(db.psycopg2, "connect", MagicMock(return_value=mock_conn))
+    mock_conn.cursor.return_value = mock_cursor
+    db.insert_pipeline_status("msg", None, conn_params)
+    mock_conn.commit.assert_called()
+    mock_conn.close.assert_called()
+
+def test_insert_pipeline_status_exception(monkeypatch, conn_params):
+    monkeypatch.setattr(db.psycopg2, "connect", MagicMock(side_effect=Exception("fail")))
+    with pytest.raises(Exception):
+        db.insert_pipeline_status("msg", "runid", conn_params)

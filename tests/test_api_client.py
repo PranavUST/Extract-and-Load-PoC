@@ -97,3 +97,10 @@ def test_extract_records_no_path():
     response = [{'id': 1}]
     records = client._extract_records(response)
     assert records == [{'id': 1}]
+
+def test_extract_records_path_midway_not_dict():
+    config = {'data_path': 'data.items'}
+    client = APIClient(config)
+    response = {'data': 123}  # 'data' is not a dict, so .get('items') will fail
+    records = client._extract_records(response)
+    assert records == []

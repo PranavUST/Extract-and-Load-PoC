@@ -102,3 +102,5 @@ pytest tests\test_file_name.py
 
 ## To test all files
 pytest
+pytest --cov=src --cov-report=html 
+(loads all tests in a html - to access it: go to folder of htmlcov and open index in desired browser)

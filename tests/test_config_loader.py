@@ -2,7 +2,7 @@ import tempfile
 import yaml
 import os
 import pytest
-from config_loader import load_config, resolve_config_vars, _validate_ftp_config, _validate_api_config
+from src.config_loader import load_config, resolve_config_vars, _validate_ftp_config, _validate_api_config
 
 def test_load_and_resolve_config():
     config_dict = {
@@ -91,3 +91,59 @@ def test_validate_api_config_missing_field():
     api_config = {'url': 'http://test'}
     with pytest.raises(ValueError):
         _validate_api_config(api_config)
+
+def test_load_config_invalid_yaml(tmp_path):
+    bad_yaml = tmp_path / "bad.yaml"
+    bad_yaml.write_text("not: [valid: yaml")
+    with pytest.raises(Exception):
+        load_config(str(bad_yaml))
+
+def test_load_config_malformed_yaml(tmp_path):
+    bad_yaml = tmp_path / "bad.yaml"
+    bad_yaml.write_text("not: [valid: yaml")
+    with pytest.raises(Exception):
+        load_config(str(bad_yaml))
+
+def test_load_config_secret_debug(tmp_path, monkeypatch):
+    import logging
+    from src.config_loader import load_config
+    config_dict = {
+        'source': {'type': 'REST_API', 'api': {'url': 'http://test', 'method': 'GET'}},
+        'destination': {},
+        'secrets': ['TEST_SECRET']
+    }
+    file_path = tmp_path / "config.yaml"
+    with open(file_path, 'w') as f:
+        yaml.dump(config_dict, f)
+    monkeypatch.setenv('TEST_SECRET', 'foo')
+    logging.getLogger('src.config_loader').setLevel(logging.DEBUG)
+    load_config(str(file_path))
+
+def test_load_config_valid_ftp(tmp_path):
+    from src.config_loader import load_config
+    config_dict = {
+        'source': {
+            'type': 'FTP',
+            'ftp': {
+                'host': 'h', 'username': 'u', 'password': 'p', 'remote_dir': 'r', 'local_dir': 'l'
+            }
+        },
+        'destination': {},
+        'secrets': []
+    }
+    file_path = tmp_path / "ftp_config.yaml"
+    with open(file_path, 'w') as f:
+        yaml.dump(config_dict, f)
+    load_config(str(file_path))
+
+def test_resolve_config_vars_literal():
+    from src.config_loader import resolve_config_vars
+    config = {'foo': 'bar'}
+    resolved = resolve_config_vars(config)
+    assert resolved['foo'] == 'bar'
+
+def test_resolve_config_vars_non_template_string():
+    from src.config_loader import resolve_config_vars
+    config = {'plain': 'not_a_template'}
+    resolved = resolve_config_vars(config)
+    assert resolved['plain'] == 'not_a_template'
