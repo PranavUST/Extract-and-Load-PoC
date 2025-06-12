@@ -143,25 +143,35 @@ class CSVSchemaGenerator:
         sql += '\n);'
         return sql
 
-    def create_table_from_csv(self, csv_path: str, table_name: str, conn_params: Dict) -> None:
-        """
-        Create a PostgreSQL table based on CSV structure and data types.
-        """
-        logger.info("Creating table '%s' from CSV: %s", table_name, csv_path)
-        schema = self.analyze_csv_schema(csv_path)
-        create_sql = self.generate_create_table_sql(table_name, schema)
+    def create_table_from_csv(self, csv_path: str, table_name: str, conn_params: dict):
+        """Create table if not exists, preserving data"""
         try:
-            conn = psycopg2.connect(**conn_params)
-            with conn.cursor() as cur:
-                cur.execute(create_sql)
-            conn.commit()
-            logger.info("Successfully created table '%s'", table_name)
+            # First check if table exists
+            check_query = """
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_name = %s
+            );
+            """
+            from src.database import get_connection  # Import here to avoid NameError
+            with get_connection(conn_params) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(check_query, (table_name,))
+                    table_exists = cur.fetchone()[0]
+                    
+                    if not table_exists:
+                        # Only create table if it doesn't exist
+                        schema = self.analyze_csv_schema(csv_path)
+                        create_sql = self.generate_create_table_sql(table_name, schema)
+                        cur.execute(create_sql)
+                        conn.commit()
+                        logger.info(f"Created new table: {table_name}")
+                    else:
+                        logger.info(f"Table {table_name} already exists, preserving structure")
+
         except Exception as e:
-            logger.error("Failed to create table '%s': %s", table_name, e)
+            logger.error(f"Failed to create/verify table {table_name}: {str(e)}")
             raise
-        finally:
-            if 'conn' in locals():
-                conn.close()
 
     def execute_query(self, query: str, conn_params: dict):
             """Execute a raw SQL query using database.py's execute_query"""
@@ -169,14 +179,15 @@ class CSVSchemaGenerator:
             return execute_query(query, conn_params=conn_params)
     
     def create_pipeline_stats_table(self, conn_params: dict):
-        """Idempotent table creation with explicit columns"""
+        """Create pipeline stats table with accumulated counters"""
         create_table_sql = """
         CREATE TABLE IF NOT EXISTS pipeline_stats (
             stat_date DATE PRIMARY KEY,
-            records_fetched INT NOT NULL,
-            records_inserted INT NOT NULL,
-            error_count INT DEFAULT 0,
-            status VARCHAR(50) NOT NULL
+            total_records_fetched BIGINT NOT NULL DEFAULT 0,
+            total_records_inserted BIGINT NOT NULL DEFAULT 0,
+            total_error_count BIGINT NOT NULL DEFAULT 0,
+            last_status VARCHAR(50) NOT NULL,
+            last_run_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         """
         try:
