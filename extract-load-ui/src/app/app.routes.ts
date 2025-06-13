@@ -36,17 +36,15 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/profile/profile').then(m => m.ProfileComponent),
     canActivate: [AuthGuard]
   },
-<<<<<<< Updated upstream
   { 
     path: 'logs',
     loadComponent: () => import('./pages/logs/logs').then(m => m.LogsPage),
-    canActivate: [AuthGuard] // Optional: add this if logs should be protected
-=======
+    canActivate: [AuthGuard]
+  },
   {
     path: 'daily-stats',
     component: DailyStats,
     canActivate: [AuthGuard]
->>>>>>> Stashed changes
   },
   { path: '**', redirectTo: 'login' }
 ];

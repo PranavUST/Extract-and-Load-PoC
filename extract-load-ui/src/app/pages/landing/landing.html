@@ -9,39 +9,34 @@
     <h1 class="welcome-title">
       Welcome, <span class="username">{{ currentUser?.username | titlecase }}</span>!
     </h1>
-<<<<<<< Updated upstream
-    <nav class="nav-buttons">
-      <button mat-raised-button class="nav-btn" routerLink="/data-extraction">
-        Data Extraction
-      </button>
-      <button *ngIf="userRole === 'Admin'" mat-raised-button class="nav-btn" routerLink="/user-management">
-        User Management
-      </button>
-      <button mat-raised-button class="nav-btn" routerLink="/logs">
-        Logs
-      </button>
-    </nav>
-=======
 
-    <mat-card>
-      <nav class="nav-buttons">
+    <mat-card class="menu-card">
+      <div class="nav-grid">
         <button mat-raised-button class="nav-btn" routerLink="/data-extraction">
-          Data Extraction
+          <mat-icon>sync</mat-icon>
+          <span>Data Extraction</span>
         </button>
 
         <button mat-raised-button class="nav-btn" [routerLink]="['/daily-stats']">
-          Daily Stats
+          <mat-icon>analytics</mat-icon>
+          <span>Daily Statistics</span>
+        </button>
+
+        <button mat-raised-button class="nav-btn" routerLink="/logs">
+          <mat-icon>list_alt</mat-icon>
+          <span>Pipeline Logs</span>
         </button>
 
         <button *ngIf="userRole === 'Admin'" mat-raised-button class="nav-btn" routerLink="/user-management">
-          User Management
+          <mat-icon>group</mat-icon>
+          <span>User Management</span>
         </button>
-      </nav>
+      </div>
     </mat-card>
->>>>>>> Stashed changes
   </div>
 
   <button (click)="logout()" mat-raised-button class="logout-fixed">
+    <mat-icon>logout</mat-icon>
     Logout
   </button>
 </div>

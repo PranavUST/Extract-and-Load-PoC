@@ -940,7 +940,6 @@ def get_profile():
         if 'cur' in locals(): cur.close()
         if 'conn' in locals(): conn.close()
 
-<<<<<<< Updated upstream
 @app.route('/api/pipeline-log', methods=['GET'])
 def get_pipeline_log():
     # Use the absolute path to the root directory
@@ -948,8 +947,7 @@ def get_pipeline_log():
     if not os.path.exists(log_path):
         return jsonify({"error": "Log file not found"}), 404
     return send_file(log_path, mimetype='text/plain')
-=======
-# Add this new route after your other routes
+
 @app.route('/pipeline-stats/<date>', methods=['GET'])
 def get_pipeline_stats(date):
     try:
@@ -999,7 +997,6 @@ def get_pipeline_stats(date):
     finally:
         if 'cur' in locals(): cur.close()
         if 'conn' in locals(): conn.close()
->>>>>>> Stashed changes
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=False)

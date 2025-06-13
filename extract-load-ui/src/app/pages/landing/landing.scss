@@ -34,29 +34,45 @@ $white: #fff;
 }
 
 .nav-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.button-row {
   display: flex;
   justify-content: center;
-  gap: 2rem;
+  gap: 1.5rem;
   width: 100%;
 }
 
 .nav-btn {
-  min-width: 170px;
-  height: 60px;
-  font-size: 1.15rem;
-  font-weight: 500;
-  border-radius: 10px;
-  padding: 0 24px;
-  box-shadow: 0 2px 8px rgba(0, 77, 77, 0.1);
-  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-  color: $teal-dark;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 1.5rem;
+  border-radius: 8px;
   background-color: $teal-dark;
+  color: $white;
+
+  mat-icon {
+    margin-right: 0.75rem;
+    font-size: 1.25rem;
+  }
+
+  span {
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
 
   &:hover {
     background-color: darken($teal-dark, 5%);
-    color: $white;
-    box-shadow: 0 4px 16px rgba(0, 77, 77, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 77, 77, 0.2);
   }
 }
 .profile-icon {
@@ -107,20 +123,56 @@ $white: #fff;
   cursor: pointer;
 }
 
+mat-card {
+  width: 100%;
+  padding: 1rem;
+}
+
+.menu-card {
+  width: 100%;
+  padding: 2rem;
+}
+
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+// Media query for mobile devices
+@media (max-width: 768px) {
+  .nav-buttons {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .nav-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0.5rem;
+  }
+
+  .nav-btn {
+    height: 48px;
+  }
+}
+
 @media (max-width: 900px) {
   .landing-container {
     max-width: 98vw;
     padding: 1.5rem 0.5rem;
   }
-  .nav-buttons {
+  .button-row {
     flex-direction: column;
+    align-items: center;
     gap: 1rem;
   }
+
   .nav-btn {
-    min-width: 120px;
-    height: 44px;
-    font-size: 1rem;
-    padding: 0 12px;
+    width: 100%;
+    max-width: 280px;
   }
   .logout-fixed {
     left: 1rem;

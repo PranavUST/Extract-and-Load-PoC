@@ -8,6 +8,10 @@
 }
 
 .stats-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1rem;
+
   mat-card {
     margin-bottom: 20px;
   }
@@ -27,27 +31,21 @@
     font-weight: 500;
   }
 
-  .mat-column-total_records_fetched {
-    width: 15%;
-  }
-
-  .mat-column-total_records_inserted {
-    width: 15%;
-  }
-
+  .mat-column-total_records_fetched,
+  .mat-column-total_records_inserted,
   .mat-column-total_error_count {
-    width: 15%;
-    color: #f44336;
-    font-weight: 500;
+    width: 20%;
+    text-align: center;
   }
 
   .mat-column-last_status {
     width: 20%;
-    text-transform: capitalize;
+    text-align: center;
   }
 
   .mat-column-last_run_timestamp {
-    width: 15%;
+    width: 20%;
+    text-align: center;
   }
 
   .error {
@@ -61,6 +59,7 @@
   }
 
   th.mat-header-cell {
+    text-align: center;
     font-weight: 600;
     color: #1976d2;
   }
