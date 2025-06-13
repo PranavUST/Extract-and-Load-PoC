@@ -8,6 +8,56 @@ body {
   /* Remove global overflow-y */
 }
 
+.profile-management-wrapper {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 24px;
+  font-family: 'Aptos', Arial, sans-serif;
+  background: transparent;
+}
+
+.profile-management-header {
+  text-align: center;
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  border-bottom: 1px solid #eef2f7;
+}
+
+.profile-management-header h2 {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+  color: #2c3e50;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 12px;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+}
+
+.profile-management-header h2:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: #0097AC;
+  border-radius: 2px;
+}
+
+.profile-management-card {
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  padding: 24px;
+  margin-top: -1px;
+}
+
 .profile-container {
   max-width: 420px;
   margin: 48px auto 64px auto;
@@ -60,10 +110,10 @@ body {
 }
 
 .profile-input:focus {
-  border-color: #1976d2;
+  border-color: #0097AC;
   outline: none;
   background: #fff;
-  box-shadow: 0 0 0 2px #1976d233;
+  box-shadow: 0 0 0 2px rgba(0, 151, 172, 0.2);
 }
 
 .profile-input[readonly] {
@@ -99,12 +149,12 @@ body {
 
 .profile-edit-btn {
   background: #f4f6fa;
-  color: #1976d2;
+  color: #0097AC;
   border: 1.5px solid #e3e8ee;
 }
 
 .profile-save-btn {
-  background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+  background: linear-gradient(90deg, #0097AC 60%, #00b3cc 100%);
   color: #fff;
   border: none;
 }
@@ -169,7 +219,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
-  color: #1976d2;
+  color: #0097AC;
   font-weight: 500;
   font-size: 1.05em;
   cursor: pointer;
@@ -178,7 +228,7 @@ body {
   transition: color 0.18s;
 }
 .change-password-link:hover, .change-password-link:focus {
-  color: #1251a3;
+  color: #007a8a;
   text-decoration: underline solid;
 }
 

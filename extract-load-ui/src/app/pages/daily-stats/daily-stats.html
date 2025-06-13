@@ -1,68 +1,63 @@
-<div class="landing-background">
-  <div class="landing-container">
-    <div class="stats-container">
-      <h1 class="welcome-title">Daily Pipeline Statistics</h1>
+<div class="stats-management-wrapper">
+  <div class="stats-management-header">
+    <h1>Daily Pipeline Statistics</h1>
+  </div>
+  <div class="stats-management-card">
+    <div class="date-picker-container">
+      <mat-form-field appearance="fill">
+        <mat-label>Choose a date</mat-label>
+        <input matInput 
+              [matDatepicker]="picker" 
+              [(ngModel)]="selectedDate" 
+              (dateChange)="onDateChange($event)">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
 
-      <mat-card class="menu-card">
-        <mat-card-content>
-          <div class="date-picker-container">
-            <mat-form-field appearance="fill">
-              <mat-label>Choose a date</mat-label>
-              <input matInput 
-                    [matDatepicker]="picker" 
-                    [(ngModel)]="selectedDate" 
-                    (dateChange)="onDateChange($event)">
-              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
-          </div>
+    <div *ngIf="loading" class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading statistics...</p>
+    </div>
 
-          <div *ngIf="loading" class="loading-state">
-            <mat-spinner diameter="40"></mat-spinner>
-            <p>Loading statistics...</p>
-          </div>
+    <div *ngIf="error" class="error-state">
+      <mat-icon color="warn">error</mat-icon>
+      <p>{{error}}</p>
+    </div>
+    
+    <div *ngIf="stats" class="stats-grid">
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon">sync</mat-icon>
+        <div class="stat-value">{{stats.total_records_fetched || 0}}</div>
+        <div class="stat-label">Records Fetched</div>
+      </mat-card>
 
-          <div *ngIf="error" class="error-state">
-            <mat-icon color="warn">error</mat-icon>
-            <p>{{error}}</p>
-          </div>
-          
-          <div *ngIf="stats" class="stats-grid">
-            <mat-card class="stat-card">
-              <mat-icon class="stat-icon">sync</mat-icon>
-              <div class="stat-value">{{stats.total_records_fetched || 0}}</div>
-              <div class="stat-label">Records Fetched</div>
-            </mat-card>
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon">save</mat-icon>
+        <div class="stat-value">{{stats.total_records_inserted || 0}}</div>
+        <div class="stat-label">Records Inserted</div>
+      </mat-card>
 
-            <mat-card class="stat-card">
-              <mat-icon class="stat-icon">save</mat-icon>
-              <div class="stat-value">{{stats.total_records_inserted || 0}}</div>
-              <div class="stat-label">Records Inserted</div>
-            </mat-card>
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon">error</mat-icon>
+        <div class="stat-value">{{stats.total_error_count || 0}}</div>
+        <div class="stat-label">Errors</div>
+      </mat-card>
 
-            <mat-card class="stat-card">
-              <mat-icon class="stat-icon">error</mat-icon>
-              <div class="stat-value">{{stats.total_error_count || 0}}</div>
-              <div class="stat-label">Errors</div>
-            </mat-card>
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon" [ngClass]="{'success': stats.last_status === 'success', 'error': stats.last_status === 'failed'}">
+          {{stats.last_status === 'success' ? 'check_circle' : 'cancel'}}
+        </mat-icon>
+        <div class="stat-value status-text" [ngClass]="{'error-status': stats.last_status === 'failed'}">
+          {{stats.last_status || '-'}}
+        </div>
+        <div class="stat-label">Last Status</div>
+      </mat-card>
 
-            <mat-card class="stat-card">
-              <mat-icon class="stat-icon" [ngClass]="{'success': stats.last_status === 'success', 'error': stats.last_status === 'failed'}">
-                {{stats.last_status === 'success' ? 'check_circle' : 'cancel'}}
-              </mat-icon>
-              <div class="stat-value status-text" [ngClass]="{'error-status': stats.last_status === 'failed'}">
-                {{stats.last_status || '-'}}
-              </div>
-              <div class="stat-label">Last Status</div>
-            </mat-card>
-
-            <mat-card class="stat-card">
-              <mat-icon class="stat-icon">schedule</mat-icon>
-              <div class="stat-value">{{stats.last_run_timestamp ? (stats.last_run_timestamp | date:'HH:mm:ss') : '-'}}</div>
-              <div class="stat-label">Last Run Time</div>
-            </mat-card>
-          </div>
-        </mat-card-content>
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon">schedule</mat-icon>
+        <div class="stat-value">{{stats.last_run_timestamp ? (stats.last_run_timestamp | date:'HH:mm:ss') : '-'}}</div>
+        <div class="stat-label">Last Run Time</div>
       </mat-card>
     </div>
   </div>

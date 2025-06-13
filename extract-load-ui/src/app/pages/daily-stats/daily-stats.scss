@@ -1,12 +1,59 @@
+.stats-management-wrapper {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 24px;
+  font-family: 'Aptos', Arial, sans-serif;
+  background: transparent;
+}
+
+.stats-management-header {
+  text-align: center;
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  border-bottom: 1px solid #eef2f7;
+
+  h1 {
+    margin: 0;
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: #2c3e50;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 12px;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: #0097AC;
+      border-radius: 2px;
+    }
+  }
+}
+
+.stats-management-card {
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  padding: 24px;
+  margin-top: -1px;
+}
+
 .landing-background {
   height: auto;
   min-height: 0;
-  background: #ffffff;
   position: relative;
   margin: 4rem;
   margin-bottom: 6rem;
-  border-radius: 12px;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
 }
 
 .landing-container {

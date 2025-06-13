@@ -1,5 +1,6 @@
 // Import Angular Material theme if needed
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
+// Import global styles
 
 // Aptos font-face (adjust path if needed)
 @font-face {
@@ -25,18 +26,17 @@ html, body {
   background: $teal-dark;
   color: $white;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .app-container {
   margin: 2rem auto 6rem auto !important;
   max-width: 900px;
-  background: none;
+  background: transparent;
   color: $teal-dark;
-  border-radius: none;
   font-family: 'Aptos', Arial, sans-serif;
-  border: none;           // <--- Add this line to remove any border
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10); // keep only the shadow if desired
-  min-height: 60vh; // Ensures the container doesn't shrink too much
+  border: none;
+  min-height: 60vh;
   position: relative;
 }
 
@@ -47,14 +47,15 @@ html, body {
   z-index: 2000;
 }
 .global-logo img {
-  height: 90px;
-  width: auto;
+  height: 60px;
+  width: 60px;
   display: block;
   /* Remove background, border-radius, box-shadow, and padding */
   background: none;
   border-radius: 0;
   box-shadow: none;
   padding: 0;
+  object-fit: contain;
 }
 .logout-btn {
   position: fixed;

@@ -4,7 +4,7 @@ import { AdminGuard } from './guards/admin.guard';
 import { DailyStats } from './pages/daily-stats/daily-stats';
 
 export const routes: Routes = [
-  { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.Login) },
+  { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./pages/register/register').then(m => m.Register) },
   { 
     path: 'landing',
