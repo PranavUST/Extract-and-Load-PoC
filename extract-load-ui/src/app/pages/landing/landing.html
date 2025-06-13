@@ -1,6 +1,5 @@
 <div class="landing-background">
-  <!-- Profile button top right -->
-  <div style="position: absolute; top: 24px; right: 24px;">
+  <div class="profile-icon">
     <button mat-icon-button color="primary" routerLink="/profile" aria-label="Profile">
       <mat-icon>account_circle</mat-icon>
     </button>
@@ -8,20 +7,19 @@
 
   <div class="landing-container">
     <h1 class="welcome-title">
-      Welcome, <span class="username">{{ currentUser?.username }}</span>!
+      Welcome, <span class="username">{{ currentUser?.username | titlecase }}</span>!
     </h1>
-
-    <mat-card>
-      <nav class="nav-buttons">
-        <button mat-raised-button class="nav-btn" routerLink="/data-extraction">
-          Data Extraction
-        </button>
-
-        <button *ngIf="userRole === 'Admin'" mat-raised-button class="nav-btn" routerLink="/user-management">
-          User Management
-        </button>
-      </nav>
-    </mat-card>
+    <nav class="nav-buttons">
+      <button mat-raised-button class="nav-btn" routerLink="/data-extraction">
+        Data Extraction
+      </button>
+      <button *ngIf="userRole === 'Admin'" mat-raised-button class="nav-btn" routerLink="/user-management">
+        User Management
+      </button>
+      <button mat-raised-button class="nav-btn" routerLink="/logs">
+        Logs
+      </button>
+    </nav>
   </div>
 
   <button (click)="logout()" mat-raised-button class="logout-fixed">

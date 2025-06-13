@@ -13,10 +13,12 @@ import { TargetConfig } from './target-config/target-config';
 import { ConfigListComponent } from '../config-list/config-list';
 import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { MatDividerModule } from '@angular/material/divider';
 @Component({
   standalone: true,
   selector: 'app-data-extraction',
   templateUrl: './data-extraction.html',
+  styleUrls: ['./data-extraction.scss'],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -26,6 +28,7 @@ import { RouterModule } from '@angular/router';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    MatDividerModule,
     RouterModule,
     SourceConfig,
     TargetConfig,

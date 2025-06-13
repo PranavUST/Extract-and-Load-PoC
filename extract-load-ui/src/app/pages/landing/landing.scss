@@ -1,98 +1,131 @@
+$teal-dark: #004d4d;
+$white: #fff;
+
 .landing-background {
-  min-height: 100vh;
+  min-height: 35vw;
+  width: auto;
+  background: $white;
+  border-radius: 2rem; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Aptos', Arial, sans-serif;
   position: relative;
+}
+.landing-container {
+  max-width: 700px;
+  width: 100%;
+  background: $white;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  padding: 3rem 2rem 2.5rem 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  background: #f0f2f5;
-  padding: 48px 16px 80px;
-  font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  overflow: hidden; // Prevent vertical scrolling
 }
-
-.landing-container {
-  width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
-}
-
 .welcome-title {
-  font-size: 2.75rem;
+  font-size: 2.8rem;
   font-weight: 700;
-  color: #1976d2; /* login page primary blue */
-  margin-bottom: 24px;
+  color: $teal-dark;
+  margin-bottom: 2.5rem;
   text-align: center;
-  text-transform: capitalize;
-}
-
-mat-card {
-  padding: 36px 28px;
-  border-radius: 0;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.12),
-    0 4px 12px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  font-family: inherit;
+  font-family: 'Aptos';
+  letter-spacing: -1px;
 }
 
 .nav-buttons {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 2rem;
+  width: 100%;
 }
 
 .nav-btn {
-  flex: 1;
-  min-width: 150px;
-  height: 56px;
-  font-weight: 400;
-  font-size: 1.125rem;
-  border-radius: 0;
-  padding: 0 28px;
-  margin: 0 8px;
-  box-shadow: 0 6px 14px rgba(25, 118, 210, 0.15); /* use blue shadow */
-  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  min-width: 170px;
+  height: 60px;
+  font-size: 1.15rem;
+  font-weight: 500;
+  border-radius: 10px;
+  padding: 0 24px;
+  box-shadow: 0 2px 8px rgba(0, 77, 77, 0.1);
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
   cursor: pointer;
-  color: #1976d2;
-  background-color: #e3f2fd; /* very light blue background */
+  color: $teal-dark;
+  background-color: $teal-dark;
 
   &:hover {
-    background-color: #bbdefb; /* lighter blue on hover */
-    color: #0d47a1; /* darker blue text on hover */
-    box-shadow: 0 10px 24px rgba(25, 118, 210, 0.3);
+    background-color: darken($teal-dark, 5%);
+    color: $white;
+    box-shadow: 0 4px 16px rgba(0, 77, 77, 0.2);
   }
 }
+.profile-icon {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
 
+  button[mat-icon-button] {
+    background: $teal-dark;
+    border-radius: 50%;
+    border: 3px solid $white; // White border for contrast
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: lighten($teal-dark, 5%);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+      border-color: #b2dfdb; // Subtle accent on hover
+    }
+
+    mat-icon {
+      color: $white;
+      font-size: 1.64rem;
+      transition: color 0.2s;
+    }
+  }
+}
 .logout-fixed {
   position: fixed;
-  bottom: 24px;
-  left: 24px;
-  min-width: 120px;
-  height: 48px;
-  font-weight: 600;
-  font-size: 1rem;
-  border-radius: 0;
-  padding: 12px 28px;
-  background-color: #1976d2;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 2000;
+  background: $white;
+  color: $teal-dark;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 2rem;
+  font-family: 'Aptos', Arial, sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
   cursor: pointer;
-  z-index: 1000;
-
-  &:hover {
-    background-color: #1565c0;
-    box-shadow: 0 6px 16px rgba(21, 101, 192, 0.6);
-  }
 }
 
-// Prevent scrollbars on the body when this page is active
-:host {
-  ::ng-deep body {
-    overflow: hidden !important;
+@media (max-width: 900px) {
+  .landing-container {
+    max-width: 98vw;
+    padding: 1.5rem 0.5rem;
+  }
+  .nav-buttons {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .nav-btn {
+    min-width: 120px;
+    height: 44px;
+    font-size: 1rem;
+    padding: 0 12px;
+  }
+  .logout-fixed {
+    left: 1rem;
+    bottom: 1rem;
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
   }
 }

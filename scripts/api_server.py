@@ -5,7 +5,7 @@ import logging
 import uuid
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, send_file
 from flask_cors import CORS,cross_origin
 from src.logging_utils import setup_logging
 import threading
@@ -933,6 +933,14 @@ def get_profile():
     finally:
         if 'cur' in locals(): cur.close()
         if 'conn' in locals(): conn.close()
+
+@app.route('/api/pipeline-log', methods=['GET'])
+def get_pipeline_log():
+    # Use the absolute path to the root directory
+    log_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'pipeline.log'))
+    if not os.path.exists(log_path):
+        return jsonify({"error": "Log file not found"}), 404
+    return send_file(log_path, mimetype='text/plain')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=False)

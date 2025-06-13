@@ -1,28 +1,40 @@
-.user-management-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-
-  h1 {
-    color: #333;
-    margin-bottom: 8px;
-    font-size: 2rem;
-    font-weight: 600;
-  }
-
-  p {
-    color: #666;
-    margin-bottom: 24px;
-    font-size: 1.1rem;
-  }
+.user-management-wrapper {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 24px;
 }
 
-@media (max-width: 768px) {
-  .user-management-container {
-    padding: 16px;
-    
-    h1 {
-      font-size: 1.5rem;
-    }
-  }
+.user-management-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.ust-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.user-management-header h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 600;
+}
+
+.user-management-header p {
+  margin: 4px 0 0 0;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.user-management-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 32px 24px;
 }

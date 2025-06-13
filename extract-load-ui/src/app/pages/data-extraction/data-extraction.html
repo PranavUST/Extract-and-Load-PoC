@@ -1,67 +1,68 @@
-<div style="display: flex; justify-content: flex-start; margin-bottom: 16px;">
-  <button mat-icon-button color="primary" [routerLink]="['/landing']" aria-label="Home">
-    <mat-icon>home</mat-icon>
-  </button>
+<div class="data-extraction-bg">
+  <div class="data-extraction-wrapper">
+    <div class="data-extraction-card">
+      <mat-tab-group>
+        <mat-tab label="Source Config">
+          <mat-card class="tab-card">
+            <app-source-config (configSaved)="refreshConfigs()"></app-source-config>
+          </mat-card>
+        </mat-tab>
+        <mat-tab label="Target Config">
+          <mat-card class="tab-card">
+            <app-target-config (configSaved)="refreshConfigs()"></app-target-config>
+          </mat-card>
+        </mat-tab>
+        <mat-tab label="Schedule">
+          <mat-card class="tab-card">
+            <h2 class="section-title">Schedule Pipeline Run</h2>
+            <mat-divider></mat-divider>
+            <form [formGroup]="schedulerForm" (ngSubmit)="runPipeline()">
+              <div class="form-row">
+                <mat-form-field appearance="fill">
+                  <mat-label>Interval (minutes)</mat-label>
+                  <input matInput type="number" formControlName="interval" min="1" />
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>Duration (hours)</mat-label>
+                  <input matInput type="number" formControlName="duration" min="0.1" step="0.1" />
+                </mat-form-field>
+              </div>
+              <div class="button-row">
+                <button mat-raised-button color="primary" type="submit" [disabled]="schedulerForm.invalid">
+                  Schedule
+                </button>
+                <button mat-raised-button color="accent" type="button" (click)="runPipelineOnce()">
+                  Run Once
+                </button>
+                <button mat-raised-button color="warn" type="button" (click)="stopPipeline()">
+                  Stop Pipeline
+                </button>
+              </div>
+            </form>
+            <div *ngIf="status" class="status-message">
+              {{ status }}
+            </div>
+            <div>Log count: {{ statusDetails.length }}</div>
+            <div *ngIf="statusDetails.length" class="pipeline-details">
+              <strong>Pipeline Details:</strong>
+              <ul>
+                <li *ngFor="let s of statusDetails">
+                  {{ s }}
+                </li>
+              </ul>
+            </div>
+            <div>Current runId: {{ runId }}</div>
+            <div *ngIf="waitingForScheduledRun" class="waiting-message">
+              Waiting for next scheduled run to start...
+            </div>
+          </mat-card>
+        </mat-tab>
+        <mat-tab label="Saved Configs">
+          <mat-card class="tab-card">
+            <app-config-list></app-config-list>
+          </mat-card>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
 </div>
-
-<mat-tab-group>
-  <mat-tab label="Source Config">
-    <div style="max-height: 70vh; overflow-y: auto; padding-right: 8px;">
-      <app-source-config (configSaved)="refreshConfigs()"></app-source-config>
-    </div>
-  </mat-tab>
-  <mat-tab label="Target Config">
-    <div style="max-height: 70vh; overflow-y: auto; padding-right: 8px;">
-      <app-target-config (configSaved)="refreshConfigs()"></app-target-config>
-    </div>
-  </mat-tab>
-  <mat-tab label="Schedule">
-    <div style="max-height: 70vh; overflow-y: auto; padding-right: 8px;">
-      <mat-card style="margin-top: 24px;">
-        <mat-card-title>Schedule Pipeline Run</mat-card-title>
-        <form [formGroup]="schedulerForm" (ngSubmit)="runPipeline()">
-          <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-            <mat-form-field appearance="fill">
-              <mat-label>Interval (minutes)</mat-label>
-              <input matInput type="number" formControlName="interval" min="1" required>
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-              <mat-label>Duration (hours)</mat-label>
-              <input matInput type="number" formControlName="duration" min="0.1" step="0.1" required>
-            </mat-form-field>
-            <button mat-raised-button color="primary" type="submit" [disabled]="schedulerForm.invalid">
-              Run Pipeline (Schedule)
-            </button>
-            <button mat-raised-button color="accent" type="button" (click)="runPipelineOnce()">
-              Run Once
-            </button>
-          </div>
-        </form>
-        <div *ngIf="status" class="status-message" style="margin-top:1rem;">
-          {{ status }}
-        </div>
-        <div>Log count: {{ statusDetails.length }}</div>
-        <div *ngIf="statusDetails.length" style="margin-top: 1rem; background: #f5f5f5; border: 1px solid #ccc; padding: 8px;">
-          <strong>Pipeline Details:</strong>
-          <ul>
-            <li *ngFor="let s of statusDetails">
-              <span style="color:gray">{{ s.timestamp }}:</span> {{ s.message }}
-            </li>
-          </ul>
-        </div>
-        <div>Current runId: {{ runId }}</div>
-        <div *ngIf="waitingForScheduledRun" style="color: #888; margin-top: 1rem;">
-          Waiting for next scheduled run to start...
-        </div>
-        <button mat-raised-button color="warn" type="button" (click)="stopPipeline()" style="margin-top: 1rem;">
-          Stop Pipeline
-        </button>
-      </mat-card>
-    </div>
-  </mat-tab>
-  <mat-tab label="Saved Configs">
-    <div style="max-height: 70vh; overflow-y: auto; padding-right: 8px;">
-      <app-config-list></app-config-list>
-    </div>
-  </mat-tab>
-</mat-tab-group>

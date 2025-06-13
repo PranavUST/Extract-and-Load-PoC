@@ -1,21 +1,89 @@
+// Import Angular Material theme if needed
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
-body {
+// Aptos font-face (adjust path if needed)
+@font-face {
+  font-family: 'Aptos';
+  src: url('/Aptos.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Aptos';
+  src: url('/Aptos-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+$teal-dark: #004d4d;
+$white: #fff;
+
+html, body {
+  height: 100%;
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  overflow: hidden !important;
+  font-family: 'Aptos', Arial, sans-serif;
+  background: $teal-dark;
+  color: $white;
+  min-height: 100vh;
 }
 
-.mat-card {
-  margin: 1rem;
-  max-width: 800px;
+.app-container {
+  margin: 2rem auto 6rem auto !important;
+  max-width: 900px;
+  background: none;
+  color: $teal-dark;
+  border-radius: none;
+  font-family: 'Aptos', Arial, sans-serif;
+  border: none;           // <--- Add this line to remove any border
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10); // keep only the shadow if desired
+  min-height: 60vh; // Ensures the container doesn't shrink too much
+  position: relative;
 }
 
-.config-section {
-  display: grid;
-  gap: 1rem;
-  padding: 1rem 0;
+.global-logo {
+  position: fixed;
+  top: 2rem;   // Reduced from 2in
+  left: 2rem;
+  z-index: 2000;
+}
+.global-logo img {
+  height: 90px;
+  width: auto;
+  display: block;
+  /* Remove background, border-radius, box-shadow, and padding */
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+.logout-btn {
+  position: fixed;
+  left: 2rem;
+  bottom: 2rem;
+  z-index: 2000;
+  background: $white;
+  color: $teal-dark;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 2rem;
+  font-family: 'Aptos', Arial, sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  cursor: pointer;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+@media (max-width: 1200px) {
+  .app-container {
+    margin: 1in auto 4rem auto !important;
+    max-width: calc(100vw - 2in);
+  }
+  .global-logo {
+    top: 1in;
+    left: 0.5in;
+  }
+  .logout-btn {
+    left: 1rem;
+    bottom: 1rem;
+  }
+}
