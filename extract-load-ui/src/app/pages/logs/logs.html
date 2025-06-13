@@ -1,12 +1,13 @@
-<mat-card>
-  <mat-card-title>
-    <span class="logs-title">Pipeline Logs</span>
+<div class="logs-wrapper">
+  <div class="logs-header">
+    <h1>Pipeline Logs</h1>
+    <p class="logs-subtitle">Latest pipeline logs</p>
     <button mat-raised-button color="primary" class="view-log-btn" (click)="viewLog()">
       <mat-icon>visibility</mat-icon>
       View pipeline.log
     </button>
-  </mat-card-title>
-  <mat-card-content>
+  </div>
+  <div class="logs-card">
     <div *ngIf="loading" class="logs-loading">
       <mat-spinner diameter="32"></mat-spinner>
       <span>Loading log...</span>
@@ -19,5 +20,5 @@
     <div *ngIf="!logContent && !loading && !error" class="logs-empty">
       Click "View pipeline.log" to display the latest logs.
     </div>
-  </mat-card-content>
-</mat-card>
+  </div>
+</div>

@@ -15,7 +15,7 @@ def get_connection(conn_params=None):
             # Use default connection parameters
             conn_params = {
                 'host': 'localhost',
-                'database': 'DataLake',
+                'database': 'postgres',
                 'user': 'postgres',
                 'password': 'admin'
             }
