@@ -11,14 +11,17 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/animations": "^20.0.0",
     "@angular/cdk": "^20.0.2",
     "@angular/common": "^20.0.0",
     "@angular/compiler": "^20.0.0",
     "@angular/core": "^20.0.0",
     "@angular/forms": "^20.0.0",
     "@angular/material": "^20.0.2",
+    "@angular/material-moment-adapter": "^20.0.3",
     "@angular/platform-browser": "^20.0.0",
     "@angular/router": "^20.0.0",
+    "moment": "^2.30.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

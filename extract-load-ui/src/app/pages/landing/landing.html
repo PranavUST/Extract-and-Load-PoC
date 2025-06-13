@@ -9,6 +9,7 @@
     <h1 class="welcome-title">
       Welcome, <span class="username">{{ currentUser?.username | titlecase }}</span>!
     </h1>
+<<<<<<< Updated upstream
     <nav class="nav-buttons">
       <button mat-raised-button class="nav-btn" routerLink="/data-extraction">
         Data Extraction
@@ -20,6 +21,24 @@
         Logs
       </button>
     </nav>
+=======
+
+    <mat-card>
+      <nav class="nav-buttons">
+        <button mat-raised-button class="nav-btn" routerLink="/data-extraction">
+          Data Extraction
+        </button>
+
+        <button mat-raised-button class="nav-btn" [routerLink]="['/daily-stats']">
+          Daily Stats
+        </button>
+
+        <button *ngIf="userRole === 'Admin'" mat-raised-button class="nav-btn" routerLink="/user-management">
+          User Management
+        </button>
+      </nav>
+    </mat-card>
+>>>>>>> Stashed changes
   </div>
 
   <button (click)="logout()" mat-raised-button class="logout-fixed">

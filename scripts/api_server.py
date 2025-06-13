@@ -100,6 +100,12 @@ CORS(
             "methods": ["POST", "OPTIONS"],
             "allow_headers": ["Content-Type"],
             "supports_credentials": True
+        },
+        r"/pipeline-stats/*": {
+            "origins": ["http://localhost:4200"],
+            "methods": ["GET", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+            "supports_credentials": True
         }
     }
 )
@@ -934,6 +940,7 @@ def get_profile():
         if 'cur' in locals(): cur.close()
         if 'conn' in locals(): conn.close()
 
+<<<<<<< Updated upstream
 @app.route('/api/pipeline-log', methods=['GET'])
 def get_pipeline_log():
     # Use the absolute path to the root directory
@@ -941,6 +948,58 @@ def get_pipeline_log():
     if not os.path.exists(log_path):
         return jsonify({"error": "Log file not found"}), 404
     return send_file(log_path, mimetype='text/plain')
+=======
+# Add this new route after your other routes
+@app.route('/pipeline-stats/<date>', methods=['GET'])
+def get_pipeline_stats(date):
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        
+        # Query for complete stats
+        cur.execute("""
+            SELECT 
+                stat_date,
+                total_records_fetched,
+                total_records_inserted,
+                total_error_count,
+                last_status,
+                last_run_timestamp
+            FROM pipeline_stats 
+            WHERE stat_date = %s::date
+        """, (date,))
+        
+        result = cur.fetchone()
+        
+        if result is not None:
+            stats = {
+                "stat_date": str(result[0]),
+                "total_records_fetched": result[1] or 0,
+                "total_records_inserted": result[2] or 0,
+                "total_error_count": result[3] or 0,
+                "last_status": result[4] or '-',
+                "last_run_timestamp": str(result[5]) if result[5] else None
+            }
+            return jsonify(stats)
+        else:
+            # Return empty stats if no data found
+            stats = {
+                "stat_date": date,
+                "total_records_fetched": 0,
+                "total_records_inserted": 0,
+                "total_error_count": 0,
+                "last_status": '-',
+                "last_run_timestamp": None
+            }
+            return jsonify(stats)
+            
+    except Exception as e:
+        logger.error(f"Error getting pipeline stats: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if 'cur' in locals(): cur.close()
+        if 'conn' in locals(): conn.close()
+>>>>>>> Stashed changes
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=False)

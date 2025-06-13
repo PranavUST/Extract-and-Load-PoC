@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
+import { DailyStats } from './pages/daily-stats/daily-stats';
 
 export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.Login) },
@@ -35,10 +36,17 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/profile/profile').then(m => m.ProfileComponent),
     canActivate: [AuthGuard]
   },
+<<<<<<< Updated upstream
   { 
     path: 'logs',
     loadComponent: () => import('./pages/logs/logs').then(m => m.LogsPage),
     canActivate: [AuthGuard] // Optional: add this if logs should be protected
+=======
+  {
+    path: 'daily-stats',
+    component: DailyStats,
+    canActivate: [AuthGuard]
+>>>>>>> Stashed changes
   },
   { path: '**', redirectTo: 'login' }
 ];
