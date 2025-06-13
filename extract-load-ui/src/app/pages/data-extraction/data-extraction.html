@@ -47,7 +47,7 @@
               <strong>Pipeline Details:</strong>
               <ul>
                 <li *ngFor="let s of statusDetails">
-                  {{ s }}
+                  <strong>{{ s.timestamp }}:</strong> {{ s.message }}
                 </li>
               </ul>
             </div>
