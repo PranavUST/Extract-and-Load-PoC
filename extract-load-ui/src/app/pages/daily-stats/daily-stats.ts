@@ -9,6 +9,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
@@ -52,6 +53,7 @@ interface PipelineStats {
     MatNativeDateModule,
     MatCardModule,
     MatTableModule,
+    MatProgressSpinnerModule,
     HttpClientModule
   ],
   providers: [
