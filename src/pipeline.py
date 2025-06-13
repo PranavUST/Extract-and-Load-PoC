@@ -14,6 +14,8 @@ from src.schema_generator import CSVSchemaGenerator
 from src.ftp_client import download_ftp_files
 from src.database import insert_pipeline_status
 
+logging.basicConfig(level=logging.DEBUG)
+
 logger = logging.getLogger(__name__)
 def get_project_root():
     return Path(__file__).parent.parent
@@ -139,10 +141,10 @@ class DataPipeline:
         logger.info("Starting DataPipeline execution")
         insert_pipeline_status("Pipeline started.", run_id)
         stats = {
-            'records_fetched': 0,
-            'records_inserted': 0,
-            'error_count': 0,
-            'status': 'success'
+            'records_fetched': 0,  # Will be incremented during pipeline run
+            'records_inserted': 0,  # Will be incremented during pipeline run
+            'error_count': 0,      # Will be incremented on errors
+            'status': 'success'    # Will be updated based on final state
         }
 
         # Initialize conn_params BEFORE try block

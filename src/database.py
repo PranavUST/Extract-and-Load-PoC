@@ -8,17 +8,22 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 load_dotenv()
 
-def get_connection():
-    """Establish database connection using environment variables"""
-    logger.debug("Establishing database connection to %s:%s/%s as user '%s'",
-                 os.getenv("DB_HOST"), os.getenv("DB_PORT"), os.getenv("DB_NAME"), os.getenv("DB_USER"))
-    return psycopg2.connect(
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT"),
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-    )
+def get_connection(conn_params=None):
+    """Get database connection with provided params or default config"""
+    try:
+        if conn_params is None:
+            # Use default connection parameters
+            conn_params = {
+                'host': 'localhost',
+                'database': 'DataLake',
+                'user': 'postgres',
+                'password': 'admin'
+            }
+        
+        return psycopg2.connect(**conn_params)
+    except Exception as e:
+        logger.error(f"Database connection failed: {str(e)}")
+        raise
 
 def create_logins_table_if_not_exists(conn_params: dict = None):
     """
@@ -140,38 +145,66 @@ def get_table_row_count(table_name: str, conn_params: dict = None) -> int:
         return 0
     
 def log_pipeline_stats(stats: dict, conn_params: dict):
-    """Atomic stats logging with self-healing schema"""
+    """Log pipeline stats with accumulation across all inserts"""
     from datetime import date
+    import logging
     
-    if not conn_params:
-        logger.error("No connection parameters provided for stats logging")
-        return
+    logger = logging.getLogger(__name__)
 
     try:
-        # Always verify table exists before logging
-        from src.schema_generator import CSVSchemaGenerator
-        CSVSchemaGenerator().create_pipeline_stats_table(conn_params)
-        
-        query = """
-        INSERT INTO pipeline_stats 
-            (stat_date, records_fetched, records_inserted, error_count, status)
-        VALUES (%s, %s, %s, %s, %s)
-        ON CONFLICT (stat_date) DO UPDATE SET
-            records_fetched = EXCLUDED.records_fetched,
-            records_inserted = EXCLUDED.records_inserted,
-            error_count = EXCLUDED.error_count,
-            status = EXCLUDED.status;
-        """
-        execute_query(query, (
-            date.today(),
-            stats['records_fetched'],
-            stats['records_inserted'],
-            stats['error_count'],
-            stats['status']
-        ), conn_params)
-        logger.info("Stats logged: %s", stats)
+        with get_connection(conn_params) as conn:
+            with conn.cursor() as cur:
+                # Get today's current totals
+                cur.execute("""
+                    SELECT total_records_fetched, total_records_inserted, total_error_count 
+                    FROM pipeline_stats 
+                    WHERE stat_date = CURRENT_DATE;
+                """)
+                current_stats = cur.fetchone()
+
+                # Each successful operation counts as new records, even if data is the same
+                records_fetched = int(stats.get('records_fetched', 0))
+                records_inserted = int(stats.get('records_inserted', 0))
+                error_count = int(stats.get('error_count', 0))
+
+                logger.debug(f"New records: fetched={records_fetched}, inserted={records_inserted}")
+
+                if current_stats:
+                    # Always add new operations to totals
+                    total_fetched = current_stats[0] + records_fetched
+                    total_inserted = current_stats[1] + records_inserted
+                    total_errors = current_stats[2] + error_count
+
+                    logger.debug(f"Updating totals: fetched={total_fetched}, inserted={total_inserted}")
+
+                    cur.execute("""
+                        UPDATE pipeline_stats 
+                        SET total_records_fetched = %s,
+                            total_records_inserted = %s,
+                            total_error_count = %s,
+                            last_status = %s,
+                            last_run_timestamp = CURRENT_TIMESTAMP
+                        WHERE stat_date = CURRENT_DATE
+                    """, (total_fetched, total_inserted, total_errors, stats['status']))
+                else:
+                    # First run of the day
+                    logger.debug("First run of the day")
+                    cur.execute("""
+                        INSERT INTO pipeline_stats 
+                            (stat_date, total_records_fetched, total_records_inserted, 
+                             total_error_count, last_status)
+                        VALUES 
+                            (CURRENT_DATE, %s, %s, %s, %s)
+                    """, (records_fetched, records_inserted, error_count, stats['status']))
+
+                conn.commit()
+
+                logger.info(f"Pipeline stats updated - Total records fetched: {total_fetched if current_stats else records_fetched}, "
+                          f"Total records inserted: {total_inserted if current_stats else records_inserted}")
+
     except Exception as e:
-        logger.error("Stats logging failed: %s", str(e))
+        logger.error(f"Failed to log pipeline stats: {str(e)}")
+        raise
 def create_pipeline_status_table_if_not_exists(conn_params: dict = None):
     """Create the pipeline_status table if it does not exist, with run_id column."""
     create_table_sql = """
