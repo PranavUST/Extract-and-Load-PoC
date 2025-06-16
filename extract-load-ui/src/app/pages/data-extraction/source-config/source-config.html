@@ -4,49 +4,49 @@
   </mat-card-header>
   <mat-card-content>
     <form [formGroup]="sourceForm" (ngSubmit)="saveConfig()">
-      <div style="display: flex; flex-direction: column; gap: 16px;">
+      <div class="top-row-equal">
         <mat-form-field appearance="fill">
           <mat-label>Name</mat-label>
           <input matInput formControlName="name" required>
           <mat-error *ngIf="sourceForm.get('name')?.invalid">Name is required</mat-error>
         </mat-form-field>
-
         <mat-form-field appearance="fill">
           <mat-label>Source Type</mat-label>
           <mat-select formControlName="type">
             <mat-option *ngFor="let type of sourceTypes" [value]="type">{{ type }}</mat-option>
           </mat-select>
         </mat-form-field>
-
+      </div>
+      <div class="input-row">
         <ng-container [ngSwitch]="sourceForm.get('type')?.value">
-          <div *ngSwitchCase="'API'">
-            <mat-form-field appearance="fill">
+          <div *ngSwitchCase="'API'" class="input-row">
+            <mat-form-field appearance="fill" class="small-input">
               <mat-label>API Endpoint</mat-label>
               <input matInput formControlName="endpoint" required>
             </mat-form-field>
-            <mat-form-field appearance="fill">
+            <mat-form-field appearance="fill" class="small-input">
               <mat-label>Auth Token</mat-label>
               <input matInput formControlName="authToken">
             </mat-form-field>
-            <mat-form-field appearance="fill">
+            <mat-form-field appearance="fill" class="small-input">
               <mat-label>Retries</mat-label>
               <input matInput type="number" formControlName="retries" min="0">
             </mat-form-field>
           </div>
-          <div *ngSwitchCase="'FTP'">
-            <mat-form-field appearance="fill">
+          <div *ngSwitchCase="'FTP'" class="input-row">
+            <mat-form-field appearance="fill" class="small-input">
               <mat-label>FTP Host</mat-label>
               <input matInput formControlName="ftpHost" required>
             </mat-form-field>
-            <mat-form-field appearance="fill">
+            <mat-form-field appearance="fill" class="small-input">
               <mat-label>FTP Username</mat-label>
               <input matInput formControlName="ftpUsername">
             </mat-form-field>
-            <mat-form-field appearance="fill">
+            <mat-form-field appearance="fill" class="small-input">
               <mat-label>FTP Password</mat-label>
               <input matInput formControlName="ftpPassword" type="password">
             </mat-form-field>
-            <mat-form-field appearance="fill">
+            <mat-form-field appearance="fill" class="small-input">
               <mat-label>Retries</mat-label>
               <input matInput type="number" formControlName="retries" min="0">
             </mat-form-field>

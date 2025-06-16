@@ -22,11 +22,14 @@ $white: #fff;
 html, body {
   height: 100%;
   margin: 0;
-  font-family: 'Aptos', Arial, sans-serif;
   background: $teal-dark;
   color: $white;
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+body, html, * {
+  font-family: 'Aptos', Arial, sans-serif !important;
 }
 
 .app-container {
@@ -34,7 +37,6 @@ html, body {
   max-width: 900px;
   background: transparent;
   color: $teal-dark;
-  font-family: 'Aptos', Arial, sans-serif;
   border: none;
   min-height: 60vh;
   position: relative;
@@ -67,7 +69,6 @@ html, body {
   border: none;
   border-radius: 8px;
   padding: 0.75rem 2rem;
-  font-family: 'Aptos', Arial, sans-serif;
   font-size: 1.1rem;
   font-weight: bold;
   box-shadow: 0 2px 8px rgba(0,0,0,0.10);
@@ -87,4 +88,51 @@ html, body {
     left: 1rem;
     bottom: 1rem;
   }
+}
+
+// GLOBAL OVERRIDES for compact Angular Material input fields in Source Config
+::ng-deep mat-form-field.small-input .mat-mdc-text-field-wrapper,
+::ng-deep mat-form-field.small-input .mat-mdc-form-field-flex,
+::ng-deep mat-form-field.small-input .mat-mdc-input-element,
+::ng-deep mat-form-field.small-input .mat-mdc-select-trigger {
+  min-height: 14px !important;
+  height: 14px !important;
+  line-height: 14px !important;
+  font-size: 0.88rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+::ng-deep mat-form-field.small-input .mat-mdc-form-field-infix {
+  min-height: 14px !important;
+  padding: 0 0 0 0 !important;
+}
+::ng-deep mat-form-field.small-input .mat-mdc-floating-label,
+::ng-deep mat-form-field.small-input .mat-mdc-form-field-label {
+  top: 8px !important;
+  font-size: 0.88rem !important;
+}
+
+/* GLOBAL: Always use Material Icons font for mat-icon */
+mat-icon, .mat-icon, .mat-mdc-icon-button mat-icon {
+  font-family: 'Material Icons' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  letter-spacing: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Prevent global font-family from overriding Material Icons */
+mat-icon, .mat-icon, .mat-mdc-icon-button mat-icon {
+  font-family: 'Material Icons' !important;
+}
+
+/* Prevent * selector from overriding mat-icon font */
+body, html, *:not(mat-icon):not(.mat-icon) {
+  font-family: 'Aptos', Arial, sans-serif !important;
 }

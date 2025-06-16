@@ -18,51 +18,44 @@
         </mat-tab>
         <mat-tab label="Schedule">
           <mat-card class="tab-card">
-            <mat-card-header>
-              <mat-card-title>Schedule Pipeline Run</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <mat-divider></mat-divider>
-              <form [formGroup]="schedulerForm" (ngSubmit)="runPipeline()">
-                <div class="form-row">
-                  <mat-form-field appearance="fill">
-                    <mat-label>Interval (minutes)</mat-label>
-                    <input matInput type="number" formControlName="interval" min="1" />
-                  </mat-form-field>
-                  <mat-form-field appearance="fill">
-                    <mat-label>Duration (hours)</mat-label>
-                    <input matInput type="number" formControlName="duration" min="0.1" step="0.1" />
-                  </mat-form-field>
-                </div>
-                <div class="button-row">
-                  <button mat-raised-button color="primary" type="submit" [disabled]="schedulerForm.invalid">
-                    Schedule
-                  </button>
-                  <button mat-raised-button color="accent" type="button" (click)="runPipelineOnce()">
-                    Run Once
-                  </button>
-                  <button mat-raised-button color="warn" type="button" (click)="stopPipeline()">
-                    Stop Pipeline
-                  </button>
-                </div>
-              </form>
-              <div *ngIf="status" class="status-message">
-                {{ status }}
+            <div class="section-title">Schedule Pipeline Run</div>
+            <form [formGroup]="schedulerForm" (ngSubmit)="runPipeline()">
+              <div class="form-row">
+                <mat-form-field appearance="fill" class="small-input">
+                  <mat-label>Interval (minutes)</mat-label>
+                  <input matInput type="number" formControlName="interval" min="1" />
+                </mat-form-field>
+                <mat-form-field appearance="fill" class="small-input">
+                  <mat-label>Duration (hours)</mat-label>
+                  <input matInput type="number" formControlName="duration" min="0.1" step="0.1" />
+                </mat-form-field>
               </div>
-              <div>Log count: {{ statusDetails.length }}</div>
-              <div *ngIf="statusDetails.length" class="pipeline-details">
-                <strong>Pipeline Details:</strong>
-                <ul>
-                  <li *ngFor="let s of statusDetails">
-                    <strong>{{ s.timestamp }}:</strong> {{ s.message }}
-                  </li>
-                </ul>
+              <div class="button-row">
+                <button mat-raised-button color="primary" type="submit" [disabled]="schedulerForm.invalid">
+                  Schedule
+                </button>
+                <button mat-raised-button color="accent" type="button" (click)="runPipelineOnce()" [disabled]="isRunOnceDisabled">
+                  Run Once
+                </button>
+                <button mat-raised-button color="warn" type="button" (click)="stopPipeline()">
+                  Stop Pipeline
+                </button>
               </div>
-              <div>Current runId: {{ runId }}</div>
-              <div *ngIf="waitingForScheduledRun" class="waiting-message">
-                Waiting for next scheduled run to start...
-              </div>
-            </mat-card-content>
+            </form>
+            <div *ngIf="status" class="status-message">
+              {{ status }}
+            </div>
+            <div *ngIf="statusDetails.length" class="pipeline-details">
+              <strong>Pipeline Details:</strong>
+              <ul>
+                <li *ngFor="let s of statusDetails">
+                  <strong>{{ s.timestamp }}:</strong> {{ s.message }}
+                </li>
+              </ul>
+            </div>
+            <div *ngIf="waitingForScheduledRun" class="waiting-message">
+              Waiting for next scheduled run to start...
+            </div>
           </mat-card>
         </mat-tab>
         <mat-tab label="Saved Configs">

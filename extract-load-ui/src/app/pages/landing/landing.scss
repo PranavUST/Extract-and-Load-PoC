@@ -49,28 +49,39 @@ $white: #fff;
 }
 
 .nav-btn {
+  background-color: $teal-dark !important;
+  color: $white !important;
+  font-weight: 600;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,77,77,0.10);
+  transition: background 0.18s, box-shadow 0.18s, color 0.18s;
   height: 56px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   padding: 0 1.5rem;
-  border-radius: 8px;
-  background-color: $teal-dark;
-  color: $white;
 
   mat-icon {
     margin-right: 0.75rem;
     font-size: 1.25rem;
+    color: $white !important;
+    transition: color 0.2s;
   }
 
   span {
     font-size: 1.1rem;
-    font-weight: 500;
+    font-weight: 450;
+    color: $white !important;
   }
 
-  &:hover {
-    background-color: darken($teal-dark, 5%);
-    box-shadow: 0 4px 12px rgba(0, 77, 77, 0.2);
+  &:hover, &:focus {
+    background-color: darken($teal-dark, 7%) !important;
+    color: $white !important;
+    box-shadow: 0 4px 16px rgba(0,77,77,0.18);
+
+    mat-icon, span {
+      color: $white !important;
+    }
   }
 }
 .profile-icon-fixed {

@@ -247,6 +247,19 @@
     input {
       width: 100%;
       padding-right: 40px;
+      /* Hide browser default password reveal icon */
+      &::-ms-reveal, &::-ms-clear {
+        display: none;
+      }
+      &::-webkit-credentials-auto-fill-button {
+        display: none !important;
+      }
+      &::-webkit-input-decoration {
+        display: none !important;
+      }
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
     }
     
     .toggle-password {

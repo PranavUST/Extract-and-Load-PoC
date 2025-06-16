@@ -20,24 +20,24 @@ body {
   text-align: center;
   margin-bottom: 20px;
   background: #fff;
-  padding: 24px;
+  padding: 32px 24px 24px 24px;
   border-radius: 16px 16px 0 0;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   border-bottom: 1px solid #eef2f7;
+  position: relative;
 }
-
 .profile-management-header h2 {
   margin: 0;
   font-size: 2.4rem;
   font-weight: 700;
   letter-spacing: -1px;
-  color: #2c3e50;
+  color: #004d5a !important;
   position: relative;
   display: inline-block;
   padding-bottom: 12px;
   text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+  font-family: 'Aptos', Arial, sans-serif !important;
 }
-
 .profile-management-header h2:after {
   content: '';
   position: absolute;
@@ -48,6 +48,33 @@ body {
   height: 4px;
   background: #0097AC;
   border-radius: 2px;
+}
+.profile-section-title {
+  font-size: 1.18rem;
+  font-weight: 600;
+  color: #004d5a !important;
+  margin-bottom: 1.2rem;
+  margin-top: 0.5rem;
+  letter-spacing: 0.01em;
+}
+.profile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5em 2.5em;
+  margin: 1.2em 0 0.5em 0;
+  font-size: 1.05em;
+  color: #444;
+  align-items: center;
+}
+.profile-meta mat-icon {
+  font-size: 1.2em;
+  vertical-align: middle;
+  margin-right: 0.3em;
+  color: #004d5a !important;
+}
+.profile-divider {
+  border-top: 1.5px dashed #e0e0e0;
+  margin: 2.2em 0 2em 0;
 }
 
 .profile-management-card {
@@ -110,10 +137,10 @@ body {
 }
 
 .profile-input:focus {
-  border-color: #0097AC;
+  border-color: #007a8a !important;
   outline: none;
   background: #fff;
-  box-shadow: 0 0 0 2px rgba(0, 151, 172, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 77, 90, 0.18) !important;
 }
 
 .profile-input[readonly] {
@@ -149,12 +176,12 @@ body {
 
 .profile-edit-btn {
   background: #f4f6fa;
-  color: #0097AC;
-  border: 1.5px solid #e3e8ee;
+  color: #004d5a !important;
+  border: 1.5px solid #b2d0d6 !important;
 }
 
 .profile-save-btn {
-  background: linear-gradient(90deg, #0097AC 60%, #00b3cc 100%);
+  background: linear-gradient(90deg, #007a8a 60%, #004d5a 100%) !important;
   color: #fff;
   border: none;
 }
@@ -194,9 +221,12 @@ body {
 }
 
 .password-section {
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e0e0e0;
+  background: #f0f7fa;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,151,172,0.04);
+  padding: 2em 1.5em 1.5em 1.5em;
+  margin-top: 0;
+  border-top: none;
 }
 .password-section h3 {
   margin-bottom: 1.2rem;
@@ -219,11 +249,11 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
-  color: #0097AC;
+  color: #007a8a !important;
   font-weight: 500;
-  font-size: 1.05em;
+  font-size: 1.08em;
   cursor: pointer;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5em;
   text-decoration: underline dotted;
   transition: color 0.18s;
 }
@@ -265,4 +295,42 @@ body {
   font-size: 22px;
   user-select: none;
   pointer-events: none;
+}
+
+/* Fix: Always use Material Icons font for mat-icon */
+mat-icon, .mat-icon, .mat-mdc-icon-button mat-icon {
+  font-family: 'Material Icons' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  letter-spacing: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Prevent parent selectors from overriding mat-icon font-family in profile page */
+.profile-management-header mat-icon,
+.profile-management-card mat-icon,
+.profile-section-title mat-icon,
+.profile-meta mat-icon,
+.profile-fields mat-icon,
+.profile-actions mat-icon,
+.password-section mat-icon,
+.change-password-link mat-icon {
+  font-family: 'Material Icons' !important;
+}
+
+.profile-management-header, .profile-management-header *,
+.profile-management-card, .profile-management-card *,
+.profile-section-title, .profile-section-title *,
+.profile-meta, .profile-meta *,
+.profile-fields, .profile-fields *,
+.profile-actions, .profile-actions *,
+.password-section, .password-section *,
+.change-password-link, .change-password-link * {
+  font-family: 'Aptos', Arial, sans-serif !important;
 }

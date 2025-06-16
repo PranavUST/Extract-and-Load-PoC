@@ -1,0 +1,69 @@
+// Schedule tab specific tweaks
+.section-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #004d4d;
+  letter-spacing: -0.5px;
+}
+
+.tab-card {
+  padding: 32px 24px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.form-row mat-form-field.small-input {
+  min-width: 120px;
+  flex: 1 1 120px;
+}
+
+.button-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+// Make 'Run Once' button transparent when disabled
+.button-row button[mat-raised-button][color="accent"][disabled] {
+  opacity: 0.4 !important;
+  background: #004d4d !important;
+  color: #fff !important;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.status-message {
+  margin-top: 1rem;
+  color: #1976d2;
+  font-weight: 500;
+}
+
+.pipeline-details {
+  margin-top: 1rem;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 0.98rem;
+}
+
+.waiting-message {
+  color: #888;
+  margin-top: 1rem;
+}
+
+// Use Aptos font for all Schedule tab content
+.tab-card, .section-title, .form-row, .button-row, .status-message, .pipeline-details, .waiting-message {
+  font-family: 'Aptos', Arial, sans-serif;
+}

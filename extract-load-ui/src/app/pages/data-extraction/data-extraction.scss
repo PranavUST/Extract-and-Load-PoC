@@ -9,14 +9,17 @@
   margin: 40px auto;
   padding: 24px;
   font-family: 'Aptos', Arial, sans-serif;
+  margin-top: -8px !important;
+  padding-top: 0 !important;
 }
 
 .data-extraction-header {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
+  padding-top: 2px;
+  padding-bottom: 8px;
   background: #fff;
-  padding: 24px 24px 12px 24px;
-  border-radius: 16px 16px 0 0;
+  border-radius: 16px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   border-bottom: 1px solid #eef2f7;
   position: relative;
@@ -24,7 +27,7 @@
 
 .data-extraction-header h1 {
   margin: 0;
-  font-size: 2.4rem;
+  font-size: 1.85rem;
   font-weight: 700;
   letter-spacing: -1px;
   color: #2c3e50;
@@ -32,6 +35,7 @@
   padding-bottom: 12px;
   text-shadow: 0 1px 1px rgba(255,255,255,0.5);
   position: relative;
+  line-height: 1.1;
 }
 
 .data-extraction-header h1:after {
@@ -94,21 +98,27 @@
   background: #fff;
   padding: 24px;
   margin-bottom: 24px;
+  margin-top: 0 !important;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .data-extraction-header {
-  margin-bottom: 32px;
+  margin-bottom: 14px;
+  padding-top: 2px;
+  padding-bottom: 8px;
   h1 {
     margin: 0;
-    font-size: 2.4rem;
+    font-size: 1.85rem;
     font-weight: 700;
     letter-spacing: -1px;
     font-family: 'Aptos', Arial, sans-serif;
+    line-height: 1.1;
   }
   p {
-    margin: 10px 0 0 0;
+    margin: 4px 0 0 0;
     color: #555;
-    font-size: 1.15rem;
+    font-size: 1.04rem;
   }
 }
 
@@ -148,7 +158,7 @@ mat-card {
   margin-bottom: 20px;
 }
 
-mat-form-field {
+.form-row mat-form-field {
   min-width: 180px;
   flex: 1 1 220px;
 }
@@ -162,7 +172,7 @@ mat-form-field {
 
 .status-message {
   margin-top: 1rem;
-  color: #1976d2;
+  color: #222 !important;
   font-weight: 500;
 }
 
@@ -197,6 +207,11 @@ mat-form-field {
 .button-row button[mat-raised-button][color="accent"]:focus {
   background: #003838 !important;
   box-shadow: 0 4px 16px rgba(0,77,77,0.18);
+}
+.button-row button[mat-raised-button][color="accent"][disabled] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.2s;
 }
 
 @media (max-width: 800px) {

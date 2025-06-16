@@ -45,6 +45,7 @@ export class DataExtraction implements OnInit, OnDestroy {
   statusDetails: {timestamp: string, message: string}[] = [];
   private pollInterval: any;
   waitingForScheduledRun: boolean = false;
+  isRunOnceDisabled = false;
   ngOnInit() {
     this.startRunIdPolling();
   }
@@ -149,6 +150,7 @@ export class DataExtraction implements OnInit, OnDestroy {
   }
   runId: string = ''; 
   runPipelineOnce() {
+    this.isRunOnceDisabled = true;
     this.http.get<{source: string, target: string}>('http://localhost:5000/current-config').subscribe({
       next: (current) => {
         this.http.get<any[]>('http://localhost:5000/saved-source-configs').subscribe({
@@ -156,6 +158,7 @@ export class DataExtraction implements OnInit, OnDestroy {
             const sourceObj = sources.find(s => s.name === current.source);
             if (!current.source || !sourceObj) {
               this.status = 'Error: No valid source config selected. Please select or create a source config.';
+              this.isRunOnceDisabled = false;
               return;
             }
             let config_file = 'config/api_config.yaml';
@@ -167,14 +170,24 @@ export class DataExtraction implements OnInit, OnDestroy {
                 this.status = 'Pipeline started (run once)';
                 this.runId = res.run_id; // Save run_id for polling
                 this.pollStatus();
+                // Do not re-enable until stopped
               },
-              error: (err) => this.status = `Error: ${err.message}`
+              error: (err) => {
+                this.status = `Error: ${err.message}`;
+                this.isRunOnceDisabled = false;
+              }
             });
           },
-          error: () => this.status = 'Error: Could not fetch source configs'
+          error: () => {
+            this.status = 'Error: Could not fetch source configs';
+            this.isRunOnceDisabled = false;
+          }
         });
       },
-      error: () => this.status = 'Error: Could not fetch current config'
+      error: () => {
+        this.status = 'Error: Could not fetch current config';
+        this.isRunOnceDisabled = false;
+      }
     });
   }
   fetchLatestScheduledRunId() {
@@ -201,6 +214,7 @@ export class DataExtraction implements OnInit, OnDestroy {
     this.statusDetails = [];
     this.runId = '';
     this.waitingForScheduledRun = false;
+    this.isRunOnceDisabled = false;
 
     // Call backend to stop scheduler
     this.api.stopPipeline().subscribe({

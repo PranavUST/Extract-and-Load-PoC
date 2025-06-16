@@ -1,0 +1,118 @@
+.input-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+  align-items: flex-end;
+  width: 100%;
+}
+
+// Make both fields equal width and aligned
+.top-row-equal {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: stretch;
+  background: rgba(255,0,0,0.07); /* debug: light red background */
+}
+.top-row-equal > mat-form-field {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  border: 2px solid #00f !important; /* debug: blue border */
+  background: #fff !important;
+  box-sizing: border-box;
+}
+.top-row-equal > mat-form-field > .mat-mdc-form-field {
+  width: auto !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  background: rgba(0,255,0,0.12) !important; /* debug: green background */
+}
+
+// Remove left margin from first field and right margin from last field for perfect alignment
+.top-row-equal mat-form-field:first-child {
+  margin-left: 0 !important;
+}
+.top-row-equal mat-form-field:last-child {
+  margin-right: 0 !important;
+}
+
+.small-input {
+  flex: 0 0 100px;
+}
+
+mat-form-field.small-input, .small-input input, .small-input mat-select {
+  width: 100px !important;
+  min-width: 100px !important;
+  max-width: 100px !important;
+  height: 32px !important;
+  font-size: 0.90rem !important;
+}
+
+mat-form-field.small-input {
+  margin-bottom: 0;
+}
+
+mat-form-field.small-input .mat-form-field-wrapper,
+mat-form-field.small-input .mat-form-field-flex,
+mat-form-field.small-input .mat-input-element,
+mat-form-field.small-input .mat-select-trigger {
+  min-height: 20px !important;
+  height: 20px !important;
+  font-size: 0.90rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+mat-form-field.small-input .mat-form-field-infix {
+  padding: 0 0 1px 0 !important;
+}
+
+mat-form-field.small-input .mat-form-field-label {
+  top: 12px !important;
+  font-size: 0.90rem !important;
+}
+
+mat-form-field.small-input .mat-select-arrow {
+  margin-top: -4px !important;
+}
+
+// Further reduce height for Angular Material v15+ (MDC-based)
+::ng-deep mat-form-field.small-input .mat-mdc-text-field-wrapper,
+::ng-deep mat-form-field.small-input .mat-mdc-form-field-flex,
+::ng-deep mat-form-field.small-input .mat-mdc-input-element,
+::ng-deep mat-form-field.small-input .mat-mdc-select-trigger {
+  min-height: 14px !important;
+  height: 14px !important;
+  line-height: 14px !important;
+  font-size: 0.88rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+::ng-deep mat-form-field.small-input .mat-mdc-form-field-infix {
+  min-height: 14px !important;
+  padding: 0 0 0 0 !important;
+}
+::ng-deep mat-form-field.small-input .mat-mdc-floating-label,
+::ng-deep mat-form-field.small-input .mat-mdc-form-field-label {
+  top: 8px !important;
+  font-size: 0.88rem !important;
+}
+
+@media (max-width: 800px) {
+  .input-row {
+    flex-direction: column;
+    gap: 6px;
+    align-items: stretch;
+  }
+  .small-input, mat-form-field.small-input {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  .top-row-equal > mat-form-field {
+    width: auto !important; /* Ensure no width: 100% on mobile */
+    max-width: none !important;
+  }
+}

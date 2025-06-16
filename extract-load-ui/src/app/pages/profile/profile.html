@@ -6,6 +6,7 @@
     <div *ngIf="loading">Loading user details...</div>
     <div *ngIf="error && !loading" class="error-message">{{ error }}</div>
     <div *ngIf="user && !loading">
+      <div class="profile-section-title">Profile Details</div>
       <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
         <div class="profile-fields">
           <label>
@@ -34,9 +35,11 @@
             </div>
           </label>
         </div>
-        <p><strong>Role:</strong> {{ user.role }}</p>
-        <p><strong>Last Login:</strong> {{ user.last_login ? (user.last_login | date:'medium') : 'Never' }}</p>
-        <p *ngIf="user.id"><strong>ID:</strong> {{ user.id }}</p>
+        <div class="profile-meta">
+          <div><mat-icon>badge</mat-icon> <strong>Role:</strong> {{ user.role }}</div>
+          <div><mat-icon>schedule</mat-icon> <strong>Last Login:</strong> {{ user.last_login ? (user.last_login | date:'medium') : 'Never' }}</div>
+          <div *ngIf="user.id"><mat-icon>fingerprint</mat-icon> <strong>ID:</strong> {{ user.id }}</div>
+        </div>
         <div class="profile-actions">
           <button *ngIf="!editing" mat-flat-button color="primary" type="button" (click)="startEdit()" class="profile-edit-btn">
             <mat-icon>edit</mat-icon> Edit Details
@@ -51,7 +54,9 @@
           <span *ngIf="saveError" class="profile-error">{{ saveError }}</span>
         </div>
       </form>
+      <div class="profile-divider"></div>
       <div class="password-section">
+        <div class="profile-section-title">Change Password</div>
         <a class="change-password-link" (click)="togglePasswordForm()" tabindex="0" role="button">
           <mat-icon>lock</mat-icon> Change Password
         </a>
