@@ -14,6 +14,7 @@ import { ConfigListComponent } from '../config-list/config-list';
 import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { MatDividerModule } from '@angular/material/divider';
+import { ReloadService } from '../../services/reload.service';
 @Component({
   standalone: true,
   selector: 'app-data-extraction',
@@ -50,7 +51,7 @@ export class DataExtraction implements OnInit, OnDestroy {
     this.startRunIdPolling();
   }
   refreshConfigs() {
-    window.location.reload();
+    this.reloadService.reload();
   }
   ngOnDestroy() {
     if (this.pollInterval) {
@@ -109,7 +110,7 @@ export class DataExtraction implements OnInit, OnDestroy {
     }, 2000);
   }
 
-  constructor(private fb: FormBuilder, private api: ApiService, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private api: ApiService, private http: HttpClient, private reloadService: ReloadService) {
     this.schedulerForm = this.fb.group({
       interval: [null, [Validators.required, Validators.min(1)]],
       duration: [null, [Validators.required, Validators.min(0.1)]]

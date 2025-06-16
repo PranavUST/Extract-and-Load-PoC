@@ -100,7 +100,17 @@ psql.exe -h localhost -p 5432 -U postgres -d DataLake
 ## To test files individually
 pytest tests\test_file_name.py
 
-## To test all files
+## To test all backend files
 pytest
 pytest --cov=src --cov-report=html 
 (loads all tests in a html - to access it: go to folder of htmlcov and open index in desired browser)
+
+## To test all frontend files
+npm run test:coverage
+
+currently: =============================== Coverage summary ===============================
+            Statements   : 76.21% ( 346/454 )
+            Branches     : 50.42% ( 60/119 )
+            Functions    : 73.56% ( 128/174 )
+            Lines        : 75.28% ( 329/437 )
+            ================================================================================

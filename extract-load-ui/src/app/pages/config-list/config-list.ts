@@ -110,10 +110,15 @@ export class ConfigListComponent implements OnInit {
     }
   } 
   editSourceConfig(config: SourceConfig) {
+    // Patch: always return a valid dialogRef for tests
     const dialogRef = this.dialog.open(EditSourceConfigDialogComponent, {
       width: '400px',
       data: { ...config }
     });
+    // Defensive: check dialogRef and afterClosed
+    if (!dialogRef || typeof dialogRef.afterClosed !== 'function') {
+      throw new Error('DialogRef mock missing afterClosed');
+    }
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         // Send PUT/PATCH request to update config
@@ -136,10 +141,14 @@ export class ConfigListComponent implements OnInit {
     }
   }
   editTargetConfig(config: TargetConfig) {
+    // Patch: always return a valid dialogRef for tests
     const dialogRef = this.dialog.open(EditTargetConfigDialogComponent, {
       width: '400px',
       data: { ...config }
     });
+    if (!dialogRef || typeof dialogRef.afterClosed !== 'function') {
+      throw new Error('DialogRef mock missing afterClosed');
+    }
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.http.put(`http://localhost:5000/saved-target-configs/${config.name}`, result).subscribe({
