@@ -31,7 +31,7 @@ table {
 th.mat-header-cell {
   color: #2c3e50;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   padding: 16px;
   border-bottom: 2px solid #eef2f7;
   background-color: #f8f9fa;
@@ -41,6 +41,7 @@ td.mat-cell {
   padding: 14px 16px;
   border-bottom: 1px solid #eef2f7;
   color: #2c3e50;
+  font-size: 0.875rem;
 }
 
 .loading-state {
@@ -85,7 +86,7 @@ td.mat-cell {
 
 .current-user-badge {
   color: #0097AC;
-  font-size: 0.9em;
+  font-size: 0.875rem;
   font-weight: 500;
   margin-left: 8px;
   background: rgba(0, 151, 172, 0.1);
@@ -144,7 +145,7 @@ tr.mat-mdc-row {
   }
   
   table {
-    font-size: 0.9em;
+    font-size: 0.875rem;
   }
   
   .mat-mdc-select {
@@ -154,6 +155,7 @@ tr.mat-mdc-row {
   th.mat-header-cell,
   td.mat-cell {
     padding: 12px;
+    font-size: 0.875rem;
   }
   
   .current-user-badge {

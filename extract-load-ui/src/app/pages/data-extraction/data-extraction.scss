@@ -5,21 +5,25 @@
 }
 
 .data-extraction-wrapper {
-  max-width: 1000px;
+  max-width: 900px;
   margin: 40px auto;
   padding: 24px;
   font-family: 'Aptos', Arial, sans-serif;
-  margin-top: -8px !important;
-  padding-top: 0 !important;
+  border-radius: 24px;
 }
 
 .data-extraction-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
-  margin-bottom: 14px;
-  padding-top: 2px;
-  padding-bottom: 8px;
+  min-height: 120px;
+  padding: 48px 24px 12px 24px;
   background: #fff;
-  border-radius: 16px;
+  border-radius: 24px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   border-bottom: 1px solid #eef2f7;
   position: relative;
@@ -27,39 +31,30 @@
 
 .data-extraction-header h1 {
   margin: 0;
-  font-size: 1.85rem;
-  font-weight: 700;
-  letter-spacing: -1px;
+  font-size: 2.2rem;
+  font-weight: 600;
   color: #2c3e50;
+  letter-spacing: -1px;
   display: inline-block;
-  padding-bottom: 12px;
-  text-shadow: 0 1px 1px rgba(255,255,255,0.5);
-  position: relative;
-  line-height: 1.1;
+  padding-bottom: 10px;
+  text-align: center;
 }
 
 .data-extraction-header h1:after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 4px;
-  background: #0097AC;
-  border-radius: 2px;
+  content: none;
 }
 
 .data-extraction-subtitle {
-  margin: 10px 0 0 0;
+  margin: 0 0 10px 0;
   color: #666;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   opacity: 0.85;
+  text-align: center;
 }
 
 .data-extraction-card {
   background: #fff;
-  border-radius: 0 0 16px 16px;
+  border-radius: 24px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   padding: 32px 24px;
 }
@@ -71,7 +66,7 @@
     margin-bottom: 8px;
   }
   .mat-tab-label {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #2c3e50;
     opacity: 0.85;
@@ -81,12 +76,12 @@
     transition: background 0.18s, color 0.18s;
   }
   .mat-tab-label.mat-tab-label-active {
-    color: #1976d2;
+    color: #2c3e50;
     background: #f5fafd;
     box-shadow: 0 2px 8px rgba(0,151,172,0.07);
   }
   .mat-ink-bar {
-    background: #0097AC;
+    background: #2c3e50;
     height: 4px;
     border-radius: 2px;
   }
@@ -109,16 +104,18 @@
   padding-bottom: 8px;
   h1 {
     margin: 0;
-    font-size: 1.85rem;
-    font-weight: 700;
+    font-size: 2.5rem;
+    font-weight: 900;
     letter-spacing: -1px;
     font-family: 'Aptos', Arial, sans-serif;
     line-height: 1.1;
+    text-align: center;
   }
   p {
     margin: 4px 0 0 0;
     color: #555;
     font-size: 1.04rem;
+    text-align: center;
   }
 }
 

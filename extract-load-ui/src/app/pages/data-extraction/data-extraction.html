@@ -1,24 +1,22 @@
-<div class="data-extraction-bg">
-  <div class="data-extraction-wrapper">
-    <div class="data-extraction-header">
-      <h1>Data Extraction</h1>
-      <p class="data-extraction-subtitle">Configure your source, target, schedule, and manage saved configs</p>
-    </div>
-    <div class="data-extraction-card">
-      <mat-tab-group>
-        <mat-tab label="Source Config">
-          <mat-card class="tab-card">
-            <app-source-config (configSaved)="refreshConfigs()"></app-source-config>
-          </mat-card>
-        </mat-tab>
-        <mat-tab label="Target Config">
-          <mat-card class="tab-card">
-            <app-target-config (configSaved)="refreshConfigs()"></app-target-config>
-          </mat-card>
-        </mat-tab>
-        <mat-tab label="Schedule">
-          <mat-card class="tab-card">
-            <div class="section-title">Schedule Pipeline Run</div>
+<div class="data-extraction-wrapper">
+  <div class="data-extraction-header">
+    <h1>Data Extraction</h1>
+    <p class="data-extraction-subtitle">Configure your source, target, schedule, and manage saved configs</p>
+  </div>
+  <div class="data-extraction-card">
+    <mat-tab-group>
+      <mat-tab label="Source Config">
+        <app-source-config (configSaved)="refreshConfigs()"></app-source-config>
+      </mat-tab>
+      <mat-tab label="Target Config">
+        <app-target-config (configSaved)="refreshConfigs()"></app-target-config>
+      </mat-tab>
+      <mat-tab label="Schedule">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>Schedule Pipeline Run</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
             <form [formGroup]="schedulerForm" (ngSubmit)="runPipeline()">
               <div class="form-row">
                 <mat-form-field appearance="fill" class="small-input">
@@ -56,14 +54,16 @@
             <div *ngIf="waitingForScheduledRun" class="waiting-message">
               Waiting for next scheduled run to start...
             </div>
-          </mat-card>
-        </mat-tab>
-        <mat-tab label="Saved Configs">
-          <mat-card class="tab-card">
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+      <mat-tab label="Saved Configs">
+        <mat-card>
+          <mat-card-content>
             <app-config-list></app-config-list>
-          </mat-card>
-        </mat-tab>
-      </mat-tab-group>
-    </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+    </mat-tab-group>
   </div>
 </div>

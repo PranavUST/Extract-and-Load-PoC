@@ -1,0 +1,14 @@
+.confidential-footer {
+  position: fixed;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 9px;
+  font-family: 'Aptos', Arial, sans-serif;
+  z-index: 9999;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.95;
+}

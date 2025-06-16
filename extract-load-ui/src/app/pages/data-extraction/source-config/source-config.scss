@@ -47,7 +47,7 @@ mat-form-field.small-input, .small-input input, .small-input mat-select {
   min-width: 100px !important;
   max-width: 100px !important;
   height: 32px !important;
-  font-size: 0.90rem !important;
+  font-size: 1rem !important;
 }
 
 mat-form-field.small-input {
@@ -60,7 +60,7 @@ mat-form-field.small-input .mat-input-element,
 mat-form-field.small-input .mat-select-trigger {
   min-height: 20px !important;
   height: 20px !important;
-  font-size: 0.90rem !important;
+  font-size: 1rem !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
@@ -71,7 +71,7 @@ mat-form-field.small-input .mat-form-field-infix {
 
 mat-form-field.small-input .mat-form-field-label {
   top: 12px !important;
-  font-size: 0.90rem !important;
+  font-size: 1rem !important;
 }
 
 mat-form-field.small-input .mat-select-arrow {
@@ -86,7 +86,7 @@ mat-form-field.small-input .mat-select-arrow {
   min-height: 14px !important;
   height: 14px !important;
   line-height: 14px !important;
-  font-size: 0.88rem !important;
+  font-size: 1rem !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
@@ -97,7 +97,7 @@ mat-form-field.small-input .mat-select-arrow {
 ::ng-deep mat-form-field.small-input .mat-mdc-floating-label,
 ::ng-deep mat-form-field.small-input .mat-mdc-form-field-label {
   top: 8px !important;
-  font-size: 0.88rem !important;
+  font-size: 1rem !important;
 }
 
 @media (max-width: 800px) {

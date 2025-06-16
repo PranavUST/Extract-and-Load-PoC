@@ -12,7 +12,7 @@ mat-header-cell, mat-cell {
 
 .config-section-title {
   font-size: 1.3rem;
-  font-weight: 600;
+  font-weight: 500; // was 600, now lighter
   color: #004d4d;
   margin-bottom: 2px;
   font-family: 'Aptos', Arial, sans-serif;
@@ -47,7 +47,7 @@ mat-header-cell, mat-cell {
 }
 .config-name {
   font-size: 1.13rem;
-  font-weight: 600;
+  font-weight: 500; // was 600, now lighter
   color: #004d4d;
   font-family: 'Aptos', Arial, sans-serif;
 }

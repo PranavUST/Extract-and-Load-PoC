@@ -30,6 +30,12 @@ html, body {
 
 body, html, * {
   font-family: 'Aptos', Arial, sans-serif !important;
+  // No global font-size override here
+}
+
+// Set a minimum font size for body text and form elements only (not headings or icons)
+body, p, label, input, select, textarea, button {
+  font-size: 1rem;
 }
 
 .app-container {
