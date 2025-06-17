@@ -1,12 +1,8 @@
 <div class="login-background">
-  <div class="login-container">
+  <div class="login-container" [ngClass]="{ 'shake': errorMessage }">
     <img src="/UST_logo.png" alt="UST Logo" class="ust-logo-login-center" />
     <form #loginForm="ngForm" (ngSubmit)="onSubmit()">
       <div class="form-title">Sign In</div>
-      
-      <div *ngIf="loading" class="login-loading">
-        <mat-spinner diameter="32"></mat-spinner>
-      </div>
       
       <div class="form-group">
         <label>Username</label>
@@ -25,10 +21,25 @@
             <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
         </div>
-        <a routerLink="/forgot-password" class="forgot-link">Forgot Password?</a>
       </div>
       
-      <button type="submit" [disabled]="!loginForm.valid" class="login-btn">Sign In</button>
+      <div class="form-row-between">
+        <div class="remember-me-left">
+          <label class="remember-me-label">
+            <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe"> Remember Me
+          </label>
+        </div>
+        <div class="forgot-link-right">
+          <a routerLink="/forgot-password" class="forgot-link">Forgot Password?</a>
+        </div>
+      </div>
+      
+      <button type="submit" [disabled]="!loginForm.valid || loading" class="login-btn">
+        <ng-container *ngIf="!loading; else loadingTpl">Sign In</ng-container>
+        <ng-template #loadingTpl>
+          <mat-spinner diameter="22" color="accent" style="vertical-align: middle;"></mat-spinner>
+        </ng-template>
+      </button>
       
       <div *ngIf="errorMessage" class="error-message">
         {{ errorMessage }}

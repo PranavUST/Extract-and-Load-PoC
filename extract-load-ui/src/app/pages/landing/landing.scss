@@ -40,10 +40,28 @@ $white: #fff;
   font-size: 2.8rem;
   font-weight: 700;
   color: $teal-dark;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0rem;
   text-align: center;
   font-family: 'Aptos';
   letter-spacing: -1px;
+}
+
+.bolder-welcome {
+  font-size: 3.2rem;
+  font-weight: 900;
+  color: #004d4d;
+  letter-spacing: -1.5px;
+  margin-bottom: 0.5em;
+  text-shadow: 0 2px 12px #0097ac22;
+}
+
+.welcome-subtitle {
+  text-align: center;
+  color: #5a7d8b;
+  font-size: 1.18rem;
+  margin-bottom: 0rem;
+  font-weight: 400;
+  letter-spacing: 0.1px;
 }
 
 .nav-buttons {
@@ -96,7 +114,7 @@ $white: #fff;
 }
 
 .nav-btn:hover mat-icon, .nav-btn:focus mat-icon {
-  color: #ffe082 !important;
+  color: #ffffff !important;
   transform: scale(1.18) rotate(-8deg); /* Step 5: icon animation */
 }
 
@@ -157,31 +175,58 @@ $white: #fff;
 
 .profile-icon-fixed:hover button[mat-icon-button] mat-icon,
 .profile-icon-fixed:focus button[mat-icon-button] mat-icon {
-  color: #0097ac;
-  transform: scale(1.13) rotate(8deg);
+  color: #004d4d;
+  transform: scale(1.13);
 }
 
-.logout-fixed {
+.profile-actions-fixed {
   position: fixed;
-  left: 1rem;
-  bottom: 1rem;
+  top: 2rem;
+  right: 2rem;
   z-index: 2000;
-  background: $white;
-  color: $teal-dark;
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 2rem;
-  font-family: 'Aptos', Arial, sans-serif;
-  font-size: 1.1rem;
-  font-weight: bold;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-  cursor: pointer;
-  transition: box-shadow 0.22s cubic-bezier(.4,2,.6,1), transform 0.22s cubic-bezier(.4,2,.6,1);
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
 }
 
-.logout-fixed:hover, .logout-fixed:focus {
+.action-icon-btn {
+  background: #fff !important;
+  color: #004d4d !important;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  width: 48px;
+  height: 48px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.22s cubic-bezier(.4,2,.6,1), transform 0.22s cubic-bezier(.4,2,.6,1), color 0.18s, background 0.18s;
+}
+
+.action-icon-btn mat-icon {
+  font-size: 1.85rem !important;
+  color: #004d4d !important;
+  line-height: 1;
+  width: 1.85rem;
+  height: 1.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.action-icon-btn:hover, .action-icon-btn:focus {
+  background: #e0f7fa !important;
+  color: #005555 !important;
   box-shadow: 0 6px 20px #0097ac33;
-  transform: scale(1.06);
+  transform: scale(1.08);
+}
+
+.action-icon-btn:hover mat-icon, .action-icon-btn:focus mat-icon {
+  color: #005555 !important;
+  transform: scale(1.13);
 }
 
 mat-card {

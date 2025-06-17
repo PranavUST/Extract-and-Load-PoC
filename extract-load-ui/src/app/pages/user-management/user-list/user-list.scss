@@ -51,7 +51,7 @@ td.mat-cell {
   mat-spinner {
     margin: 0 auto 16px;
     ::ng-deep circle {
-      stroke: #0097AC;
+      stroke: #004d4d;
     }
   }
   
@@ -73,7 +73,7 @@ td.mat-cell {
     height: 48px;
     width: 48px;
     margin-bottom: 16px;
-    color: #0097AC;
+    color: #004d4d;
     opacity: 0.5;
   }
   
@@ -85,10 +85,10 @@ td.mat-cell {
 }
 
 .current-user-badge {
-  color: #0097AC;
+  color: #004d4d;
   font-size: 0.875rem;
   font-weight: 500;
-  margin-left: 8px;
+  margin-left: -2px;
   background: rgba(0, 151, 172, 0.1);
   padding: 4px 8px;
   border-radius: 4px;
@@ -118,6 +118,14 @@ td.mat-cell {
   
   &:not([disabled]):hover {
     background-color: rgba(0, 151, 172, 0.1);
+  }
+}
+
+// Make the delete icon always red
+.mat-mdc-icon-button .mat-icon {
+  &.delete-icon {
+    color: #e53935 !important;
+    transition: color 0.2s;
   }
 }
 

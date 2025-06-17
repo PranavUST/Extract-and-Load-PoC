@@ -37,6 +37,32 @@ export class AuthService {
     );
   }
 
+  // Login with backend API, with rememberMe support
+  loginWithRemember(username: string, password: string, rememberMe: boolean): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, { username, password }, { 
+      withCredentials: true 
+    }).pipe(
+      tap((response: any) => {
+        if (response.success) {
+          const user = {
+            name: response.name || '',
+            email: response.email || '',
+            username: response.username,
+            role: response.role
+          };
+          if (rememberMe) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            sessionStorage.removeItem('currentUser');
+          } else {
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+            localStorage.removeItem('currentUser');
+          }
+          this.currentUserSubject.next(user);
+        }
+      })
+    );
+  }
+
   // Register with backend API
   register(userData: {
     name: string,
@@ -52,6 +78,7 @@ export class AuthService {
   logout(): void {
     this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe(() => {
       sessionStorage.removeItem('currentUser');
+      localStorage.removeItem('currentUser');
       this.currentUserSubject.next(null);
       this.router.navigate(['/login']);
       this.clearCookies();
@@ -78,12 +105,25 @@ export class AuthService {
     return this.currentUserSubject.value?.role || null;
   }
 
+  /**
+   * Ensures currentUserSubject is set from storage if not already set.
+   * Call this before checking isLoggedIn() in guards.
+   */
+  rehydrateUserFromStorage(): void {
+    if (!this.currentUserSubject.value) {
+      const userData = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+      if (userData) {
+        this.currentUserSubject.next(JSON.parse(userData));
+      }
+    }
+  }
+
   private clearCookies() {
     document.cookie = 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
   }
 
   private getStoredUser(): User | null {
-    const userData = sessionStorage.getItem('currentUser');
+    const userData = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
     return userData ? JSON.parse(userData) : null;
   }
 }

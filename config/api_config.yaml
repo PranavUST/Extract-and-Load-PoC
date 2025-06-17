@@ -27,7 +27,7 @@ source:
       page_size: 100
       page_size_param: limit
     params: {}
-    retries: 4
+    retries: 3
     timeout: 30
     url: http://127.0.0.1:5001/v1/data
   type: REST_API

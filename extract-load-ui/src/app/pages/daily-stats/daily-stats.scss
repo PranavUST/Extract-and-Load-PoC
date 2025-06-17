@@ -85,7 +85,7 @@
     transform: translateX(-50%);
     width: 60px;
     height: 4px;
-    background: #0097AC;
+    background: #004d4d;
     border-radius: 2px;
   }
 }
@@ -158,7 +158,7 @@
     font-size: 2rem;
     height: 2rem;
     width: 2rem;
-    margin-bottom: 1rem;    color: #0097AC;
+    margin-bottom: 1rem;    color: #004d4dda;
 
     &.success {
       color: #4caf50;
@@ -200,7 +200,7 @@
 
   h1 {
     margin-bottom: 20px;
-    color: #1976d2;
+    color: #004d4d;
 
     &:after {
       content: none;
@@ -264,11 +264,20 @@
   th.mat-header-cell {
     text-align: center;
     font-weight: 600;
-    color: #0097AC;
+    color: #004d4d;
   }
 
   td.mat-cell, th.mat-header-cell {
     padding: 12px 16px;
   }
   /* Removed duplicate stats-container */
+}
+
+// Custom color for selected date in Angular Material datepicker (calendar)
+::ng-deep .mat-calendar-body-selected {
+  background-color: #004d4d !important; // main theme color
+  color: #fff !important;
+}
+::ng-deep .mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border-color: #004d4d !important; // main theme color for today ring
 }

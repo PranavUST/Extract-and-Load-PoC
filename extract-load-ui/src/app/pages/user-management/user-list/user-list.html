@@ -60,7 +60,7 @@
                   (click)="deleteUser(user)" 
                   [disabled]="isCurrentUser(user)"
                   [title]="isCurrentUser(user) ? 'Cannot delete yourself' : 'Delete user'">
-            <mat-icon>delete</mat-icon>
+            <mat-icon class="delete-icon">delete</mat-icon>
           </button>
         </td>
       </ng-container>

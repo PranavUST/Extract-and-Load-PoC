@@ -26,18 +26,37 @@ export class LoginComponent implements OnInit {
   loginError = false;
   hidePassword = true;
   loading = false;
+  rememberMe = false;
 
   constructor(
     private authService: AuthService,
     private router: Router
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    // If already logged in, redirect to landing
+    this.authService.rehydrateUserFromStorage();
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/landing']);
+      return;
+    }
+    // Autofill username if user is in localStorage (Remember Me)
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        if (user && user.username) {
+          this.username = user.username;
+          this.rememberMe = true;
+        }
+      } catch {}
+    }
+  }
 
   onSubmit(): void {
     if (this.username && this.password) {
       this.loading = true;
-      this.authService.login(this.username, this.password).subscribe({
+      this.authService.loginWithRemember(this.username, this.password, this.rememberMe).subscribe({
         next: (response) => {
           this.loading = false;
           if (response.success) {
@@ -45,12 +64,14 @@ export class LoginComponent implements OnInit {
           } else {
             this.loginError = true;
             this.errorMessage = 'Invalid Username or Password';
+            setTimeout(() => this.errorMessage = '', 600); // clear error for shake
           }
         },
         error: () => {
           this.loading = false;
           this.loginError = true;
           this.errorMessage = 'Invalid Username or Password';
+          setTimeout(() => this.errorMessage = '', 600); // clear error for shake
         }
       });
     }

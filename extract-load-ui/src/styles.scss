@@ -69,7 +69,7 @@ body, p, label, input, select, textarea, button {
 }
 .global-logo:hover img, .global-logo:focus img {
   filter: drop-shadow(0 4px 16px #004d4d33) drop-shadow(0 0 18px #0097ac55);
-  transform: scale(1.08) rotate(-4deg);
+  transform: scale(1.08);
   box-shadow: 0 0 16px 4px #0097ac55;
 }
 .logout-btn {

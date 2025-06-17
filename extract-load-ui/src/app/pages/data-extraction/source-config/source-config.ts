@@ -30,26 +30,43 @@ export class SourceConfig {
   @Output() configSaved = new EventEmitter<void>();
   sourceTypes = ['API', 'FTP'];
   public sourceForm: FormGroup = this.fb.group({
-    name: ['', Validators.required],
-    type: ['API', Validators.required],
-    endpoint: ['', Validators.required], // Ensure required for API
+    name: ['', [Validators.required, this.trimValidator]],
+    type: ['', Validators.required],
+    endpoint: ['', [Validators.required, this.trimValidator]], // Ensure required for API
     authToken: [''],
-    ftpHost: ['', Validators.required], // Ensure required for FTP
+    ftpHost: ['', [Validators.required, this.trimValidator]], // Ensure required for FTP
     ftpUsername: [''],
     ftpPassword: [''],
     retries: [3] 
   });
+
+  trimValidator(control: import('@angular/forms').AbstractControl) {
+    if (typeof control.value === 'string' && control.value.trim().length === 0) {
+      return { required: true };
+    }
+    return null;
+  }
+
   constructor() {
     this.sourceForm.get('type')?.valueChanges.subscribe(type => {
       if (type === 'API') {
-        this.sourceForm.get('endpoint')?.setValidators([Validators.required]);
+        this.sourceForm.get('endpoint')?.setValidators([Validators.required, this.trimValidator]);
         this.sourceForm.get('ftpHost')?.clearValidators();
         this.sourceForm.get('ftpUsername')?.clearValidators();
         this.sourceForm.get('ftpPassword')?.clearValidators();
       } else if (type === 'FTP') {
-        this.sourceForm.get('ftpHost')?.setValidators([Validators.required]);
+        this.sourceForm.get('ftpHost')?.setValidators([Validators.required, this.trimValidator]);
         this.sourceForm.get('endpoint')?.clearValidators();
         this.sourceForm.get('authToken')?.clearValidators();
+      }
+      // Always trim the value for endpoint and ftpHost
+      const endpoint = this.sourceForm.get('endpoint')?.value;
+      if (typeof endpoint === 'string') {
+        this.sourceForm.get('endpoint')?.setValue(endpoint.trim(), { emitEvent: false });
+      }
+      const ftpHost = this.sourceForm.get('ftpHost')?.value;
+      if (typeof ftpHost === 'string') {
+        this.sourceForm.get('ftpHost')?.setValue(ftpHost.trim(), { emitEvent: false });
       }
       this.sourceForm.get('endpoint')?.updateValueAndValidity();
       this.sourceForm.get('ftpHost')?.updateValueAndValidity();
@@ -57,7 +74,60 @@ export class SourceConfig {
       this.sourceForm.get('ftpPassword')?.updateValueAndValidity();
       this.sourceForm.get('authToken')?.updateValueAndValidity();
     });
+
+    // Fix: Also trim and update validity on blur for endpoint and ftpHost
+    this.sourceForm.get('endpoint')?.valueChanges.subscribe(val => {
+      if (typeof val === 'string' && val !== val.trim()) {
+        this.sourceForm.get('endpoint')?.setValue(val.trim(), { emitEvent: false });
+        this.sourceForm.get('endpoint')?.updateValueAndValidity();
+      }
+    });
+    this.sourceForm.get('ftpHost')?.valueChanges.subscribe(val => {
+      if (typeof val === 'string' && val !== val.trim()) {
+        this.sourceForm.get('ftpHost')?.setValue(val.trim(), { emitEvent: false });
+        this.sourceForm.get('ftpHost')?.updateValueAndValidity();
+      }
+    });
   }
+
+  onEndpointBlur() {
+    const ctrl = this.sourceForm.get('endpoint');
+    if (ctrl && typeof ctrl.value === 'string') {
+      ctrl.setValue(ctrl.value.trim());
+      ctrl.updateValueAndValidity();
+    }
+  }
+
+  onFtpHostBlur() {
+    const ctrl = this.sourceForm.get('ftpHost');
+    if (ctrl && typeof ctrl.value === 'string') {
+      ctrl.setValue(ctrl.value.trim());
+      ctrl.updateValueAndValidity();
+    }
+  }
+
+  onEndpointInput() {
+    const ctrl = this.sourceForm.get('endpoint');
+    if (ctrl && typeof ctrl.value === 'string') {
+      const trimmed = ctrl.value.trim();
+      if (ctrl.value !== trimmed) {
+        ctrl.setValue(trimmed); // emitEvent defaults to true
+      }
+      ctrl.updateValueAndValidity();
+    }
+  }
+
+  onFtpHostInput() {
+    const ctrl = this.sourceForm.get('ftpHost');
+    if (ctrl && typeof ctrl.value === 'string') {
+      const trimmed = ctrl.value.trim();
+      if (ctrl.value !== trimmed) {
+        ctrl.setValue(trimmed); // emitEvent defaults to true
+      }
+      ctrl.updateValueAndValidity();
+    }
+  }
+
   saveConfig() {
     if (this.sourceForm.valid) {
       this.api.saveSourceConfig(this.sourceForm.value).subscribe({
