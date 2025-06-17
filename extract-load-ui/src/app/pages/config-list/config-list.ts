@@ -1,5 +1,5 @@
 // config-list.ts (CORRECTED)
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
@@ -10,6 +10,14 @@ import { HttpClient } from '@angular/common/http';
 import { EditSourceConfigDialogComponent } from './edit-source-config-dialog';
 import { EditTargetConfigDialogComponent } from './edit-target-config-dialog';
 import { MatDialog } from '@angular/material/dialog';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ApiService } from '../../services/api.service';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatExpansionModule } from '@angular/material/expansion';
+
 // Define interfaces for type safety
 export interface SourceConfig {
   name: string;
@@ -41,7 +49,13 @@ interface TargetConfig {
     MatListModule,
     MatIconModule,
     EditSourceConfigDialogComponent,
-    EditTargetConfigDialogComponent
+    EditTargetConfigDialogComponent,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatExpansionModule
   ]
 })
 export class ConfigListComponent implements OnInit {
@@ -49,8 +63,30 @@ export class ConfigListComponent implements OnInit {
   targetConfigs: TargetConfig[] = [];
   currentSource: string | null = null;
   currentTarget: string | null = null;
+  editForm: FormGroup;
+  @ViewChild('editSourceDialog') editSourceDialog!: TemplateRef<any>;
+  editingConfig: any = null;
 
-  constructor(private http: HttpClient, private dialog: MatDialog) {}
+  constructor(private http: HttpClient, private dialog: MatDialog, private fb: FormBuilder, private api: ApiService) {
+    this.editForm = this.fb.group({
+      name: ['', Validators.required],
+      type: ['API', Validators.required],
+      endpoint: [''],
+      authToken: [''],
+      ftpHost: [''],
+      ftpUsername: [''],
+      ftpPassword: [''],
+      retries: [3],
+      // Advanced fields
+      apiLimit: [100],
+      apiMaxPages: [10],
+      ftpRemoteDir: [''],
+      ftpLocalDir: [''],
+      ftpFileTypes: ['.csv,.json,.parquet'],
+      ftpRetryDelay: [5],
+      csvOutputPath: ['data/output.csv']
+    });
+  }
 
   ngOnInit(): void {
     this.loadSourceConfigs();
@@ -174,4 +210,56 @@ export class ConfigListComponent implements OnInit {
     });
   }
 
+  openEditSourceDialog(config: any) {
+    // Use the component dialog, not a template
+    this.dialog.open(EditSourceConfigDialogComponent, {
+      data: { ...config },
+      minWidth: '700px',
+      maxWidth: '1100px',
+      width: '900px',
+      panelClass: 'edit-source-dialog-panel'
+    }).afterClosed().subscribe(() => {
+      this.loadSourceConfigs();
+      this.loadCurrentConfig();
+    });
+  }
+
+  // Add this method if it doesn't exist
+  loadConfigs() {
+    // Implement logic to reload configs, e.g.:
+    // this.api.getSourceConfigs().subscribe(configs => this.configs = configs);
+    // ...or trigger however you normally reload the list...
+  }
+
+  saveEdit(dialogRef: any) {
+    if (this.editForm.valid) {
+      const form = this.editForm.value;
+      const payload = {
+        name: form.name,
+        type: form.type,
+        endpoint: form.endpoint,
+        authToken: form.authToken,
+        ftpHost: form.ftpHost,
+        ftpUsername: form.ftpUsername,
+        ftpPassword: form.ftpPassword,
+        retries: form.retries,
+        advanced: {
+          apiLimit: form.apiLimit,
+          apiMaxPages: form.apiMaxPages,
+          ftpRemoteDir: form.ftpRemoteDir,
+          ftpLocalDir: form.ftpLocalDir,
+          ftpFileTypes: form.ftpFileTypes,
+          ftpRetryDelay: form.ftpRetryDelay,
+          csvOutputPath: form.csvOutputPath
+        }
+      };
+      this.api.saveSourceConfig(payload).subscribe({
+        next: () => {
+          dialogRef.close();
+          this.loadConfigs(); // Use the correct method to reload configs
+        },
+        error: (err: any) => alert('Save failed: ' + err.message)
+      });
+    }
+  }
 }

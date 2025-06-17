@@ -9,7 +9,7 @@
         <span *ngIf="currentSource === config.name" class="current-badge">Current</span>
       </div>
       <div class="config-row-actions">
-        <button mat-icon-button color="primary" (click)="editSourceConfig(config)" matTooltip="Edit">
+        <button mat-icon-button color="primary" (click)="openEditSourceDialog(config)" matTooltip="Edit">
           <mat-icon>edit</mat-icon>
         </button>
         <button mat-icon-button color="warn" (click)="deleteSourceConfig(config)" matTooltip="Delete">

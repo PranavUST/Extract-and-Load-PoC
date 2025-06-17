@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -28,6 +28,7 @@ export class SourceConfig {
   private fb = inject(FormBuilder);
   private api = inject(ApiService);
   @Output() configSaved = new EventEmitter<void>();
+  @Input() advancedSettings: any; // Accept advanced settings from parent
   sourceTypes = ['API', 'FTP'];
   public sourceForm: FormGroup = this.fb.group({
     name: ['', Validators.required],
@@ -60,7 +61,12 @@ export class SourceConfig {
   }
   saveConfig() {
     if (this.sourceForm.valid) {
-      this.api.saveSourceConfig(this.sourceForm.value).subscribe({
+      // Merge advanced settings with source config
+      const payload = {
+        ...this.sourceForm.value,
+        advanced: this.advancedSettings ? this.advancedSettings.value : {}
+      };
+      this.api.saveSourceConfig(payload).subscribe({
         next: (res) => {
           alert('Source config saved!'),
           this.configSaved.emit();

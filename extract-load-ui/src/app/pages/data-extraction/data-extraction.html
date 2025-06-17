@@ -6,10 +6,102 @@
   <div class="data-extraction-card">
     <mat-tab-group>
       <mat-tab label="Source Config">
-        <app-source-config (configSaved)="refreshConfigs()"></app-source-config>
+        <app-source-config #sourceConfigComp [advancedSettings]="advancedForm" (configSaved)="refreshConfigs()"></app-source-config>
+        <mat-expansion-panel style="margin-top:24px;" [expanded]="false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Advanced Pipeline Settings
+            </mat-panel-title>
+            <mat-panel-description>
+              Show/hide advanced YAML fields
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <form [formGroup]="advancedForm">
+            <div class="form-row">
+              <ng-container *ngIf="selectedSourceType === 'API'">
+                <mat-form-field appearance="fill">
+                  <mat-label>API Pagination Limit</mat-label>
+                  <input matInput type="number" formControlName="apiLimit" min="1" />
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>API Max Pages</mat-label>
+                  <input matInput type="number" formControlName="apiMaxPages" min="1" />
+                </mat-form-field>
+              </ng-container>
+              <ng-container *ngIf="selectedSourceType === 'FTP'">
+                <mat-form-field appearance="fill">
+                  <mat-label>FTP Remote Directory</mat-label>
+                  <input matInput formControlName="ftpRemoteDir" />
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>FTP Local Directory</mat-label>
+                  <input matInput formControlName="ftpLocalDir" />
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>FTP File Types (comma separated)</mat-label>
+                  <input matInput formControlName="ftpFileTypes" />
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>FTP Retry Delay (seconds)</mat-label>
+                  <input matInput type="number" formControlName="ftpRetryDelay" min="0" />
+                </mat-form-field>
+              </ng-container>
+              <mat-form-field appearance="fill">
+                <mat-label>CSV Output Path</mat-label>
+                <input matInput formControlName="csvOutputPath" />
+              </mat-form-field>
+            </div>
+          </form>
+        </mat-expansion-panel>
       </mat-tab>
       <mat-tab label="Target Config">
         <app-target-config (configSaved)="refreshConfigs()"></app-target-config>
+        <mat-expansion-panel style="margin-top:24px;" [expanded]="false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Advanced Pipeline Settings
+            </mat-panel-title>
+            <mat-panel-description>
+              Show/hide advanced YAML fields
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <form [formGroup]="advancedForm">
+            <div class="form-row">
+              <ng-container *ngIf="selectedSourceType === 'API'">
+                <mat-form-field appearance="fill">
+                  <mat-label>API Pagination Limit</mat-label>
+                  <input matInput type="number" formControlName="apiLimit" min="1" />
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>API Max Pages</mat-label>
+                  <input matInput type="number" formControlName="apiMaxPages" min="1" />
+                </mat-form-field>
+              </ng-container>
+              <ng-container *ngIf="selectedSourceType === 'FTP'">
+                <mat-form-field appearance="fill">
+                  <mat-label>FTP Remote Directory</mat-label>
+                  <input matInput formControlName="ftpRemoteDir" />
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>FTP Local Directory</mat-label>
+                  <input matInput formControlName="ftpLocalDir" />
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>FTP File Types (comma separated)</mat-label>
+                  <input matInput formControlName="ftpFileTypes" />
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>FTP Retry Delay (seconds)</mat-label>
+                  <input matInput type="number" formControlName="ftpRetryDelay" min="0" />
+                </mat-form-field>
+              </ng-container>
+              <mat-form-field appearance="fill">
+                <mat-label>CSV Output Path</mat-label>
+                <input matInput formControlName="csvOutputPath" />
+              </mat-form-field>
+            </div>
+          </form>
+        </mat-expansion-panel>
       </mat-tab>
       <mat-tab label="Schedule">
         <mat-card>

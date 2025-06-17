@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
@@ -15,6 +15,11 @@ import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { MatDividerModule } from '@angular/material/divider';
 import { ReloadService } from '../../services/reload.service';
+import { FormControl } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { Subscription } from 'rxjs';
 @Component({
   standalone: true,
   selector: 'app-data-extraction',
@@ -33,12 +38,15 @@ import { ReloadService } from '../../services/reload.service';
     RouterModule,
     SourceConfig,
     TargetConfig,
-    ConfigListComponent
+    ConfigListComponent,
+    MatSelectModule,
+    MatOptionModule,
+    MatExpansionModule
   ]
 })
-export class DataExtraction implements OnInit, OnDestroy {
+export class DataExtraction implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(ConfigListComponent) configList!: ConfigListComponent;
-  @ViewChild(SourceConfig) sourceConfigComponent!: SourceConfig;
+  @ViewChild('sourceConfigComp', { static: false }) sourceConfigComp: any;
   schedulerForm: FormGroup;
   status = '';
   runIdPollInterval: any;
@@ -47,11 +55,91 @@ export class DataExtraction implements OnInit, OnDestroy {
   private pollInterval: any;
   waitingForScheduledRun: boolean = false;
   isRunOnceDisabled = false;
+  advancedForm: FormGroup;
+  selectedSourceType: 'API' | 'FTP' = 'API';
+  configSub?: any; // Add definite assignment assertion or make it optional
+
+  editingConfig: any = null;
+  editConfigForm: FormGroup;
+
   ngOnInit() {
     this.startRunIdPolling();
+    this.refreshSourceType();
+  }
+
+  ngAfterViewInit() {
+    // Try to get the SourceConfig component and subscribe to its type changes
+    // Assumes <app-source-config #sourceConfigComp> in template
+    setTimeout(() => {
+      if (this.sourceConfigComp && this.sourceConfigComp.sourceForm) {
+        const typeCtrl = this.sourceConfigComp.sourceForm.get('type');
+        if (typeCtrl) {
+          this.selectedSourceType = (typeCtrl.value || '').toUpperCase() === 'FTP' ? 'FTP' : 'API';
+          typeCtrl.valueChanges.subscribe((type: string) => {
+            this.selectedSourceType = (type || '').toUpperCase() === 'FTP' ? 'FTP' : 'API';
+            this.refreshAdvancedFields();
+          });
+        }
+      }
+    }, 0);
+  }
+
+  refreshSourceType() {
+    // Always fetch the latest current config and saved source configs
+    this.http.get<{source: string}>('http://localhost:5000/current-config').subscribe({
+      next: (current) => {
+        if (!current.source) {
+          this.selectedSourceType = 'API'; // fallback
+          this.refreshAdvancedFields();
+          return;
+        }
+        this.http.get<any[]>('http://localhost:5000/saved-source-configs').subscribe({
+          next: (sources) => {
+            const sourceObj = sources.find(
+              s => (s.name || '').trim() === (current.source || '').trim()
+            );
+            if (sourceObj && typeof sourceObj.type === 'string') {
+              const type = (sourceObj.type || '').toUpperCase();
+              this.selectedSourceType = type === 'FTP' ? 'FTP' : 'API';
+            } else {
+              this.selectedSourceType = 'API';
+            }
+            this.refreshAdvancedFields();
+          },
+          error: () => {
+            this.selectedSourceType = 'API';
+            this.refreshAdvancedFields();
+          }
+        });
+      },
+      error: () => {
+        this.selectedSourceType = 'API';
+        this.refreshAdvancedFields();
+      }
+    });
   }
   refreshConfigs() {
     this.reloadService.reload();
+    this.refreshSourceType(); // Also update source type and advanced fields when configs change
+  }
+  refreshAdvancedFields() {
+    // Reset advanced fields based on selectedSourceType
+    if (this.selectedSourceType === 'API') {
+      this.advancedForm.patchValue({
+        apiLimit: 100,
+        apiMaxPages: 10,
+        // ...other API defaults if needed...
+      });
+    } else if (this.selectedSourceType === 'FTP') {
+      this.advancedForm.patchValue({
+        ftpRemoteDir: '',
+        ftpLocalDir: '',
+        ftpFileTypes: '.csv,.json,.parquet',
+        ftpRetryDelay: 5,
+        // ...other FTP defaults if needed...
+      });
+    }
+    // Always keep CSV/DB fields as is or set defaults if needed
   }
   ngOnDestroy() {
     if (this.pollInterval) {
@@ -60,6 +148,7 @@ export class DataExtraction implements OnInit, OnDestroy {
     if (this.runIdPollInterval) {
       clearInterval(this.runIdPollInterval);
     }
+    if (this.configSub) this.configSub.unsubscribe();
   }
   startRunIdPolling() {
     if (this.runIdPollInterval) {
@@ -114,6 +203,26 @@ export class DataExtraction implements OnInit, OnDestroy {
     this.schedulerForm = this.fb.group({
       interval: [null, [Validators.required, Validators.min(1)]],
       duration: [null, [Validators.required, Validators.min(0.1)]]
+    });
+    this.advancedForm = this.fb.group({
+      apiLimit: [100],
+      apiMaxPages: [10],
+      ftpRemoteDir: [''],
+      ftpLocalDir: [''],
+      ftpFileTypes: ['.csv,.json,.parquet'],
+      ftpRetryDelay: [5],
+      csvOutputPath: ['data/output.csv']
+      // dbEnabled: [true] // Removed
+    });
+    this.editConfigForm = this.fb.group({
+      type: ['API', Validators.required],
+      apiLimit: [100],
+      apiMaxPages: [10],
+      ftpRemoteDir: [''],
+      ftpLocalDir: [''],
+      ftpFileTypes: ['.csv,.json,.parquet'],
+      ftpRetryDelay: [5],
+      csvOutputPath: ['data/output.csv']
     });
   }
   runPipeline() {
@@ -222,5 +331,48 @@ export class DataExtraction implements OnInit, OnDestroy {
       next: () => {},
       error: (err) => this.status = `Error: ${err.error?.message || err.message || 'Failed to stop pipeline'}`
     });
+  }
+
+  onEditConfig(config: any) {
+    this.editingConfig = config;
+    this.editConfigForm.patchValue({
+      type: config.type || 'API',
+      apiLimit: config.advanced?.apiLimit ?? 100,
+      apiMaxPages: config.advanced?.apiMaxPages ?? 10,
+      ftpRemoteDir: config.advanced?.ftpRemoteDir ?? '',
+      ftpLocalDir: config.advanced?.ftpLocalDir ?? '',
+      ftpFileTypes: config.advanced?.ftpFileTypes ?? '.csv,.json,.parquet',
+      ftpRetryDelay: config.advanced?.ftpRetryDelay ?? 5,
+      csvOutputPath: config.advanced?.csvOutputPath ?? 'data/output.csv'
+    });
+  }
+
+  saveEditedConfig() {
+    if (this.editConfigForm.valid && this.editingConfig) {
+      const adv = this.editConfigForm.value;
+      const payload = {
+        ...this.editingConfig,
+        advanced: {
+          apiLimit: adv.apiLimit,
+          apiMaxPages: adv.apiMaxPages,
+          ftpRemoteDir: adv.ftpRemoteDir,
+          ftpLocalDir: adv.ftpLocalDir,
+          ftpFileTypes: adv.ftpFileTypes,
+          ftpRetryDelay: adv.ftpRetryDelay,
+          csvOutputPath: adv.csvOutputPath
+        }
+      };
+      this.api.saveSourceConfig(payload).subscribe({
+        next: () => {
+          this.editingConfig = null;
+          this.refreshConfigs();
+        },
+        error: (err) => alert('Save failed: ' + err.message)
+      });
+    }
+  }
+
+  cancelEditConfig() {
+    this.editingConfig = null;
   }
 }
