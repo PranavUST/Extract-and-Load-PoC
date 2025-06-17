@@ -12,14 +12,14 @@ def get_connection(conn_params=None):
     """Get database connection with provided params or default config"""
     try:
         if conn_params is None:
-            # Use default connection parameters
+            # Load from environment variables (from .env or system env)
             conn_params = {
-                'host': 'localhost',
-                'database': 'postgres',
-                'user': 'postgres',
-                'password': 'admin'
+                'host': os.getenv('DB_HOST', 'localhost'),
+                'database': os.getenv('DB_NAME', 'postgres'),
+                'user': os.getenv('DB_USER', 'postgres'),
+                'password': os.getenv('DB_PASSWORD', 'admin'),
+                'port': os.getenv('DB_PORT', 5432)
             }
-        
         return psycopg2.connect(**conn_params)
     except Exception as e:
         logger.error(f"Database connection failed: {str(e)}")
