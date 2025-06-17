@@ -32,11 +32,11 @@ export class SourceConfig {
   public sourceForm: FormGroup = this.fb.group({
     name: ['', Validators.required],
     type: ['API', Validators.required],
-    endpoint: [''],
+    endpoint: ['', Validators.required], // Ensure required for API
     authToken: [''],
-    ftpHost: [''],
-    ftpUsername: ['your_username'],
-    ftpPassword: ['your_password'],
+    ftpHost: ['', Validators.required], // Ensure required for FTP
+    ftpUsername: [''],
+    ftpPassword: [''],
     retries: [3] 
   });
   constructor() {

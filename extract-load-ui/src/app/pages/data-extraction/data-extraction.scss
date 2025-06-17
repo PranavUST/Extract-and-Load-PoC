@@ -76,12 +76,12 @@
     transition: background 0.18s, color 0.18s;
   }
   .mat-tab-label.mat-tab-label-active {
-    color: #2c3e50;
+    color: #004d4d !important;
     background: #f5fafd;
     box-shadow: 0 2px 8px rgba(0,151,172,0.07);
   }
   .mat-ink-bar {
-    background: #2c3e50;
+    background: #004d4d !important;
     height: 4px;
     border-radius: 2px;
   }
@@ -209,6 +209,15 @@ mat-card {
   opacity: 0 !important;
   pointer-events: none !important;
   transition: opacity 0.2s;
+}
+
+::ng-deep .mat-tab-group .mat-ink-bar,
+::ng-deep .mat-mdc-tab-group .mat-mdc-tab-header .mat-mdc-tab-indicator .mat-mdc-tab-indicator__content {
+  background-color: #004d4d !important;
+}
+::ng-deep .mat-tab-label.mat-tab-label-active,
+::ng-deep .mat-mdc-tab-label.mat-mdc-tab-label-active {
+  color: #004d4d !important;
 }
 
 @media (max-width: 800px) {

@@ -7,20 +7,45 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  z-index: 1;
+  background-color: #00555361;
+  overflow: auto;
 }
 
 .register-container {
+  margin-top: 10rem;
+  margin-bottom: 2rem;
   width: 100%;
-  max-width: 350px;
-  margin: auto;
+  max-width: 400px;
   border-radius: 16px;
   background: #fff;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1);
   padding: 32px 24px 24px 24px;
   position: relative;
   z-index: 2;
+  max-height: none;
+  overflow-y: visible;
+}
+
+.register-logo, .register-branding {
+  display: none;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.register-header h2 {
+  font-weight: 500;
+  font-size: 1.5rem;
+  margin-bottom: 2px;
+  color: #004d40;
+}
+
+.register-subtitle {
+  color: #607d8b;
+  font-size: 1rem;
+  margin-bottom: 8px;
 }
 
 .form-title {
@@ -53,13 +78,13 @@ input, select {
 }
 
 input:focus, select:focus {
-  border: 1.5px solid #1976d2;
+  border: 1.5px solid #004d4d;
 }
 
 .register-btn {
   width: 100%;
   max-width: 320px;
-  background: #0097AC !important;
+  background: #004d4d !important;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -100,7 +125,7 @@ input:focus, select:focus {
   color: #666;
 }
 .login-link a {
-  color: #0097AC;
+  color: #004d4d;
   text-decoration: none;
   cursor: pointer;
   transition: color 0.2s;
@@ -115,4 +140,55 @@ input:focus, select:focus {
   font-size: 1rem;
   margin-top: 2px;
   margin-bottom: 2px;
+}
+
+.input-icon-group {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.input-icon {
+  font-family: 'Material Icons' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 1.3em;
+  color: #004d4d;
+  margin-right: 8px;
+  margin-left: 4px;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+.input-icon + input {
+  flex: 1;
+  margin-left: 0;
+}
+.input-icon-group input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding-left: 0;
+}
+.form-group input, .form-group select {
+  width: 100%;
+}
+.form-group .input-icon-group {
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  background: #fafafa;
+  padding: 8px 10px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-group .input-icon-group:focus-within {
+  border-color: #004d4d;
+  box-shadow: 0 0 0 2px #b2dfdb;
 }

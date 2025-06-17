@@ -22,7 +22,7 @@ $white: #fff;
 html, body {
   height: 100%;
   margin: 0;
-  background: $teal-dark;
+  background: linear-gradient(135deg, #004d4d 0%, #004d4d7e 100%);
   color: $white;
   min-height: 100vh;
   overflow-x: hidden;
@@ -50,20 +50,27 @@ body, p, label, input, select, textarea, button {
 
 .global-logo {
   position: fixed;
-  top: 2rem;   // Reduced from 2in
+  top: 2rem;
   left: 2rem;
   z-index: 2000;
+  transition: filter 0.25s cubic-bezier(.4,2,.6,1), transform 0.22s cubic-bezier(.4,2,.6,1);
 }
 .global-logo img {
   height: 60px;
   width: 60px;
   display: block;
-  /* Remove background, border-radius, box-shadow, and padding */
   background: none;
-  border-radius: 0;
-  box-shadow: none;
+  border-radius: 0; // Remove curved edges
+  box-shadow: 0 0 0 0 #0097ac55;
   padding: 0;
   object-fit: contain;
+  filter: drop-shadow(0 2px 8px #004d4d22) drop-shadow(0 0 12px #0097ac33);
+  transition: filter 0.25s cubic-bezier(.4,2,.6,1), transform 0.22s cubic-bezier(.4,2,.6,1);
+}
+.global-logo:hover img, .global-logo:focus img {
+  filter: drop-shadow(0 4px 16px #004d4d33) drop-shadow(0 0 18px #0097ac55);
+  transform: scale(1.08) rotate(-4deg);
+  box-shadow: 0 0 16px 4px #0097ac55;
 }
 .logout-btn {
   position: fixed;
@@ -142,3 +149,97 @@ mat-icon, .mat-icon, .mat-mdc-icon-button mat-icon {
 body, html, *:not(mat-icon):not(.mat-icon) {
   font-family: 'Aptos', Arial, sans-serif !important;
 }
+
+/* Remove card-like border and shadow from config containers */
+.config-card, .saved-config-card, .source-config-card, .target-config-card {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* If the containers use mat-card or similar, also override: */
+mat-card, .mat-card {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+// Force all mat-raised-button with color primary inside Source Config to dark teal
+button.mat-raised-button.mat-primary,
+button.mat-mdc-raised-button.mat-primary {
+  background-color: #004d4d !important;
+  color: #fff !important;
+  border-radius: 8px;
+  font-weight: 500; // Reduced from 600 to 500 for a lighter look
+  box-shadow: 0 2px 8px rgba(0,77,77,0.10) !important;
+}
+button.mat-raised-button.mat-primary:hover,
+button.mat-mdc-raised-button.mat-primary:hover,
+button.mat-raised-button.mat-primary:focus,
+button.mat-mdc-raised-button.mat-primary:focus {
+  background-color: #003838 !important;
+}
+button.mat-raised-button.mat-primary:disabled,
+button.mat-mdc-raised-button.mat-primary:disabled {
+  background-color: #004d4d !important;
+  color: #fff !important;
+  opacity: 0.45 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  filter: grayscale(0.2);
+}
+
+// Change underline and focus color for Angular Material form fields
+.mat-form-field-appearance-fill .mat-form-field-flex {
+  background-color: #fff !important;
+}
+.mat-form-field-appearance-fill .mat-form-field-ripple,
+.mat-form-field-appearance-fill .mat-mdc-form-field-ripple {
+  background-color: #004d4d !important;
+}
+.mat-form-field-appearance-fill.mat-focused .mat-form-field-ripple,
+.mat-form-field-appearance-fill.mat-focused .mat-mdc-form-field-ripple {
+  background-color: #004d4d !important;
+}
+.mat-form-field-label {
+  color: #004d4d !important;
+}
+.mat-form-field.mat-focused .mat-form-field-label {
+  color: #004d4d !important;
+}
+
+/* Override blue color for specific Angular Material components */
+.mat-tab-group.mat-primary .mat-ink-bar,
+.mat-mdc-tab-group.mat-primary .mat-mdc-tab-header .mat-mdc-tab-indicator .mat-mdc-tab-indicator__content {
+  background-color: #004d4d !important;
+}
+
+.mat-tab-label.mat-tab-label-active,
+.mat-mdc-tab-label.mat-mdc-tab-label-active {
+  color: #004d4d !important;
+}
+
+// Force tab underline and active tab label to dark teal
+.mat-mdc-tab-group .mat-mdc-tab-header .mat-mdc-tab-indicator .mat-mdc-tab-indicator__content {
+  background-color: #004d4d !important;
+}
+.mat-mdc-tab-label.mat-mdc-tab-label-active {
+  color: #004d4d !important;
+}
+// For legacy Material tabs
+.mat-tab-group .mat-ink-bar {
+  background-color: #004d4d !important;
+}
+.mat-tab-label.mat-tab-label-active {
+  color: #004d4d !important;
+}
+
+/* Remove all blue (Material default blue and custom blue) from global styles
+// Target common Material blue shades and override with your preferred color (e.g., dark teal)
+
+// Angular Material default blue (indigo-pink theme)
+$mat-blue: #3f51b5;
+$mat-indigo: #3f51b5;
+$mat-primary: #1976d2;
+$mat-accent: #448aff;
+*/

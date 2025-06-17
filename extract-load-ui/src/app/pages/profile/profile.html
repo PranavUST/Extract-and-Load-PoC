@@ -11,6 +11,7 @@
       <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
         <div class="profile-fields">
           <label>
+            <mat-icon class="profile-field-icon">person</mat-icon>
             <strong>Name:</strong>
             <input formControlName="name" [readonly]="!editing" class="profile-input" placeholder="Full Name" (blur)="profileForm.get('name')?.markAsTouched()" />
             <div class="field-error" *ngIf="editing && profileForm.get('name')?.invalid && (profileForm.get('name')?.touched || profileForm.get('name')?.dirty)">
@@ -19,6 +20,7 @@
             </div>
           </label>
           <label>
+            <mat-icon class="profile-field-icon">email</mat-icon>
             <strong>Email:</strong>
             <input formControlName="email" [readonly]="!editing" class="profile-input" placeholder="Email" type="email" (blur)="profileForm.get('email')?.markAsTouched()" />
             <div class="field-error" *ngIf="editing && profileForm.get('email')?.invalid && (profileForm.get('email')?.touched || profileForm.get('email')?.dirty)">
@@ -27,6 +29,7 @@
             </div>
           </label>
           <label>
+            <mat-icon class="profile-field-icon">account_box</mat-icon>
             <strong>Username:</strong>
             <input formControlName="username" [readonly]="!editing" class="profile-input" placeholder="Username" (blur)="profileForm.get('username')?.markAsTouched()" />
             <div class="field-error" *ngIf="editing && profileForm.get('username')?.invalid && (profileForm.get('username')?.touched || profileForm.get('username')?.dirty)">
