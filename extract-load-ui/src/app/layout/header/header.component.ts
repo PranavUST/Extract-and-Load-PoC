@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -15,4 +16,10 @@ import { MatButtonModule } from '@angular/material/button';
     MatButtonModule
   ]
 })
-export class HeaderComponent {}
+export class HeaderComponent {
+  constructor(private router: Router) {}
+
+  get isLoginPage(): boolean {
+    return this.router.url === '/login';
+  }
+}

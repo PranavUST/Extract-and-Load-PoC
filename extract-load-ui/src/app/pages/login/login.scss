@@ -131,7 +131,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: #004d4d;
   z-index: 1;
 }
 
@@ -155,6 +155,7 @@
     font-weight: 600;
     text-align: center;
     margin-bottom: 24px;  // increased from 18px
+    color: #004d4d;
   }
 
   .form-group {
@@ -182,13 +183,13 @@
   }
 
   input:focus {
-    border: 1.5px solid #1976d2;
+    border: 1.5px solid #004d4d;
   }
 
   .login-btn {
     width: 100%;
     max-width: 320px;
-    background: #0097AC !important;
+    background: #004d4d !important;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -199,13 +200,13 @@
     letter-spacing: 0.3px;
     margin: 10px auto 0;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 151, 172, 0.15);
+    box-shadow: 0 2px 8px rgba(0,77,77,0.15);
     transition: all 0.2s;
     display: block;
 
     &:hover:not([disabled]) {
-      background: darken(#0097AC, 5%) !important;
-      box-shadow: 0 4px 12px rgba(0, 151, 172, 0.25);
+      background: #003838 !important;
+      box-shadow: 0 4px 12px rgba(0,77,77,0.25);
     }
 
     &:disabled {
@@ -229,13 +230,14 @@
     color: #666;
     
     a {
-      color: #0097AC;
+      color: #004d4d;
       text-decoration: none;
       cursor: pointer;
       transition: color 0.2s;
 
       &:hover {
         text-decoration: underline;
+        color: #003838;
       }
     }
   }
@@ -285,13 +287,37 @@
     display: block;
     text-align: right;
     font-size: 1rem;
-    color: #0097AC;
+    color: #004d4d;
     text-decoration: none;
     margin-top: 6px;
     transition: color 0.2s;
 
     &:hover {
       text-decoration: underline;
+      color: #003838;
     }
+  }
+
+  .ust-logo-login {
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    width: 64px;
+    height: auto;
+    z-index: 10;
+  }
+
+  .ust-logo-login-center {
+    display: block;
+    margin: 0 auto 18px auto;
+    width: 64px;
+    height: auto;
+  }
+
+  .login-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 18px;
   }
 }

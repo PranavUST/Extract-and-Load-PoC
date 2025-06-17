@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,8 @@ import { AuthService } from '../../services/auth.service';
     CommonModule,
     FormsModule,
     MatIconModule,
-    RouterLink
+    RouterLink,
+    MatProgressSpinnerModule
   ],
   templateUrl: './login.html',
   styleUrls: ['./login.scss']
@@ -23,6 +25,7 @@ export class LoginComponent implements OnInit {
   errorMessage = '';
   loginError = false;
   hidePassword = true;
+  loading = false;
 
   constructor(
     private authService: AuthService,
@@ -33,9 +36,10 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.username && this.password) {
-      
+      this.loading = true;
       this.authService.login(this.username, this.password).subscribe({
         next: (response) => {
+          this.loading = false;
           if (response.success) {
             this.router.navigate(['/landing']);
           } else {
@@ -44,6 +48,7 @@ export class LoginComponent implements OnInit {
           }
         },
         error: () => {
+          this.loading = false;
           this.loginError = true;
           this.errorMessage = 'Invalid Username or Password';
         }

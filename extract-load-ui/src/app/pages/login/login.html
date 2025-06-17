@@ -1,7 +1,12 @@
 <div class="login-background">
   <div class="login-container">
+    <img src="/UST_logo.png" alt="UST Logo" class="ust-logo-login-center" />
     <form #loginForm="ngForm" (ngSubmit)="onSubmit()">
       <div class="form-title">Sign In</div>
+      
+      <div *ngIf="loading" class="login-loading">
+        <mat-spinner diameter="32"></mat-spinner>
+      </div>
       
       <div class="form-group">
         <label>Username</label>

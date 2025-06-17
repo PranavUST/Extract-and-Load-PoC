@@ -1,11 +1,19 @@
 <div class="logs-wrapper">
-  <div class="logs-header">
-    <h1>Pipeline Logs</h1>
-    <p class="logs-subtitle">Latest pipeline logs</p>
-    <button mat-raised-button color="primary" class="view-log-btn" (click)="viewLog()">
-      <mat-icon>visibility</mat-icon>
-      View pipeline.log
-    </button>
+  <div class="logs-header logs-header-horizontal">
+    <div class="logs-header-row-gap">
+      <button mat-raised-button color="primary" class="download-log-btn" (click)="downloadLog()">
+        <mat-icon>download</mat-icon>
+        Download pipeline.log
+      </button>
+      <div class="logs-header-center">
+        <h1>Pipeline Logs</h1>
+        <p class="logs-subtitle">Latest pipeline logs</p>
+      </div>
+      <button mat-raised-button color="primary" class="view-log-btn" (click)="viewLog()">
+        <mat-icon>visibility</mat-icon>
+        View pipeline.log
+      </button>
+    </div>
   </div>
   <div class="logs-card">
     <div *ngIf="loading" class="logs-loading">

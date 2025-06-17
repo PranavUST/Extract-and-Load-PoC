@@ -31,7 +31,9 @@ export class LogsPage {
     this.error = null;
     this.logService.getPipelineLog().subscribe({
       next: (data) => {
-        this.logContent = data;
+        // Reverse the log lines so latest logs appear first
+        const lines = data.split(/\r?\n/).filter(line => line.trim().length > 0);
+        this.logContent = lines.reverse().join('\n');
         this.loading = false;
       },
       error: (err) => {
@@ -39,5 +41,24 @@ export class LogsPage {
         this.loading = false;
       }
     });
+  }
+
+  async downloadLog() {
+    const url = 'http://localhost:5000/api/pipeline-log';
+    try {
+      const response = await fetch(url, { credentials: 'include' });
+      if (!response.ok) throw new Error('Network response was not ok');
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = 'pipeline.log';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (err) {
+      alert('Failed to download log file.');
+    }
   }
 }
