@@ -3,22 +3,105 @@
   <div class="config-section-subtitle">Manage and select your saved source configurations below.</div>
   <div *ngIf="sourceConfigs.length; else emptySource">
     <div class="config-row-card" *ngFor="let config of sourceConfigs">
-      <div class="config-row-main">
-        <span class="config-name">{{ config.name }}</span>
-        <span class="type-badge" [ngClass]="config.type.toLowerCase()">{{ config.type }}</span>
-        <span *ngIf="currentSource === config.name" class="current-badge">Current</span>
+      <div *ngIf="editingSourceConfig?.name !== config.name; else editSourceForm">
+        <div class="config-row-main">
+          <span class="config-name">{{ config.name }}</span>
+          <span class="type-badge" [ngClass]="config.type.toLowerCase()">{{ config.type }}</span>
+          <span *ngIf="currentSource === config.name" class="current-badge">Current</span>
+        </div>
+        <div class="config-row-actions">
+          <button mat-icon-button color="primary" (click)="startEditSourceConfig(config)" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteSourceConfig(config)" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <button mat-stroked-button color="accent" *ngIf="currentSource !== config.name" (click)="setCurrentSource(config.name)" matTooltip="Set as Current">
+            <mat-icon>check_circle</mat-icon> Set as Current
+          </button>
+        </div>
       </div>
-      <div class="config-row-actions">
-        <button mat-icon-button color="primary" (click)="editSourceConfig(config)" matTooltip="Edit">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="deleteSourceConfig(config)" matTooltip="Delete">
-          <mat-icon>delete</mat-icon>
-        </button>
-        <button mat-stroked-button color="accent" *ngIf="currentSource !== config.name" (click)="setCurrentSource(config.name)" matTooltip="Set as Current">
-          <mat-icon>check_circle</mat-icon> Set as Current
-        </button>
-      </div>
+      <ng-template #editSourceForm>
+        <form class="edit-config-form" [formGroup]="editSourceFormGroup">
+          <div class="edit-config-fields">
+            <mat-form-field appearance="fill">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="name" />
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Type</mat-label>
+              <mat-select formControlName="type">
+                <mat-option value="API">API</mat-option>
+                <mat-option value="FTP">FTP</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill" *ngIf="editSourceFormGroup.get('type')?.value === 'API'">
+              <mat-label>Endpoint</mat-label>
+              <input matInput formControlName="endpoint" />
+            </mat-form-field>
+            <mat-form-field appearance="fill" *ngIf="editSourceFormGroup.get('type')?.value === 'API'">
+              <mat-label>Auth Token</mat-label>
+              <input matInput formControlName="authToken" />
+            </mat-form-field>
+            <mat-form-field appearance="fill" *ngIf="editSourceFormGroup.get('type')?.value === 'FTP'">
+              <mat-label>Host</mat-label>
+              <input matInput formControlName="ftpHost" />
+            </mat-form-field>
+            <mat-form-field appearance="fill" *ngIf="editSourceFormGroup.get('type')?.value === 'FTP'">
+              <mat-label>Username</mat-label>
+              <input matInput formControlName="ftpUsername" />
+            </mat-form-field>
+            <mat-form-field appearance="fill" *ngIf="editSourceFormGroup.get('type')?.value === 'FTP'">
+              <mat-label>Password</mat-label>
+              <input matInput formControlName="ftpPassword" />
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Retries</mat-label>
+              <input matInput type="number" formControlName="retries" min="0" />
+            </mat-form-field>
+          </div>
+          <mat-divider style="margin:16px 0;"></mat-divider>
+          <div class="dialog-section-heading" style="color:#006E74;">Advanced {{editSourceFormGroup.get('type')?.value}} Settings</div>
+          <div class="edit-config-fields">
+            <ng-container *ngIf="editSourceFormGroup.get('type')?.value === 'API'">
+              <mat-form-field appearance="fill">
+                <mat-label>API Pagination Limit</mat-label>
+                <input matInput type="number" formControlName="apiLimit" min="1" />
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>API Max Pages</mat-label>
+                <input matInput type="number" formControlName="apiMaxPages" min="1" />
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngIf="editSourceFormGroup.get('type')?.value === 'FTP'">
+              <mat-form-field appearance="fill">
+                <mat-label>FTP Remote Directory</mat-label>
+                <input matInput formControlName="ftpRemoteDir" />
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>FTP Local Directory</mat-label>
+                <input matInput formControlName="ftpLocalDir" />
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>FTP File Types (comma separated)</mat-label>
+                <input matInput formControlName="ftpFileTypes" />
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>FTP Retry Delay (seconds)</mat-label>
+                <input matInput type="number" formControlName="ftpRetryDelay" min="0" />
+              </mat-form-field>
+            </ng-container>
+            <mat-form-field appearance="fill">
+              <mat-label>CSV Output Path</mat-label>
+              <input matInput formControlName="csvOutputPath" />
+            </mat-form-field>
+          </div>
+          <div class="edit-config-actions">
+            <button mat-button type="button" (click)="cancelEditSourceConfig()">Cancel</button>
+            <button mat-raised-button color="primary" type="button" (click)="saveEditSourceConfig()" [disabled]="editSourceFormGroup.invalid">Save</button>
+          </div>
+        </form>
+      </ng-template>
     </div>
   </div>
   <ng-template #emptySource>
@@ -36,22 +119,83 @@
   <div class="config-section-subtitle">Manage and select your saved target configurations below.</div>
   <div *ngIf="targetConfigs.length; else emptyTarget">
     <div class="config-row-card" *ngFor="let config of targetConfigs">
-      <div class="config-row-main">
-        <span class="config-name">{{ config.name }}</span>
-        <span class="type-badge" [ngClass]="config.type?.toLowerCase()">{{ config.type }}</span>
-        <span *ngIf="currentTarget === config.name" class="current-badge">Current</span>
+      <div *ngIf="editingTargetConfig?.name !== config.name; else editTargetForm">
+        <div class="config-row-main">
+          <span class="config-name">{{ config.name }}</span>
+          <span class="type-badge" [ngClass]="config.type?.toLowerCase()">{{ config.type }}</span>
+          <span *ngIf="currentTarget === config.name" class="current-badge">Current</span>
+        </div>
+        <div class="config-row-actions">
+          <button mat-icon-button color="primary" (click)="startEditTargetConfig(config)" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteTargetConfig(config)" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <button mat-stroked-button color="accent" *ngIf="currentTarget !== config.name" (click)="setCurrentTarget(config.name)" matTooltip="Set as Current">
+            <mat-icon>check_circle</mat-icon> Set as Current
+          </button>
+        </div>
       </div>
-      <div class="config-row-actions">
-        <button mat-icon-button color="primary" (click)="editTargetConfig(config)" matTooltip="Edit">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="deleteTargetConfig(config)" matTooltip="Delete">
-          <mat-icon>delete</mat-icon>
-        </button>
-        <button mat-stroked-button color="accent" *ngIf="currentTarget !== config.name" (click)="setCurrentTarget(config.name)" matTooltip="Set as Current">
-          <mat-icon>check_circle</mat-icon> Set as Current
-        </button>
-      </div>
+      <ng-template #editTargetForm>
+        <form class="edit-config-form" [formGroup]="editTargetFormGroup">
+          <div class="edit-config-fields">
+            <mat-form-field appearance="fill">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="name" />
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Type</mat-label>
+              <mat-select formControlName="type">
+                <mat-option value="API">API</mat-option>
+                <mat-option value="FTP">FTP</mat-option>
+                <mat-option value="DATABASE">DATABASE</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <!-- Add more standard fields for target config as needed -->
+          </div>
+          <mat-divider style="margin:16px 0;"></mat-divider>
+          <div class="dialog-section-heading" style="color:#006E74;">Advanced {{editTargetFormGroup.get('type')?.value}} Settings</div>
+          <div class="edit-config-fields">
+            <ng-container *ngIf="editTargetFormGroup.get('type')?.value === 'API'">
+              <mat-form-field appearance="fill">
+                <mat-label>API Pagination Limit</mat-label>
+                <input matInput type="number" formControlName="apiLimit" min="1" />
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>API Max Pages</mat-label>
+                <input matInput type="number" formControlName="apiMaxPages" min="1" />
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngIf="editTargetFormGroup.get('type')?.value === 'FTP'">
+              <mat-form-field appearance="fill">
+                <mat-label>FTP Remote Directory</mat-label>
+                <input matInput formControlName="ftpRemoteDir" />
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>FTP Local Directory</mat-label>
+                <input matInput formControlName="ftpLocalDir" />
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>FTP File Types (comma separated)</mat-label>
+                <input matInput formControlName="ftpFileTypes" />
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>FTP Retry Delay (seconds)</mat-label>
+                <input matInput type="number" formControlName="ftpRetryDelay" min="0" />
+              </mat-form-field>
+            </ng-container>
+            <mat-form-field appearance="fill">
+              <mat-label>CSV Output Path</mat-label>
+              <input matInput formControlName="csvOutputPath" />
+            </mat-form-field>
+          </div>
+          <div class="edit-config-actions">
+            <button mat-button type="button" (click)="cancelEditTargetConfig()">Cancel</button>
+            <button mat-raised-button color="primary" type="button" (click)="saveEditTargetConfig()" [disabled]="editTargetFormGroup.invalid">Save</button>
+          </div>
+        </form>
+      </ng-template>
     </div>
   </div>
   <ng-template #emptyTarget>

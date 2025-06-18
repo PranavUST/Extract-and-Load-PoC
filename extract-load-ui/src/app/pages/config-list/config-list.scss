@@ -26,7 +26,7 @@ mat-header-cell, mat-cell {
 
 .config-row-card {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: center;
   background: #f8fafd;
   border-radius: 14px;
@@ -44,6 +44,8 @@ mat-header-cell, mat-cell {
   display: flex;
   align-items: center;
   gap: 18px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 .config-name {
   font-size: 1.13rem;
@@ -86,9 +88,13 @@ mat-header-cell, mat-cell {
 }
 .config-row-actions {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 8px;
+  margin-left: auto;
+  flex: 0 0 auto; // Prevent growing/shrinking
 }
+
 mat-cell button[mat-icon-button] {
   margin-right: 6px;
   transition: background 0.18s;

@@ -28,12 +28,44 @@ export interface SourceConfig {
   ftpUsername?: string;
   ftpPassword?: string;
   retries?: number;
+  advanced?: {
+    apiLimit?: number;
+    apiMaxPages?: number;
+    ftpRemoteDir?: string;
+    ftpLocalDir?: string;
+    ftpFileTypes?: string;
+    ftpRetryDelay?: number;
+    csvOutputPath?: string;
+  };
+  apiLimit?: number;
+  apiMaxPages?: number;
+  ftpRemoteDir?: string;
+  ftpLocalDir?: string;
+  ftpFileTypes?: string;
+  ftpRetryDelay?: number;
+  csvOutputPath?: string;
 }
 
 interface TargetConfig {
   name: string;
   tableName?: string;
   type?: string;
+  advanced?: {
+    apiLimit?: number;
+    apiMaxPages?: number;
+    ftpRemoteDir?: string;
+    ftpLocalDir?: string;
+    ftpFileTypes?: string;
+    ftpRetryDelay?: number;
+    csvOutputPath?: string;
+  };
+  apiLimit?: number;
+  apiMaxPages?: number;
+  ftpRemoteDir?: string;
+  ftpLocalDir?: string;
+  ftpFileTypes?: string;
+  ftpRetryDelay?: number;
+  csvOutputPath?: string;
 }
 
 @Component({
@@ -64,6 +96,11 @@ export class ConfigListComponent implements OnInit {
   currentSource: string | null = null;
   currentTarget: string | null = null;
   editForm: FormGroup;
+  // Inline editing state
+  editingSourceConfig: SourceConfig | null = null;
+  editingTargetConfig: TargetConfig | null = null;
+  editSourceFormGroup: FormGroup;
+  editTargetFormGroup: FormGroup;
   @ViewChild('editSourceDialog') editSourceDialog!: TemplateRef<any>;
   editingConfig: any = null;
 
@@ -78,6 +115,35 @@ export class ConfigListComponent implements OnInit {
       ftpPassword: [''],
       retries: [3],
       // Advanced fields
+      apiLimit: [100],
+      apiMaxPages: [10],
+      ftpRemoteDir: [''],
+      ftpLocalDir: [''],
+      ftpFileTypes: ['.csv,.json,.parquet'],
+      ftpRetryDelay: [5],
+      csvOutputPath: ['data/output.csv']
+    });
+    // Inline edit forms
+    this.editSourceFormGroup = this.fb.group({
+      name: ['', Validators.required],
+      type: ['API', Validators.required],
+      endpoint: [''],
+      authToken: [''],
+      ftpHost: [''],
+      ftpUsername: [''],
+      ftpPassword: [''],
+      retries: [3],
+      apiLimit: [100],
+      apiMaxPages: [10],
+      ftpRemoteDir: [''],
+      ftpLocalDir: [''],
+      ftpFileTypes: ['.csv,.json,.parquet'],
+      ftpRetryDelay: [5],
+      csvOutputPath: ['data/output.csv']
+    });
+    this.editTargetFormGroup = this.fb.group({
+      name: ['', Validators.required],
+      type: ['API', Validators.required],
       apiLimit: [100],
       apiMaxPages: [10],
       ftpRemoteDir: [''],
@@ -259,6 +325,112 @@ export class ConfigListComponent implements OnInit {
           this.loadConfigs(); // Use the correct method to reload configs
         },
         error: (err: any) => alert('Save failed: ' + err.message)
+      });
+    }
+  }
+
+  // Inline edit logic for source configs
+  startEditSourceConfig(config: SourceConfig) {
+    this.editingSourceConfig = config;
+    this.editSourceFormGroup.patchValue({
+      name: config.name || '',
+      type: config.type || 'API',
+      endpoint: config.endpoint || '',
+      authToken: config.authToken || '',
+      ftpHost: config.ftpHost || '',
+      ftpUsername: config.ftpUsername || '',
+      ftpPassword: config.ftpPassword || '',
+      retries: config.retries ?? 3,
+      apiLimit: (config.advanced?.apiLimit ?? config.apiLimit) ?? 100,
+      apiMaxPages: (config.advanced?.apiMaxPages ?? config.apiMaxPages) ?? 10,
+      ftpRemoteDir: (config.advanced?.ftpRemoteDir ?? config.ftpRemoteDir) ?? '',
+      ftpLocalDir: (config.advanced?.ftpLocalDir ?? config.ftpLocalDir) ?? '',
+      ftpFileTypes: (config.advanced?.ftpFileTypes ?? config.ftpFileTypes) ?? '.csv,.json,.parquet',
+      ftpRetryDelay: (config.advanced?.ftpRetryDelay ?? config.ftpRetryDelay) ?? 5,
+      csvOutputPath: (config.advanced?.csvOutputPath ?? config.csvOutputPath) ?? 'data/output.csv'
+    });
+  }
+
+  cancelEditSourceConfig() {
+    this.editingSourceConfig = null;
+  }
+
+  saveEditSourceConfig() {
+    if (this.editSourceFormGroup.valid && this.editingSourceConfig) {
+      const form = this.editSourceFormGroup.value;
+      const payload = {
+        name: form.name,
+        type: form.type,
+        endpoint: form.endpoint,
+        authToken: form.authToken,
+        ftpHost: form.ftpHost,
+        ftpUsername: form.ftpUsername,
+        ftpPassword: form.ftpPassword,
+        retries: form.retries,
+        advanced: {
+          apiLimit: form.apiLimit,
+          apiMaxPages: form.apiMaxPages,
+          ftpRemoteDir: form.ftpRemoteDir,
+          ftpLocalDir: form.ftpLocalDir,
+          ftpFileTypes: form.ftpFileTypes,
+          ftpRetryDelay: form.ftpRetryDelay,
+          csvOutputPath: form.csvOutputPath
+        }
+      };
+      this.http.put(`http://localhost:5000/saved-source-configs/${this.editingSourceConfig.name}`, payload).subscribe({
+        next: () => {
+          this.editingSourceConfig = null;
+          this.loadSourceConfigs();
+          this.loadCurrentConfig();
+        },
+        error: (err) => alert('Update failed: ' + err.message)
+      });
+    }
+  }
+
+  // Inline edit logic for target configs
+  startEditTargetConfig(config: TargetConfig) {
+    this.editingTargetConfig = config;
+    this.editTargetFormGroup.patchValue({
+      name: config.name || '',
+      type: config.type || 'API',
+      apiLimit: (config.advanced?.apiLimit ?? config.apiLimit) ?? 100,
+      apiMaxPages: (config.advanced?.apiMaxPages ?? config.apiMaxPages) ?? 10,
+      ftpRemoteDir: (config.advanced?.ftpRemoteDir ?? config.ftpRemoteDir) ?? '',
+      ftpLocalDir: (config.advanced?.ftpLocalDir ?? config.ftpLocalDir) ?? '',
+      ftpFileTypes: (config.advanced?.ftpFileTypes ?? config.ftpFileTypes) ?? '.csv,.json,.parquet',
+      ftpRetryDelay: (config.advanced?.ftpRetryDelay ?? config.ftpRetryDelay) ?? 5,
+      csvOutputPath: (config.advanced?.csvOutputPath ?? config.csvOutputPath) ?? 'data/output.csv'
+    });
+  }
+
+  cancelEditTargetConfig() {
+    this.editingTargetConfig = null;
+  }
+
+  saveEditTargetConfig() {
+    if (this.editTargetFormGroup.valid && this.editingTargetConfig) {
+      const form = this.editTargetFormGroup.value;
+      const payload = {
+        name: form.name,
+        type: form.type,
+        advanced: {
+          apiLimit: form.apiLimit,
+          apiMaxPages: form.apiMaxPages,
+          ftpRemoteDir: form.ftpRemoteDir,
+          ftpLocalDir: form.ftpLocalDir,
+          ftpFileTypes: form.ftpFileTypes,
+          ftpRetryDelay: form.ftpRetryDelay,
+          csvOutputPath: form.csvOutputPath
+        }
+      };
+      this.http.put(`http://localhost:5000/saved-target-configs/${this.editingTargetConfig.name}`, payload).subscribe({
+        next: () => {
+          this.editingTargetConfig = null;
+          this.loadTargetConfigs();
+          this.loadCurrentConfig();
+        },
+        error: (err) => alert('Update failed: ' + err.message)
       });
     }
   }
