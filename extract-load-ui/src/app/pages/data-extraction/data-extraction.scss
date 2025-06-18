@@ -163,7 +163,7 @@ mat-card {
 .button-row {
   display: flex;
   gap: 16px;
-  margin-top: 16px;
+  margin-top: 0 !important;
   flex-wrap: wrap;
 }
 
@@ -228,6 +228,14 @@ mat-card {
   border-radius: 0 !important;
   padding: 0 !important;
   margin-bottom: 0 !important;
+}
+
+// Remove extra margin from input-row and button-row in Schedule tab
+.input-row {
+  margin-bottom: 0 !important;
+}
+.button-row {
+  margin-top: 0 !important;
 }
 
 @media (max-width: 800px) {

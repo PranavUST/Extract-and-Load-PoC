@@ -4,7 +4,7 @@
   <div *ngIf="sourceConfigs.length; else emptySource">
     <div class="config-row-card" *ngFor="let config of sourceConfigs">
       <div *ngIf="editingSourceConfig?.name !== config.name; else editSourceForm">
-        <div class="config-row-main">
+        <div class="config-row-main full-width">
           <span class="config-name">{{ config.name }}</span>
           <span class="type-badge" [ngClass]="config.type.toLowerCase()">{{ config.type }}</span>
           <span *ngIf="currentSource === config.name" class="current-badge">Current</span>
@@ -120,7 +120,7 @@
   <div *ngIf="targetConfigs.length; else emptyTarget">
     <div class="config-row-card" *ngFor="let config of targetConfigs">
       <div *ngIf="editingTargetConfig?.name !== config.name; else editTargetForm">
-        <div class="config-row-main">
+        <div class="config-row-main full-width">
           <span class="config-name">{{ config.name }}</span>
           <span class="type-badge" [ngClass]="config.type?.toLowerCase()">{{ config.type }}</span>
           <span *ngIf="currentTarget === config.name" class="current-badge">Current</span>

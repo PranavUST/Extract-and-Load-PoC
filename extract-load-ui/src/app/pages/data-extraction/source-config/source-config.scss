@@ -7,11 +7,19 @@
   width: 100%;
 }
 
+.input-row mat-form-field {
+  margin-right: 18px;
+  margin-bottom: 12px;
+}
+.input-row mat-form-field:last-child {
+  margin-right: 0;
+}
+
 // Make both fields equal width and aligned
 .top-row-equal {
   display: flex;
   flex-direction: row;
-  gap: 32px;
+  gap: 22px;
   align-items: stretch;
   margin-bottom: 12px;
 }

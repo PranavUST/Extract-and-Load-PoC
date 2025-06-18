@@ -438,3 +438,71 @@ mat-card-title {
 .mat-tab-label.mat-tab-label-active {
   color: #004d4d !important;
 }
+
+// Add spacing between input fields in Source Config only
+.source-config-container .input-row mat-form-field {
+  margin-right: 18px !important;
+  margin-bottom: 16px !important;
+}
+.source-config-container .input-row mat-form-field:last-child {
+  margin-right: 0 !important;
+}
+
+// Add spacing between input fields in the Advanced section of Data Extraction page
+.data-extraction-card .mat-expansion-panel .input-row mat-form-field {
+  margin-right: 18px !important;
+  margin-bottom: 16px !important;
+}
+.data-extraction-card .mat-expansion-panel .input-row mat-form-field:last-child {
+  margin-right: 0 !important;
+}
+
+// Ensure gap between all input fields in any .input-row inside .data-extraction-card (all tabs)
+.data-extraction-card .input-row mat-form-field {
+  margin-right: 18px !important;
+  margin-bottom: 16px !important;
+}
+.data-extraction-card .input-row mat-form-field:last-child {
+  margin-right: 0 !important;
+}
+
+// Add spacing between fields in the top row of Source Config (Name and Source Type)
+.source-config-container .top-row-equal > mat-form-field {
+  margin-right: 18px !important;
+}
+.source-config-container .top-row-equal > mat-form-field:last-child {
+  margin-right: 0 !important;
+}
+
+// Add spacing between input fields in the Target Config tab
+.target-config-container .input-row mat-form-field {
+  margin-right: 18px !important;
+  margin-bottom: 16px !important;
+}
+.target-config-container .input-row mat-form-field:last-child {
+  margin-right: 0 !important;
+}
+// Add spacing between fields in the top row of Target Config (if any)
+.target-config-container .top-row-equal > mat-form-field {
+  margin-right: 18px !important;
+}
+.target-config-container .top-row-equal > mat-form-field:last-child {
+  margin-right: 0 !important;
+}
+
+// Add spacing between input fields in the Schedule tab
+.data-extraction-card .mat-tab-body-content .input-row mat-form-field {
+  margin-right: 18px !important;
+  margin-bottom: 14px !important;
+}
+.data-extraction-card .mat-tab-body-content .input-row mat-form-field:last-child {
+  margin-right: 0 !important;
+}
+
+// Remove conflicting/duplicate rules and force minimal gap between input fields and button row in Schedule tab
+.data-extraction-card .mat-tab-body-content .input-row {
+  margin-bottom: 0 !important;
+}
+.data-extraction-card .mat-tab-body-content .button-row {
+  margin-top: 0 !important;
+}

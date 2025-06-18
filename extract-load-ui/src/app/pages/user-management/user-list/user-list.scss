@@ -146,6 +146,20 @@ tr.mat-mdc-row {
   font-family: 'Aptos', Arial, sans-serif;
 }
 
+// Custom Users heading styles
+.users-title-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 2px;
+}
+.users-title-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  font-family: 'Aptos', Arial, sans-serif;
+}
+
 // Responsive design
 @media (max-width: 768px) {
   .mat-mdc-card {

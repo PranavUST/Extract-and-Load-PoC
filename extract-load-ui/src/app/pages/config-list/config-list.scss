@@ -25,9 +25,9 @@ mat-header-cell, mat-cell {
 }
 
 .config-row-card {
-  display: flex;
+  display: block !important;
   flex-direction: row;
-  align-items: center;
+  align-items: stretch;
   background: #f8fafd;
   border-radius: 14px;
   box-shadow: 0 2px 12px rgba(0,151,172,0.07);
@@ -47,6 +47,13 @@ mat-header-cell, mat-cell {
   position: relative;
   min-width: 0;
 }
+.config-row-main.full-width {
+  display: flex !important;
+  width: 100% !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  min-width: 0 !important;
+}
 .config-row-actions {
   display: flex;
   flex-direction: row;
@@ -56,10 +63,11 @@ mat-header-cell, mat-cell {
   flex: 0 0 auto; // Prevent growing/shrinking
 }
 .config-row-actions-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-left: auto !important;
+  margin-right: 0;
 }
 
 .config-name {
