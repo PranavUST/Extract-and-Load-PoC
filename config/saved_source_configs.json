@@ -1,1 +1,1 @@
-[]
+[{"name": "apitest", "type": "API", "endpoint": "123", "authToken": "123", "ftpHost": "", "ftpUsername": "", "ftpPassword": "", "retries": 3, "advanced": {"apiLimit": 100, "apiMaxPages": 10, "ftpRemoteDir": "", "ftpLocalDir": "", "ftpFileTypes": ".csv,.json,.parquet", "ftpRetryDelay": 5, "csvOutputPath": "data/output.csv1"}}]

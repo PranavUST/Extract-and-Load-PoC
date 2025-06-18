@@ -16,7 +16,7 @@ secrets:
 source:
   api:
     auth:
-      token: ''
+      token: '123'
       type: static_token
     data_path: data.items
     headers: {}
@@ -27,8 +27,8 @@ source:
       page_size: 100
       page_size_param: limit
     params: {}
-    retries: 4
+    retries: 3
     timeout: 30
-    url: http://127.0.0.1:5001/v1/data
+    url: '123'
   type: REST_API
 version: 1.0
