@@ -374,3 +374,14 @@ mat-icon, .mat-icon, .mat-mdc-icon-button mat-icon {
   filter: drop-shadow(0 4px 16px #004d4d33) drop-shadow(0 0 18px #0097ac55);
   transform: scale(1.08);
 }
+
+/* Hide Edge/IE password reveal and clear buttons */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* Hide Chromium Edge/Chrome autofill password reveal button */
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+}
