@@ -36,6 +36,7 @@ mat-header-cell, mat-cell {
   transition: box-shadow 0.18s, background 0.18s;
   border: 1px solid #e0f2f1;
 }
+// Optionally, keep a subtle hover effect for clarity
 .config-row-card:hover {
   background: #e0f7fa;
   box-shadow: 0 4px 24px rgba(0,151,172,0.13);
