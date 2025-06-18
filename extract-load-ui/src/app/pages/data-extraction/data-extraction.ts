@@ -56,7 +56,7 @@ export class DataExtraction implements OnInit, OnDestroy, AfterViewInit {
   waitingForScheduledRun: boolean = false;
   isRunOnceDisabled = false;
   advancedForm: FormGroup;
-  selectedSourceType: 'API' | 'FTP' = 'API';
+  selectedSourceType: 'API' | 'FTP' | '' = '';
   configSub?: any; // Add definite assignment assertion or make it optional
 
   editingConfig: any = null;
@@ -74,9 +74,10 @@ export class DataExtraction implements OnInit, OnDestroy, AfterViewInit {
       if (this.sourceConfigComp && this.sourceConfigComp.sourceForm) {
         const typeCtrl = this.sourceConfigComp.sourceForm.get('type');
         if (typeCtrl) {
-          this.selectedSourceType = (typeCtrl.value || '').toUpperCase() === 'FTP' ? 'FTP' : 'API';
+          // Only set selectedSourceType if a value is present
+          this.selectedSourceType = typeCtrl.value ? ((typeCtrl.value || '').toUpperCase() === 'FTP' ? 'FTP' : (typeCtrl.value || '').toUpperCase() === 'API' ? 'API' : '') : '';
           typeCtrl.valueChanges.subscribe((type: string) => {
-            this.selectedSourceType = (type || '').toUpperCase() === 'FTP' ? 'FTP' : 'API';
+            this.selectedSourceType = type ? (type.toUpperCase() === 'FTP' ? 'FTP' : type.toUpperCase() === 'API' ? 'API' : '') : '';
             this.refreshAdvancedFields();
           });
         }
@@ -89,7 +90,7 @@ export class DataExtraction implements OnInit, OnDestroy, AfterViewInit {
     this.http.get<{source: string}>('http://localhost:5000/current-config').subscribe({
       next: (current) => {
         if (!current.source) {
-          this.selectedSourceType = 'API'; // fallback
+          this.selectedSourceType = '';
           this.refreshAdvancedFields();
           return;
         }
@@ -100,20 +101,20 @@ export class DataExtraction implements OnInit, OnDestroy, AfterViewInit {
             );
             if (sourceObj && typeof sourceObj.type === 'string') {
               const type = (sourceObj.type || '').toUpperCase();
-              this.selectedSourceType = type === 'FTP' ? 'FTP' : 'API';
+              this.selectedSourceType = type === 'FTP' ? 'FTP' : type === 'API' ? 'API' : '';
             } else {
-              this.selectedSourceType = 'API';
+              this.selectedSourceType = '';
             }
             this.refreshAdvancedFields();
           },
           error: () => {
-            this.selectedSourceType = 'API';
+            this.selectedSourceType = '';
             this.refreshAdvancedFields();
           }
         });
       },
       error: () => {
-        this.selectedSourceType = 'API';
+        this.selectedSourceType = '';
         this.refreshAdvancedFields();
       }
     });

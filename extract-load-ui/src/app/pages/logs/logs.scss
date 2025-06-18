@@ -45,7 +45,7 @@
   flex-direction: row;
   align-items: center;
   gap: 24px;
-  width: 100%;
+  width: auto;
   justify-content: center;
 }
 
@@ -63,14 +63,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none; // Prevent column from being clickable
+  pointer-events: none;
+  width: auto;
 }
 
 .logs-header-btn-col button {
-  pointer-events: auto; // Only button is clickable
+  pointer-events: auto;
   width: auto !important;
-  position: static !important;
-  outline: 2px dashed #ff9800; // Debug: remove after verifying clickable area
+  min-width: 210px;
+  max-width: 210px;
+  outline: none;
+  box-sizing: border-box;
+  align-self: center;
 }
 
 .logs-header-center-col {
@@ -207,6 +211,9 @@
 
 .download-log-btn, .view-log-btn {
   min-width: 210px;
+  max-width: 210px;
+  width: auto !important;
+  box-sizing: border-box;
   font-size: 1rem;
   font-weight: 500;
   border-radius: 10px;
@@ -220,6 +227,14 @@
   align-items: center;
   justify-content: center;
   height: 40px;
+}
+
+/* Prevent global styles from making the button fill the parent */
+:host ::ng-deep .logs-header-btn-col button.mat-raised-button,
+:host ::ng-deep .logs-header-btn-col button.mat-mdc-raised-button {
+  width: auto !important;
+  min-width: 210px;
+  max-width: 210px;
 }
 
 .download-log-btn {
@@ -320,10 +335,61 @@
   display: inline-block;
   margin-right: 8px;
   vertical-align: middle;
-  font-size: 20px !important;
-  width: 20px;
-  height: 20px;
-  line-height: 1;
+  font-size: 22px !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+  margin-right: 8px;
+  vertical-align: middle;
   color: #fff !important;
   opacity: 1 !important;
+}
+
+.logs-header-btn-col button .mat-mdc-button-touch-target {
+  width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 100% !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  position: absolute !important;
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.logs-header-btn-col button {
+  position: relative;
+  overflow: visible;
+}
+
+/* Reduce touch target to match button visual size */
+.logs-header-btn-col button .mat-mdc-button-touch-target {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: unset !important;
+  min-height: unset !important;
+  max-width: unset !important;
+  max-height: unset !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  border-radius: inherit !important;
+}
+
+.logs-header-btn-col .mat-icon,
+.download-log-btn .mat-icon,
+.view-log-btn .mat-icon {
+  font-family: 'Material Icons' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  letter-spacing: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
 }
