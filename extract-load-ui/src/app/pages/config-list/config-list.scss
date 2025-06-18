@@ -44,10 +44,24 @@ mat-header-cell, mat-cell {
 .config-row-main {
   display: flex;
   align-items: center;
-  gap: 18px;
-  flex: 1 1 auto;
+  position: relative;
   min-width: 0;
 }
+.config-row-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex: 0 0 auto; // Prevent growing/shrinking
+}
+.config-row-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
 .config-name {
   font-size: 1.13rem;
   font-weight: 500; // was 600, now lighter
@@ -87,15 +101,6 @@ mat-header-cell, mat-cell {
   border-radius: 6px;
   padding: 2px 10px;
 }
-.config-row-actions {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-  flex: 0 0 auto; // Prevent growing/shrinking
-}
-
 mat-cell button[mat-icon-button] {
   margin-right: 6px;
   transition: background 0.18s;

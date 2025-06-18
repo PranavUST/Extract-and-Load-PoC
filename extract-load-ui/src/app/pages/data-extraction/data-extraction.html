@@ -7,7 +7,7 @@
     <mat-tab-group>
       <mat-tab label="Source Config">
         <app-source-config #sourceConfigComp [advancedSettings]="advancedForm" (configSaved)="refreshConfigs()"></app-source-config>
-        <mat-expansion-panel style="margin-top:24px;" [expanded]="false" *ngIf="selectedSourceType">
+        <mat-expansion-panel style="margin-top:24px;" [expanded]="false" *ngIf="selectedSourceType === 'API' || selectedSourceType === 'FTP'">
           <mat-expansion-panel-header>
             <mat-panel-title>
               Advanced Pipeline Settings

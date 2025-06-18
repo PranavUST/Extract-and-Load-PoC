@@ -8,17 +8,17 @@
           <span class="config-name">{{ config.name }}</span>
           <span class="type-badge" [ngClass]="config.type.toLowerCase()">{{ config.type }}</span>
           <span *ngIf="currentSource === config.name" class="current-badge">Current</span>
-        </div>
-        <div class="config-row-actions">
-          <button mat-icon-button color="primary" (click)="startEditSourceConfig(config)" matTooltip="Edit">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteSourceConfig(config)" matTooltip="Delete">
-            <mat-icon>delete</mat-icon>
-          </button>
-          <button mat-stroked-button color="accent" *ngIf="currentSource !== config.name" (click)="setCurrentSource(config.name)" matTooltip="Set as Current">
-            <mat-icon>check_circle</mat-icon> Set as Current
-          </button>
+          <span class="config-row-actions-right">
+            <button mat-icon-button color="primary" (click)="startEditSourceConfig(config)" matTooltip="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteSourceConfig(config)" matTooltip="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button mat-stroked-button color="accent" *ngIf="currentSource !== config.name" (click)="setCurrentSource(config.name)" matTooltip="Set as Current">
+              <mat-icon>check_circle</mat-icon> Set as Current
+            </button>
+          </span>
         </div>
       </div>
       <ng-template #editSourceForm>
@@ -124,17 +124,17 @@
           <span class="config-name">{{ config.name }}</span>
           <span class="type-badge" [ngClass]="config.type?.toLowerCase()">{{ config.type }}</span>
           <span *ngIf="currentTarget === config.name" class="current-badge">Current</span>
-        </div>
-        <div class="config-row-actions">
-          <button mat-icon-button color="primary" (click)="startEditTargetConfig(config)" matTooltip="Edit">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteTargetConfig(config)" matTooltip="Delete">
-            <mat-icon>delete</mat-icon>
-          </button>
-          <button mat-stroked-button color="accent" *ngIf="currentTarget !== config.name" (click)="setCurrentTarget(config.name)" matTooltip="Set as Current">
-            <mat-icon>check_circle</mat-icon> Set as Current
-          </button>
+          <span class="config-row-actions-right">
+            <button mat-icon-button color="primary" (click)="startEditTargetConfig(config)" matTooltip="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteTargetConfig(config)" matTooltip="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button mat-stroked-button color="accent" *ngIf="currentTarget !== config.name" (click)="setCurrentTarget(config.name)" matTooltip="Set as Current">
+              <mat-icon>check_circle</mat-icon> Set as Current
+            </button>
+          </span>
         </div>
       </div>
       <ng-template #editTargetForm>
