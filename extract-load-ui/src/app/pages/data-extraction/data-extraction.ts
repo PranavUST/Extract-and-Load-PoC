@@ -74,10 +74,12 @@ export class DataExtraction implements OnInit, OnDestroy, AfterViewInit {
       if (this.sourceConfigComp && this.sourceConfigComp.sourceForm) {
         const typeCtrl = this.sourceConfigComp.sourceForm.get('type');
         if (typeCtrl) {
-          // Only set selectedSourceType if a value is present
-          this.selectedSourceType = typeCtrl.value ? ((typeCtrl.value || '').toUpperCase() === 'FTP' ? 'FTP' : (typeCtrl.value || '').toUpperCase() === 'API' ? 'API' : '') : '';
-          typeCtrl.valueChanges.subscribe((type: string) => {
-            this.selectedSourceType = type ? (type.toUpperCase() === 'FTP' ? 'FTP' : type.toUpperCase() === 'API' ? 'API' : '') : '';
+          // Defensive: Only set selectedSourceType if type is exactly 'API' or 'FTP' (case-insensitive)
+          const type = (typeCtrl.value || '').toUpperCase();
+          this.selectedSourceType = (type === 'API' || type === 'FTP') ? type : '';
+          typeCtrl.valueChanges.subscribe((newType: string) => {
+            const t = (newType || '').toUpperCase();
+            this.selectedSourceType = (t === 'API' || t === 'FTP') ? t : '';
             this.refreshAdvancedFields();
           });
         }
@@ -101,7 +103,7 @@ export class DataExtraction implements OnInit, OnDestroy, AfterViewInit {
             );
             if (sourceObj && typeof sourceObj.type === 'string') {
               const type = (sourceObj.type || '').toUpperCase();
-              this.selectedSourceType = type === 'FTP' ? 'FTP' : type === 'API' ? 'API' : '';
+              this.selectedSourceType = (type === 'API' || type === 'FTP') ? type : '';
             } else {
               this.selectedSourceType = '';
             }

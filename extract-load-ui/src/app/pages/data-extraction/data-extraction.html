@@ -7,7 +7,8 @@
     <mat-tab-group>
       <mat-tab label="Source Config">
         <app-source-config #sourceConfigComp [advancedSettings]="advancedForm" (configSaved)="refreshConfigs()"></app-source-config>
-        <mat-expansion-panel style="margin-top:24px;" [expanded]="false" *ngIf="selectedSourceType === 'API' || selectedSourceType === 'FTP'">
+        <!-- Only show advanced panel if the source type field in the form is filled -->
+        <mat-expansion-panel style="margin-top:24px;" [expanded]="false" *ngIf="sourceConfigComp?.sourceForm?.get('type')?.value === 'API' || sourceConfigComp?.sourceForm?.get('type')?.value === 'FTP'">
           <mat-expansion-panel-header>
             <mat-panel-title>
               Advanced Pipeline Settings
@@ -18,7 +19,7 @@
           </mat-expansion-panel-header>
           <form [formGroup]="advancedForm">
             <div class="input-row">
-              <ng-container *ngIf="selectedSourceType === 'API'">
+              <ng-container *ngIf="sourceConfigComp?.sourceForm?.get('type')?.value === 'API'">
                 <mat-form-field appearance="outline" class="small-input">
                   <mat-label>API Pagination Limit</mat-label>
                   <input matInput type="number" formControlName="apiLimit" min="1" />
@@ -28,7 +29,7 @@
                   <input matInput type="number" formControlName="apiMaxPages" min="1" />
                 </mat-form-field>
               </ng-container>
-              <ng-container *ngIf="selectedSourceType === 'FTP'">
+              <ng-container *ngIf="sourceConfigComp?.sourceForm?.get('type')?.value === 'FTP'">
                 <mat-form-field appearance="outline" class="small-input">
                   <mat-label>FTP Remote Directory</mat-label>
                   <input matInput formControlName="ftpRemoteDir" />
