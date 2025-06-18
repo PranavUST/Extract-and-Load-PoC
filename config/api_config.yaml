@@ -29,6 +29,6 @@ source:
     params: {}
     retries: 3
     timeout: 30
-    url: http://127.0.0.1:5001/v1/data
+    url: dwec
   type: REST_API
 version: 1.0

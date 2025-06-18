@@ -28,6 +28,10 @@ html, body {
   overflow-x: hidden;
 }
 
+body {
+  background: linear-gradient(135deg, #004d4d 0%, #008080 100%) !important;
+}
+
 body, html, * {
   font-family: 'Aptos', Arial, sans-serif !important;
   // No global font-size override here
@@ -151,18 +155,19 @@ body, html, *:not(mat-icon):not(.mat-icon) {
 }
 
 /* Remove card-like border and shadow from config containers */
+/*
 .config-card, .saved-config-card, .source-config-card, .target-config-card {
   border: none !important;
   box-shadow: none !important;
   background: transparent !important;
 }
 
-/* If the containers use mat-card or similar, also override: */
 mat-card, .mat-card {
   border: none !important;
   box-shadow: none !important;
   background: transparent !important;
 }
+*/
 
 // Force all mat-raised-button with color primary inside Source Config to dark teal
 button.mat-raised-button.mat-primary,
@@ -243,3 +248,193 @@ $mat-indigo: #3f51b5;
 $mat-primary: #1976d2;
 $mat-accent: #448aff;
 */
+
+// Force boxed, modern input styles for Angular Material outline fields in Source/Target Config
+::ng-deep .source-config-container .mat-mdc-form-field.mat-mdc-form-field-appearance-outline,
+::ng-deep .target-config-container .mat-mdc-form-field.mat-mdc-form-field-appearance-outline {
+  background: #f8fafc !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.07) !important;
+  transition: box-shadow 0.2s;
+}
+::ng-deep .source-config-container .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline,
+::ng-deep .target-config-container .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline {
+  color: #008080 !important;
+  border-radius: 10px !important;
+}
+::ng-deep .source-config-container .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline-thick,
+::ng-deep .target-config-container .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline-thick {
+  border-width: 2px !important;
+}
+::ng-deep .source-config-container .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-flex,
+::ng-deep .target-config-container .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-flex {
+  background: transparent !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 10px !important;
+}
+::ng-deep .source-config-container .mat-mdc-input-element,
+::ng-deep .target-config-container .mat-mdc-input-element {
+  background: transparent !important;
+  font-size: 1rem !important;
+  color: #1a2a2e !important;
+}
+::ng-deep .source-config-container .mat-mdc-form-field-appearance-outline.mat-focused,
+::ng-deep .target-config-container .mat-mdc-form-field-appearance-outline.mat-focused {
+  box-shadow: 0 4px 16px 0 rgba(0,128,128,0.13) !important;
+}
+::ng-deep .mat-mdc-form-field-appearance-outline {
+  border: 5px solid red !important;
+}
+::ng-deep .mat-mdc-form-field {
+  border: 3px solid orange !important;
+}
+::ng-deep .mat-mdc-form-field-infix {
+  background: #f8fafc !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.07) !important;
+  padding: 0.75rem 1rem !important;
+}
+::ng-deep .mat-mdc-input-element {
+  background: transparent !important;
+  font-size: 1rem !important;
+  color: #1a2a2e !important;
+}
+
+/* Button style for consistency */
+button.mat-raised-button.mat-primary,
+button.mat-mdc-raised-button.mat-primary {
+  background:  #004d4d !important;
+  color: #fff !important;
+  border-radius: 8px;
+  font-weight: 450;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0,77,77,0.10) !important;
+  padding: 0.7rem 1.5rem;
+  letter-spacing: 0.02em;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+button.mat-raised-button.mat-primary:hover,
+button.mat-mdc-raised-button.mat-primary:hover {
+  background: linear-gradient(90deg, #009999 0%, #004d4d 100%) !important;
+  box-shadow: 0 4px 16px rgba(0,128,128,0.13) !important;
+}
+button.mat-raised-button.mat-primary:disabled,
+button.mat-mdc-raised-button.mat-primary:disabled {
+  background: #b2dfdb !important;
+  color: #fff !important;
+  opacity: 0.55 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
+// Modern boxed input styles for Angular Material outline fields (applies globally)
+.mat-mdc-form-field-appearance-outline {
+  background: #f8fafc !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 18px 0 rgba(0,0,0,0.10) !important;
+  margin-bottom: 1.5rem !important;
+  border: none !important;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline {
+  border-radius: 14px !important;
+  border-width: 2px !important;
+  border-color: #b2dfdb !important;
+  transition: border-color 0.2s;
+}
+.mat-mdc-form-field-appearance-outline.mat-focused .mat-mdc-form-field-outline,
+.mat-mdc-form-field-appearance-outline:hover .mat-mdc-form-field-outline {
+  border-color: #004d4d !important;
+  border-width: 2.5px !important;
+  box-shadow: 0 0 0 3px #004d4d22 !important;
+}
+.mat-mdc-form-field-appearance-outline .mat-mdc-form-field-infix {
+  background: transparent !important;
+  border-radius: 14px !important;
+  padding: 1.1rem 1.4rem !important;
+}
+.mat-mdc-input-element {
+  background: transparent !important;
+  font-size: 1.12rem !important;
+  color: #1a2a2e !important;
+  letter-spacing: 0.01em !important;
+  font-weight: 500 !important;
+}
+.mat-mdc-form-field-label {
+  color: #008080 !important;
+  font-weight: 600 !important;
+  font-size: 1.08rem !important;
+  opacity: 0.92 !important;
+  letter-spacing: 0.01em !important;
+}
+.mat-mdc-form-field-appearance-outline.mat-focused .mat-mdc-form-field-label {
+  color: #004d4d !important;
+  opacity: 1 !important;
+}
+.mat-mdc-form-field-underline, .mat-mdc-form-field-ripple {
+  display: none !important;
+}
+
+mat-card-title {
+  margin-bottom: 22px !important; // Less space below
+  font-size: 1.35rem !important;
+  font-weight: 500 !important; // Less bold
+  color: #004d4d !important;
+  letter-spacing: 0.01em !important;
+  border-bottom: 2px solid #e0eaea;
+  padding-bottom: 4px; // Move divider closer to text
+  border-radius: 0;
+  background: none !important; // Remove background gradient
+  box-shadow: none !important;
+}
+
+// --- DARK TEAL OVERRIDES FOR ANGULAR MATERIAL ---
+// Active tab underline (ink bar) and label
+.mat-tab-group .mat-ink-bar,
+.mat-mdc-tab-group .mat-mdc-tab-header .mat-mdc-tab-indicator .mat-mdc-tab-indicator__content {
+  background-color: #004d4d !important;
+}
+.mat-tab-label.mat-tab-label-active,
+.mat-mdc-tab-label.mat-mdc-tab-label-active {
+  color: #004d4d !important;
+}
+
+// Active/focused form field border and label
+.mat-mdc-form-field-appearance-outline.mat-focused .mat-mdc-form-field-outline,
+.mat-mdc-form-field-appearance-outline:hover .mat-mdc-form-field-outline {
+  border-color: #004d4d !important;
+  border-width: 2.5px !important;
+  box-shadow: 0 0 0 3px #004d4d22 !important;
+}
+.mat-mdc-form-field-appearance-outline.mat-focused .mat-mdc-form-field-label {
+  color: #004d4d !important;
+  opacity: 1 !important;
+}
+
+// Remove or override previous color rules for form fields and tabs
+.mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline {
+  border-color: #b2dfdb !important; // default
+}
+.mat-mdc-form-field-appearance-outline.mat-focused .mat-mdc-form-field-outline,
+.mat-mdc-form-field-appearance-outline:hover .mat-mdc-form-field-outline {
+  border-color: #004d4d !important;
+  border-width: 2.5px !important;
+  box-shadow: 0 0 0 3px #004d4d22 !important;
+}
+.mat-mdc-form-field-label {
+  color: #004d4d !important;
+}
+.mat-mdc-form-field-appearance-outline.mat-focused .mat-mdc-form-field-label {
+  color: #004d4d !important;
+  opacity: 1 !important;
+}
+
+// Tab underline and active label
+.mat-mdc-tab-group .mat-mdc-tab-header .mat-mdc-tab-indicator .mat-mdc-tab-indicator__content,
+.mat-tab-group .mat-ink-bar {
+  background-color: #004d4d !important;
+}
+.mat-mdc-tab-label.mat-mdc-tab-label-active,
+.mat-tab-label.mat-tab-label-active {
+  color: #004d4d !important;
+}

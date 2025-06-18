@@ -49,6 +49,37 @@
   justify-content: center;
 }
 
+.logs-header-row-fixed {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0;
+}
+
+.logs-header-btn-col {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; // Prevent column from being clickable
+}
+
+.logs-header-btn-col button {
+  pointer-events: auto; // Only button is clickable
+  width: auto !important;
+  position: static !important;
+  outline: 2px dashed #ff9800; // Debug: remove after verifying clickable area
+}
+
+.logs-header-center-col {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .logs-header-row-gap {
   display: flex;
   flex-direction: row;

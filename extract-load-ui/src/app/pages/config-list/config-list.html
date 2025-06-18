@@ -1,4 +1,4 @@
-<mat-card>
+<div class="saved-source-configs-section">
   <div class="config-section-title">Saved Source Configs</div>
   <div class="config-section-subtitle">Manage and select your saved source configurations below.</div>
   <div *ngIf="sourceConfigs.length; else emptySource">
@@ -27,11 +27,11 @@
       <div>No source configs saved yet.<br>Add your first source config!</div>
     </div>
   </ng-template>
-</mat-card>
+</div>
 
 <mat-divider style="margin: 32px 0 24px 0;"></mat-divider>
 
-<mat-card>
+<div class="saved-target-configs-section">
   <div class="config-section-title">Saved Target Configs</div>
   <div class="config-section-subtitle">Manage and select your saved target configurations below.</div>
   <div *ngIf="targetConfigs.length; else emptyTarget">
@@ -60,4 +60,4 @@
       <div>No target configs saved yet.<br>Add your first target config!</div>
     </div>
   </ng-template>
-</mat-card>
+</div>

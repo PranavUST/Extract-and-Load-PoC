@@ -1,8 +1,8 @@
 .input-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 22px;
+  margin-bottom: 18px;
   align-items: flex-end;
   width: 100%;
 }
@@ -11,25 +11,16 @@
 .top-row-equal {
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  gap: 32px;
   align-items: stretch;
-  background: rgba(255,0,0,0.07); /* debug: light red background */
+  margin-bottom: 12px;
 }
 .top-row-equal > mat-form-field {
   flex: 1 1 0 !important;
   min-width: 0 !important;
   max-width: none !important;
-  border: 2px solid #00464f !important; /* debug: blue border */
-  background: #fff !important;
   box-sizing: border-box;
 }
-.top-row-equal > mat-form-field > .mat-mdc-form-field {
-  width: auto !important;
-  flex: 1 1 0 !important;
-  min-width: 0 !important;
-  background: rgba(0,255,0,0.12) !important; /* debug: green background */
-}
-
 // Remove left margin from first field and right margin from last field for perfect alignment
 .top-row-equal mat-form-field:first-child {
   margin-left: 0 !important;
@@ -39,71 +30,16 @@
 }
 
 .small-input {
-  flex: 0 0 100px;
+  flex: 0 0 120px;
 }
-
-mat-form-field.small-input, .small-input input, .small-input mat-select {
-  width: 100px !important;
-  min-width: 100px !important;
-  max-width: 100px !important;
-  height: 32px !important;
-  font-size: 1rem !important;
-}
-
 mat-form-field.small-input {
   margin-bottom: 0;
 }
 
-mat-form-field.small-input .mat-form-field-wrapper,
-mat-form-field.small-input .mat-form-field-flex,
-mat-form-field.small-input .mat-input-element,
-mat-form-field.small-input .mat-select-trigger {
-  min-height: 20px !important;
-  height: 20px !important;
-  font-size: 1rem !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-mat-form-field.small-input .mat-form-field-infix {
-  padding: 0 0 1px 0 !important;
-}
-
-mat-form-field.small-input .mat-form-field-label {
-  top: 12px !important;
-  font-size: 1rem !important;
-}
-
-mat-form-field.small-input .mat-select-arrow {
-  margin-top: -4px !important;
-}
-
-// Further reduce height for Angular Material v15+ (MDC-based)
-::ng-deep mat-form-field.small-input .mat-mdc-text-field-wrapper,
-::ng-deep mat-form-field.small-input .mat-mdc-form-field-flex,
-::ng-deep mat-form-field.small-input .mat-mdc-input-element,
-::ng-deep mat-form-field.small-input .mat-mdc-select-trigger {
-  min-height: 14px !important;
-  height: 14px !important;
-  line-height: 14px !important;
-  font-size: 1rem !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-::ng-deep mat-form-field.small-input .mat-mdc-form-field-infix {
-  min-height: 14px !important;
-  padding: 0 0 0 0 !important;
-}
-::ng-deep mat-form-field.small-input .mat-mdc-floating-label,
-::ng-deep mat-form-field.small-input .mat-mdc-form-field-label {
-  top: 8px !important;
-  font-size: 1rem !important;
-}
-
-@media (max-width: 800px) {
-  .input-row {
+@media (max-width: 900px) {
+  .input-row, .top-row-equal {
     flex-direction: column;
-    gap: 6px;
+    gap: 12px;
     align-items: stretch;
   }
   .small-input, mat-form-field.small-input {
@@ -117,7 +53,19 @@ mat-form-field.small-input .mat-select-arrow {
   }
 }
 
+// Add a little spacing below the section title
+mat-card-title {
+  margin-bottom: 36px; // Increased from 16px for more space
+  font-size: 1.32rem;
+  font-weight: 700;
+  color: #004d4d;
+  letter-spacing: 0.01em;
+}
+
+// Add spacing above the Save button
 .source-config-save-btn {
+  margin-top: 28px;
+  align-self: flex-end;
   background: #004d4d !important;
   color: #fff !important;
   font-weight: 600;
@@ -129,43 +77,4 @@ mat-form-field.small-input .mat-select-arrow {
   background: #003838 !important;
 }
 
-// Increase specificity for Angular Material
-button.mat-raised-button.source-config-save-btn,
-button.mat-mdc-raised-button.source-config-save-btn {
-  background: #004d4d !important;
-  color: #fff !important;
-}
-button.mat-raised-button.source-config-save-btn:hover,
-button.mat-mdc-raised-button.source-config-save-btn:hover {
-  background: #003838 !important;
-}
-
-// Force dark teal for the Save Source Config button in Source Config
-:host ::ng-deep button.mat-raised-button.source-config-save-btn,
-:host ::ng-deep button.mat-mdc-raised-button.source-config-save-btn {
-  background: #004d4d !important;
-  color: #fff !important;
-  border-radius: 8px;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0,77,77,0.10) !important;
-}
-:host ::ng-deep button.mat-raised-button.source-config-save-btn:hover,
-:host ::ng-deep button.mat-mdc-raised-button.source-config-save-btn:hover {
-  background: #003838 !important;
-}
-
-// Use even higher specificity and target MDC classes directly
-:host ::ng-deep button.mat-mdc-raised-button.source-config-save-btn,
-:host ::ng-deep button.mat-mdc-raised-button.source-config-save-btn.mat-primary,
-:host ::ng-deep .mat-mdc-raised-button.source-config-save-btn,
-:host ::ng-deep .mat-mdc-raised-button.source-config-save-btn.mat-primary {
-  background-color: #004d4d !important;
-  color: #fff !important;
-  border-radius: 8px;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0,77,77,0.10) !important;
-}
-:host ::ng-deep button.mat-mdc-raised-button.source-config-save-btn:hover,
-:host ::ng-deep button.mat-mdc-raised-button.source-config-save-btn:focus {
-  background-color: #003838 !important;
-}
+// Remove boxed input appearance overrides (now handled globally)
