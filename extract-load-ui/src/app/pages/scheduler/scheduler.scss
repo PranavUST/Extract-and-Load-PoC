@@ -39,7 +39,7 @@
 // Make 'Run Once' button transparent when disabled
 .button-row button[mat-raised-button][color="accent"][disabled] {
   opacity: 0.4 !important;
-  background: #004d4d !important;
+  background: #07c7c7aa !important;
   color: #fff !important;
   pointer-events: none;
   transition: opacity 0.2s;

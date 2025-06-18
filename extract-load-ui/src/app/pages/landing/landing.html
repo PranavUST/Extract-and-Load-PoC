@@ -1,15 +1,18 @@
 <div class="landing-background">
-  <div class="profile-icon-fixed">
-    <button mat-icon-button color="primary" routerLink="/profile" aria-label="Profile">
+  <div class="profile-actions-fixed">
+    <button mat-icon-button routerLink="/profile" aria-label="Profile" class="action-icon-btn">
       <mat-icon>account_circle</mat-icon>
+    </button>
+    <button mat-icon-button (click)="logout()" aria-label="Logout" class="action-icon-btn">
+      <mat-icon>logout</mat-icon>
     </button>
   </div>
 
   <div class="landing-container">
-    <h1 class="welcome-title">
+    <h1 class="welcome-title bolder-welcome">
       Welcome, <span class="username">{{ currentUser?.username | titlecase }}</span>!
     </h1>
-
+    <div class="welcome-subtitle">Select an action to get started</div>
     <mat-card class="menu-card">
       <div class="nav-grid">
         <button mat-raised-button class="nav-btn" routerLink="/data-extraction">
@@ -34,9 +37,4 @@
       </div>
     </mat-card>
   </div>
-
-  <button (click)="logout()" mat-raised-button class="logout-fixed">
-    <mat-icon>logout</mat-icon>
-    Logout
-  </button>
 </div>

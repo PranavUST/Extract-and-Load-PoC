@@ -65,16 +65,26 @@
   button[type="submit"] {
     margin-top: 1rem;
     padding: 0.75rem;
-    background: #0097AC;
+    background: linear-gradient(90deg, #006666 0%, #008080 100%); // gradient similar to background
     color: white;
     font-weight: 500;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 8px rgba(0,77,77,0.10);
+    transition: background 0.18s, box-shadow 0.18s;
 
-    &:hover {
-      background: color.adjust(#0097AC, $lightness: -5%);
+    &:hover:not([disabled]) {
+      background: linear-gradient(90deg, #005555 0%, #007070 100%);
+      box-shadow: 0 4px 16px rgba(0,77,77,0.18);
     }
 
     &:disabled {
       background: #ccc;
+      color: #fff;
+      opacity: 0.6;
+      box-shadow: none;
+      cursor: not-allowed;
     }
   }
 
@@ -165,6 +175,15 @@
   font-family: 'Aptos', Arial, sans-serif;
 }
 
+.register-title-bold {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #004d4d;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.2em;
+  font-family: 'Aptos', Arial, sans-serif;
+}
+
 .form-group {
   margin-bottom: 20px; // increased spacing between form groups
   display: flex;
@@ -213,10 +232,10 @@ input:focus {
 .login-btn {
   width: 100%;
   max-width: 320px;
-  background: #004d4d !important;
+  background: linear-gradient(90deg, #004d4d 0%, #008080 100%) !important;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 12px 24px;
   font-size: 1.08em;
   font-weight: 600;
@@ -229,7 +248,7 @@ input:focus {
   display: block;
 
   &:hover:not([disabled]), &:focus:not([disabled]) {
-    background: #003838 !important;
+    background: linear-gradient(90deg, #003838 0%, #007070 100%) !important;
     box-shadow: 0 4px 18px 0 #0097ac33, 0 0 0 4px #0097ac33; // Step 3: glow effect
     outline: none;
   }
@@ -239,6 +258,11 @@ input:focus {
     color: #9e9e9e;
     cursor: not-allowed;
     opacity: 0.7;
+  }
+
+  mat-spinner {
+    display: inline-block;
+    vertical-align: middle;
   }
 }
 
@@ -271,7 +295,7 @@ input:focus {
   font-size: 1rem;
   color: #004d4d;
   text-decoration: none;
-  margin-top: 6px;
+  margin-top: 5.5px;
   transition: color 0.2s;
   font-family: 'Aptos', Arial, sans-serif;
 
@@ -355,6 +379,109 @@ input:focus {
   margin-top: 10px;
   font-family: 'Aptos', Arial, sans-serif;
   font-size: 1.05rem;
+}
+
+.login-container.shake {
+  animation: shake 0.32s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-8px); }
+  40%, 60% { transform: translateX(8px); }
+  100% { transform: none; }
+}
+
+.form-row-between {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.remember-me-left {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+}
+
+.forgot-link-right {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.remember-me-label,
+.forgot-link {
+  font-size: 0.90rem !important;
+  font-weight: 400 !important;
+  color: #008080 !important;
+  cursor: pointer;
+  transition: color 0.18s;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Aptos', Arial, sans-serif !important;
+  background: none;
+  border: none;
+  padding: 0;
+  /* Shrink the whole label, not just the input */
+  transform: scale(0.92);
+}
+
+.remember-me-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  margin-right: 4px;
+  /* Remove transform here to avoid shrinking the tick */
+  position: relative;
+}
+
+.remember-me-label input[type="checkbox"]:checked {
+  background: #008080;
+  border-color: #008080;
+}
+
+.remember-me-label input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -60%) rotate(45deg);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.remember-me-label:hover,
+.forgot-link:hover {
+  color: #005555 !important;
+  text-decoration: underline;
+}
+
+.forgot-link-right {
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+// Center the checkmark for all DPI
+.remember-me-label {
+  /* ...existing code... */
+  input[type="checkbox"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  margin-top: 4px; // Added top margin for better alignment
 }
 
 @media (max-width: 600px) {
