@@ -1,6 +1,7 @@
 import time
 import logging
 import schedule
+import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +132,6 @@ def start_days_of_month_scheduler(job_func, days_of_month):
     Scheduler that runs the job on specific days of the month at midnight.
     days_of_month: list of integers (1-31)
     """
-    import datetime
     logging.info(f"Starting days-of-month scheduler for days: {days_of_month}")
 
     def should_run_today():
