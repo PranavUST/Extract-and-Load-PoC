@@ -32,5 +32,10 @@ export class Landing {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
+  openCoverageReports() {
+    window.open('/backend-coverage.html', '_blank', 'noopener');
+    // This will open the backend coverage report in a new tab without reloading the landing page.
+  }
 }
 

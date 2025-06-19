@@ -258,6 +258,41 @@ mat-card {
   /* Step 4: subtle background for grid */
 }
 
+.test-all-btn {
+  position: fixed;
+  bottom: 2.5rem;
+  right: 2.5rem;
+  z-index: 3000;
+  background: #fff !important; // Inverted: white background
+  color: #009688 !important;   // Teal icon/text
+  box-shadow: 0 4px 24px #00968844;
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  border: 2px solid #009688;
+  transition: box-shadow 0.22s, transform 0.22s, background 0.22s, color 0.22s;
+}
+
+.test-all-btn:hover, .test-all-btn:focus {
+  background: #e0f7fa !important; // Light teal on hover
+  color: #00796b !important;
+  box-shadow: 0 8px 32px #00968866;
+  transform: scale(1.08);
+  border-color: #00796b;
+}
+
+.test-all-btn mat-icon {
+  font-size: 2.2rem;
+  color: #009688 !important; // Teal icon
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 // Media query for mobile devices
 @media (max-width: 768px) {
   .nav-buttons {
