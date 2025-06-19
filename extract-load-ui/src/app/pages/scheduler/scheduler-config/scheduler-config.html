@@ -1,40 +1,47 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>Schedule Pipeline Run</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <form [formGroup]="schedulerForm" (ngSubmit)="runPipeline()">
-      <div class="top-row-equal">
-        <mat-form-field appearance="fill">
-          <mat-label>Source Type</mat-label>
-          <mat-select formControlName="sourceType" required>
-            <mat-option value="API">API</mat-option>
-            <mat-option value="FTP">FTP</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Interval (minutes)</mat-label>
-          <input matInput type="number" formControlName="interval" min="1" required>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Duration (hours)</mat-label>
-          <input matInput type="number" formControlName="duration" min="0.1" step="0.1" required>
-        </mat-form-field>
-      </div>
-      <div class="input-row">
-        <!-- Add more fields here if needed for future expansion -->
-      </div>
-      <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
-        <button mat-raised-button color="primary" type="submit" [disabled]="schedulerForm.invalid">
-          Run Pipeline
-        </button>
-        <button mat-raised-button color="warn" type="button" (click)="stopPipeline()">
-          Stop Pipeline
-        </button>
-      </div>
-    </form>
-    <div *ngIf="status" class="status-message" style="margin-top:1rem;">
-      {{ status }}
+<form [formGroup]="schedulerForm" (ngSubmit)="runPipeline()">
+  <div class="input-row">
+    <mat-form-field appearance="outline" class="small-input">
+      <mat-label>Schedule Type</mat-label>
+      <mat-select formControlName="scheduleType" required (selectionChange)="onScheduleTypeChange($event.value)">
+        <mat-option value="interval">Custom</mat-option>
+        <mat-option value="hourly">Hourly</mat-option>
+        <mat-option value="daysOfMonth">Days of Month</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="small-input" *ngIf="schedulerForm.value.scheduleType === 'interval'">
+      <mat-label>Interval (minutes)</mat-label>
+      <input matInput type="number" formControlName="interval" min="1" required>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="small-input" *ngIf="schedulerForm.value.scheduleType === 'daysOfMonth'" style="min-width:320px;max-width:420px;">
+      <mat-label>Days of Month</mat-label>
+      <input matInput type="text" formControlName="daysOfMonth" placeholder="e.g. 1,15,28" style="font-size:1.08rem;">
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="small-input" *ngIf="schedulerForm.value.scheduleType === 'interval' || schedulerForm.value.scheduleType === 'hourly'">
+      <mat-label>Duration (hours)</mat-label>
+      <input matInput type="number" formControlName="duration" min="0.1" step="0.1" required>
+    </mat-form-field>
+  </div>
+  <div class="button-row" style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+    <button mat-raised-button color="primary" type="submit" [disabled]="schedulerForm.invalid">
+      Run Pipeline
+    </button>
+    <button mat-raised-button color="accent" type="button" (click)="runOnce()" [disabled]="isRunOnceDisabled" class="run-once-btn" style="background: #009999; color: #fff;">
+      Run Once
+    </button>
+    <button mat-raised-button color="warn" type="button" (click)="stopPipeline()">
+      Stop Pipeline
+    </button>
+  </div>
+</form>
+<div *ngIf="status" class="status-message" style="margin-top:1rem;">
+  {{ status }}
+</div>
+<div *ngIf="statusDetails.length > 0" class="log-section" style="margin-top:1.5rem;">
+  <h3 style="margin-bottom: 0.5rem; color: #004d4d; font-size: 1.1rem;">Current Run Logs</h3>
+  <div class="log-list" style="max-height: 220px; overflow-y: auto; background: #f8fafc; border-radius: 8px; padding: 12px 18px; border: 1px solid #e0e0e0;">
+    <div *ngFor="let log of statusDetails" style="font-size: 0.98rem; margin-bottom: 6px; color: #222;">
+      <span style="color: #888; font-size: 0.93em;">{{ log.timestamp }}:</span>
+      <span>{{ log.message }}</span>
     </div>
-  </mat-card-content>
-</mat-card>
+  </div>
+</div>
