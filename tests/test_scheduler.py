@@ -125,5 +125,51 @@ class TestScheduler(unittest.TestCase):
             scheduler_module.start_one_time_job(job_func)
         mock_logging.error.assert_any_call("One-time job failed: fail", exc_info=True)
 
+    @patch('src.scheduler.logging')
+    def test_start_days_of_month_scheduler_runs_on_specified_day(self, mock_logging):
+        job_func = MagicMock()
+        # Simulate today is 19th (matches days_of_month)
+        class FakeDateTime:
+            @classmethod
+            def now(cls):
+                import datetime
+                return datetime.datetime(2025, 6, 19, 0, 0, 0)
+            @classmethod
+            def date(cls):
+                import datetime
+                return datetime.date(2025, 6, 19)
+        with patch('src.scheduler.datetime') as mock_datetime:
+            mock_datetime.datetime = FakeDateTime
+            mock_datetime.timedelta = __import__('datetime').timedelta
+            # Patch time.sleep to raise KeyboardInterrupt after first loop
+            with patch('src.scheduler.time.sleep', side_effect=KeyboardInterrupt()):
+                scheduler_module.start_days_of_month_scheduler(job_func, days_of_month=[19])
+        mock_logging.info.assert_any_call("Scheduler stopped by user")
+        # Should run initial and scheduled job (since last_run_date is updated after initial)
+        self.assertGreaterEqual(job_func.call_count, 1)
+
+    @patch('src.scheduler.logging')
+    def test_start_days_of_month_scheduler_skips_on_non_matching_day(self, mock_logging):
+        job_func = MagicMock()
+        # Simulate today is 20th (does not match days_of_month)
+        class FakeDateTime:
+            @classmethod
+            def now(cls):
+                import datetime
+                return datetime.datetime(2025, 6, 20, 0, 0, 0)
+            @classmethod
+            def date(cls):
+                import datetime
+                return datetime.date(2025, 6, 20)
+        with patch('src.scheduler.datetime') as mock_datetime:
+            mock_datetime.datetime = FakeDateTime
+            mock_datetime.timedelta = __import__('datetime').timedelta
+            # Patch time.sleep to raise KeyboardInterrupt after first loop
+            with patch('src.scheduler.time.sleep', side_effect=KeyboardInterrupt()):
+                scheduler_module.start_days_of_month_scheduler(job_func, days_of_month=[19])
+        mock_logging.info.assert_any_call("Scheduler stopped by user")
+        # Should not run job_func at all
+        job_func.assert_not_called()
+
 if __name__ == '__main__':
     unittest.main()

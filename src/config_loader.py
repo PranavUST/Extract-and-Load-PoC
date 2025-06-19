@@ -67,13 +67,12 @@ def resolve_config_vars(config: Dict[str, Any]) -> Dict[str, Any]:
     return resolved
 
 def _validate_ftp_config(ftp_config: Dict[str, Any]):
-    """Validate required FTP configuration fields"""
+    """Validate required FTP configuration fields, but allow empty fields for retry logic"""
     required_fields = ['host', 'username', 'password', 'remote_dir', 'local_dir']
     for field in required_fields:
         if field not in ftp_config:
             raise ValueError(f"Missing required FTP config field: {field}")
-        if not ftp_config[field]:
-            raise ValueError(f"Empty value for FTP config field: {field}")
+    # Do not raise error for empty values; let the pipeline/FTP client handle connection failures and retries
 
 def _validate_api_config(api_config: Dict[str, Any]):
     """Validate required API configuration fields"""

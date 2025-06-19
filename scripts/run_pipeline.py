@@ -38,24 +38,53 @@ def main():
     """Entry point for command-line execution."""
     parser = argparse.ArgumentParser(description='Run the data pipeline.')
     parser.add_argument('config', type=str, help='Path to the configuration file (e.g., config/api_config.yaml)')
-    parser.add_argument('--interval', type=int, default=2, help='Interval in minutes between pipeline runs')
-    parser.add_argument('--duration', type=float, required=True, help='Total duration in hours to keep running')
+    parser.add_argument('--interval', type=int, help='Interval in minutes between pipeline runs')
+    parser.add_argument('--duration', type=float, help='Total duration in hours to keep running')
+    parser.add_argument('--hourly', action='store_true', help='Run once every hour')
+    parser.add_argument('--days-of-month', type=str, help='Comma-separated days of month (e.g. 1,15,28)')
     args = parser.parse_args()
 
     setup_logging("INFO", "pipeline.log")
     load_dotenv()
 
-    end_time = datetime.now() + timedelta(hours=args.duration)
-
-    def scheduled_task():
-        if datetime.now() <= end_time:
+    if args.days_of_month:
+        # Days of month scheduler
+        days = [int(day.strip()) for day in args.days_of_month.split(',') if day.strip().isdigit()]
+        def scheduled_task():
             run_ingestion(args.config)
-        else:
-            print("Duration complete. Stopping scheduler.")
-            # Stop the scheduler by raising SystemExit in the main thread
-            threading.Thread(target=lambda: sys.exit(0)).start()
-
-    start_simple_scheduler(scheduled_task, interval_minutes=args.interval)
+        from src.scheduler import start_days_of_month_scheduler
+        start_days_of_month_scheduler(scheduled_task, days)
+    elif args.hourly:
+        # Hourly scheduler
+        if not args.duration:
+            print("Duration is required for hourly schedule.")
+            sys.exit(1)
+        end_time = datetime.now() + timedelta(hours=args.duration)
+        def scheduled_task():
+            if datetime.now() <= end_time:
+                run_ingestion(args.config)
+            else:
+                print("Duration complete. Stopping scheduler.")
+                threading.Thread(target=lambda: sys.exit(0)).start()
+        from src.scheduler import start_simple_scheduler
+        start_simple_scheduler(scheduled_task, interval_minutes=60)
+    elif args.interval:
+        # Interval scheduler
+        if not args.duration:
+            print("Duration is required for interval schedule.")
+            sys.exit(1)
+        end_time = datetime.now() + timedelta(hours=args.duration)
+        def scheduled_task():
+            if datetime.now() <= end_time:
+                run_ingestion(args.config)
+            else:
+                print("Duration complete. Stopping scheduler.")
+                threading.Thread(target=lambda: sys.exit(0)).start()
+        from src.scheduler import start_simple_scheduler
+        start_simple_scheduler(scheduled_task, interval_minutes=args.interval)
+    else:
+        # Default: run once
+        run_ingestion(args.config)
 
 if __name__ == "__main__":
     main()

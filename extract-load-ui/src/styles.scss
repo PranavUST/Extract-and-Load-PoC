@@ -506,3 +506,14 @@ mat-card-title {
 .data-extraction-card .mat-tab-body-content .button-row {
   margin-top: 0 !important;
 }
+
+// Make Run Once button (accent color) transparent when disabled
+button.run-once-btn[disabled],
+button.mat-raised-button.mat-accent.run-once-btn[disabled] {
+  background: transparent !important;
+  color: #009999 !important;
+  opacity: 0.45 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  border: 1.5px dashed #00999933 !important;
+}
