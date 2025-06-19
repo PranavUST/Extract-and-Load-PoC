@@ -203,7 +203,7 @@ def register():
         return jsonify({
             "success": False,
             "error": "Username or email already exists"
-        }), 400
+        }, 400)
     except Exception as e:
         logging.error(f"Registration error: {str(e)}")
         return jsonify({"success": False}), 500
@@ -398,26 +398,52 @@ def run_pipeline_api():
             return jsonify({"status": "error", "message": "No JSON data provided"}), 400
             
         config_file = data.get("config_file")
+        schedule_type = data.get("scheduleType")
         interval = data.get("interval")
         duration = data.get("duration")
+        days_of_month = data.get("daysOfMonth")
         if not config_file:
             return jsonify({"status": "error", "message": "No config file provided"}), 400
-        if not interval or not duration:
-            return jsonify({"status": "error", "message": "Interval and duration required"}), 400
+        # Validate required fields for each type
+        if schedule_type == "interval":
+            if not interval or not duration:
+                return jsonify({"status": "error", "message": "Interval and duration required"}), 400
+        elif schedule_type == "hourly":
+            if not duration:
+                return jsonify({"status": "error", "message": "Duration required"}), 400
+        elif schedule_type == "daysOfMonth":
+            if not days_of_month:
+                return jsonify({"status": "error", "message": "Days of month required"}), 400
+        else:
+            return jsonify({"status": "error", "message": "Unknown schedule type"}), 400
 
-        # Start the scheduler in a thread
         import subprocess
         import sys
         def run_scheduler():
             script_path = os.path.join(os.path.dirname(__file__), "run_pipeline.py")
             project_root = os.path.dirname(os.path.dirname(__file__))
-            proc = subprocess.Popen([
-                sys.executable, script_path,
-                config_file,
-                "--interval", str(interval),
-                "--duration", str(duration)
-            ], cwd=project_root)
-            # Save the PID
+            if schedule_type == "interval":
+                proc = subprocess.Popen([
+                    sys.executable, script_path,
+                    config_file,
+                    "--interval", str(interval),
+                    "--duration", str(duration)
+                ], cwd=project_root)
+            elif schedule_type == "hourly":
+                proc = subprocess.Popen([
+                    sys.executable, script_path,
+                    config_file,
+                    "--hourly",
+                    "--duration", str(duration)
+                ], cwd=project_root)
+            elif schedule_type == "daysOfMonth":
+                proc = subprocess.Popen([
+                    sys.executable, script_path,
+                    config_file,
+                    "--days-of-month", str(days_of_month)
+                ], cwd=project_root)
+            else:
+                return  # Should not happen
             with open(PIPELINE_PID_FILE, 'w') as f:
                 f.write(str(proc.pid))
         threading.Thread(target=run_scheduler, daemon=True).start()
@@ -824,11 +850,14 @@ def save_target_config():
 
 @app.route('/current-config', methods=['GET'])
 def get_current_config():
-    path = os.path.join(BASE_DIR, '../config/current_config.json')
-    if not os.path.exists(path):
-        return jsonify({"source": None, "target": None})
-    with open(path, 'r') as f:
-        return jsonify(json.load(f))
+    try:
+        config_path = Path(__file__).parent.parent / 'config' / 'current_config.json'
+        with open(config_path) as f:
+            config = json.load(f)
+        return jsonify(config)
+    except Exception as e:
+        logger.error(f"Error reading current config: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/current-config', methods=['POST'])
 def set_current_config():
