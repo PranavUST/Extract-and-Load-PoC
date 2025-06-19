@@ -2,5 +2,5 @@
 REM Run backend (pytest) coverage
 python -m pytest --cov=src --cov-report=html
 
-REM Copy backend coverage to public folder
-copy /Y htmlcov\index.html extract-load-ui\public\backend-coverage.html
+REM Copy all backend coverage assets to public folder for full report functionality
+xcopy /Y /E /I htmlcov\* extract-load-ui\public\
