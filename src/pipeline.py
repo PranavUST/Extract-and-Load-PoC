@@ -79,10 +79,10 @@ class DataPipeline:
                 writer.writerow(cleaned_record)
         logger.info("Successfully exported %d records to %s", len(data), output_path)
 
-    def fetch_data(self) -> List[Dict]:
+    def fetch_data(self, run_id=None) -> List[Dict]:
         source_type = self.config['source']['type']
         if source_type == "REST_API":
-            return self.api_client.fetch_data()
+            return self.api_client.fetch_data(run_id=run_id)
         elif source_type == "FTP":
             # For local testing without FTP server
             if self.ftp_config.get('skip_download', False):
@@ -95,8 +95,9 @@ class DataPipeline:
                     remote_dir=self.ftp_config['remote_dir'],
                     local_dir=self.ftp_config['local_dir'],
                     file_types=self.ftp_config.get('file_types', ['.csv', '.json', '.parquet']),
-                    retries=self.ftp_config.get('retries', 3),  # <-- add this line
-                    delay=self.ftp_config.get('retry_delay', 5)
+                    retries=self.ftp_config.get('retries', 3),
+                    delay=self.ftp_config.get('retry_delay', 5),
+                    run_id=run_id
                 )
                 if not downloaded_files:
                     logger.error("FTP download failed. Will attempt to load files from local directory anyway.")
@@ -141,7 +142,7 @@ class DataPipeline:
 
     def run(self, run_id=None, csv_only=False):
         logger.info("Starting DataPipeline execution")
-        insert_pipeline_status("Pipeline started.", run_id)
+        insert_pipeline_status("Pipeline started.", run_id, log_level="INFO", module="pipeline")
         stats = {
             'records_fetched': 0,  # Will be incremented during pipeline run
             'records_inserted': 0,  # Will be incremented during pipeline run
@@ -168,50 +169,51 @@ class DataPipeline:
 
         try:
             logger.info("Fetching data")
-            insert_pipeline_status("Fetching data...", run_id)
-            raw_data = self.fetch_data() or []
+            insert_pipeline_status("Fetching data...", run_id, log_level="INFO", module="pipeline")
+            raw_data = self.fetch_data(run_id=run_id) or []
             stats['records_fetched'] = len(raw_data)
             logger.info("Data fetch completed. Records retrieved: %d", stats['records_fetched'])
-            insert_pipeline_status(f"Data fetch completed. Records retrieved: {stats['records_fetched']}", run_id)
+            insert_pipeline_status(f"Data fetch completed. Records retrieved: {stats['records_fetched']}", run_id, log_level="INFO", module="pipeline")
 
             # Always export to CSV
             csv_output_path = self.config['destination']['csv']['output_path']
             csv_output_path = str((Path(__file__).parent.parent / csv_output_path).resolve())
             logger.info("Exporting all data to CSV: %s", csv_output_path)
-            insert_pipeline_status(f"Exporting all data to CSV: {csv_output_path}", run_id)
+            insert_pipeline_status(f"Exporting all data to CSV: {csv_output_path}", run_id, log_level="INFO", module="pipeline")
             self.export_to_csv(raw_data, csv_output_path)
             stats['records_inserted'] = len(raw_data)
-            insert_pipeline_status(f"Exported {len(raw_data)} records to CSV.", run_id)
+            insert_pipeline_status(f"Exported {len(raw_data)} records to CSV.", run_id, log_level="INFO", module="pipeline")
 
             # Conditionally run database operations
             if csv_only:
                 logger.info("CSV-only mode: Skipping database operations")
-                insert_pipeline_status("CSV-only mode: Skipping database operations", run_id)
+                insert_pipeline_status("CSV-only mode: Skipping database operations", run_id, log_level="INFO", module="pipeline")
             elif self.config['destination']['database'].get('enabled'):
                 logger.info("Database integration enabled, running INSERT operations...")
-                insert_pipeline_status("Database integration enabled, running INSERT operations...", run_id)
+                insert_pipeline_status("Database integration enabled, running INSERT operations...", run_id, log_level="INFO", module="pipeline")
                 db_config = self.config['destination']['database']
                 table_name = db_config.get('table', 'data')
 
                 # Create main data table
                 logger.info("Creating/updating table '%s'", table_name)
-                insert_pipeline_status(f"Creating/updating table '{table_name}'", run_id)
+                insert_pipeline_status(f"Creating/updating table '{table_name}'", run_id, log_level="INFO", module="pipeline")
                 self.schema_generator.create_table_from_csv(csv_output_path, table_name, conn_params)
                 
                 # Load data
                 logger.info("Loading CSV data into table '%s'", table_name)
-                insert_pipeline_status(f"Loading CSV data into table '{table_name}'", run_id)
+                insert_pipeline_status(f"Loading CSV data into table '{table_name}'", run_id, log_level="INFO", module="pipeline")
                 load_csv_to_db(csv_output_path, table_name, conn_params)
 
             logger.info("DataPipeline execution completed successfully")
-            insert_pipeline_status("Pipeline completed successfully.", run_id)
+            insert_pipeline_status("Pipeline completed successfully.", run_id, log_level="INFO", module="pipeline")
 
         except Exception as e:
             stats['error_count'] = 1
             stats['status'] = 'failed'
             logger.error("Pipeline execution failed: %s", str(e))
-            tb = traceback.format_exc()
-            insert_pipeline_status(f"Pipeline execution failed:\n{tb}", run_id)
+            # Only insert a short, single-line error message (no traceback)
+            error_msg = str(e).splitlines()[0][:200]  # First line, max 200 chars
+            insert_pipeline_status(f"Pipeline execution failed: {error_msg}", run_id, log_level="ERROR", module="pipeline")
             raise
         finally:
             # Stats logging with guaranteed conn_params availability

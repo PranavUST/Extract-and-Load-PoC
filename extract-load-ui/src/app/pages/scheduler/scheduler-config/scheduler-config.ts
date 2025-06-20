@@ -38,7 +38,7 @@ export class SchedulerConfig implements OnDestroy {
     daysOfMonth: [''],
     duration: [null]
   });
-  statusDetails: {timestamp: string, message: string}[] = [];
+  statusDetails: {timestamp: string, message: string, log_level: string, module: string}[] = [];
   pollInterval: any;
   runId: string = '';
   runIdPollInterval: any;
@@ -193,7 +193,12 @@ export class SchedulerConfig implements OnDestroy {
       // Fallback: fetch latest logs if no runId is set
       this.api.getPipelineStatus().subscribe({
         next: (res) => {
-          this.statusDetails = res.status;
+          this.statusDetails = (res.status || []).map((log: any) => ({
+            timestamp: log.timestamp,
+            message: log.message,
+            log_level: log.log_level || '',
+            module: log.module || ''
+          }));
         },
         error: () => this.statusDetails = []
       });
@@ -202,7 +207,12 @@ export class SchedulerConfig implements OnDestroy {
     this.pollInterval = setInterval(() => {
       this.api.getPipelineStatusByRunId(this.runId).subscribe({
         next: (res) => {
-          this.statusDetails = res.status;
+          this.statusDetails = (res.status || []).map((log: any) => ({
+            timestamp: log.timestamp,
+            message: log.message,
+            log_level: log.log_level || '',
+            module: log.module || ''
+          }));
           const isRunComplete = this.statusDetails.some(s => s.message.includes('Pipeline completed successfully') || s.message.toLowerCase().includes('failed'));
           if (isRunComplete) {
             clearInterval(this.pollInterval);
