@@ -23,75 +23,77 @@
       </div>
       <ng-template #editSourceForm>
         <form class="edit-config-form" [formGroup]="editSourceFormGroup">
-          <div class="edit-config-fields">
-            <mat-form-field appearance="fill">
+          <div class="top-row-equal">
+            <mat-form-field appearance="outline">
               <mat-label>Name</mat-label>
               <input matInput formControlName="name" />
             </mat-form-field>
-            <mat-form-field appearance="fill">
+            <mat-form-field appearance="outline">
               <mat-label>Type</mat-label>
               <mat-select formControlName="type">
                 <mat-option value="API">API</mat-option>
                 <mat-option value="FTP">FTP</mat-option>
               </mat-select>
             </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="editSourceFormGroup.get('type')?.value === 'API'">
+          </div>
+          <div class="input-row">
+            <mat-form-field appearance="outline" *ngIf="editSourceFormGroup.get('type')?.value === 'API'">
               <mat-label>Endpoint</mat-label>
               <input matInput formControlName="endpoint" />
             </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="editSourceFormGroup.get('type')?.value === 'API'">
+            <mat-form-field appearance="outline" class="small-input" *ngIf="editSourceFormGroup.get('type')?.value === 'API'">
               <mat-label>Auth Token</mat-label>
               <input matInput formControlName="authToken" />
             </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="editSourceFormGroup.get('type')?.value === 'FTP'">
+            <mat-form-field appearance="outline" class="small-input" *ngIf="editSourceFormGroup.get('type')?.value === 'FTP'">
               <mat-label>Host</mat-label>
               <input matInput formControlName="ftpHost" />
             </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="editSourceFormGroup.get('type')?.value === 'FTP'">
+            <mat-form-field appearance="outline" class="small-input" *ngIf="editSourceFormGroup.get('type')?.value === 'FTP'">
               <mat-label>Username</mat-label>
               <input matInput formControlName="ftpUsername" />
             </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="editSourceFormGroup.get('type')?.value === 'FTP'">
+            <mat-form-field appearance="outline" class="small-input" *ngIf="editSourceFormGroup.get('type')?.value === 'FTP'">
               <mat-label>Password</mat-label>
               <input matInput formControlName="ftpPassword" />
             </mat-form-field>
-            <mat-form-field appearance="fill">
+            <mat-form-field appearance="outline" class="small-input">
               <mat-label>Retries</mat-label>
               <input matInput type="number" formControlName="retries" min="0" />
             </mat-form-field>
           </div>
           <mat-divider style="margin:16px 0;"></mat-divider>
           <div class="dialog-section-heading" style="color:#006E74;">Advanced {{editSourceFormGroup.get('type')?.value}} Settings</div>
-          <div class="edit-config-fields">
+          <div class="input-row">
             <ng-container *ngIf="editSourceFormGroup.get('type')?.value === 'API'">
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline" class="small-input">
                 <mat-label>API Pagination Limit</mat-label>
                 <input matInput type="number" formControlName="apiLimit" min="1" />
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline" class="small-input">
                 <mat-label>API Max Pages</mat-label>
                 <input matInput type="number" formControlName="apiMaxPages" min="1" />
               </mat-form-field>
             </ng-container>
             <ng-container *ngIf="editSourceFormGroup.get('type')?.value === 'FTP'">
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline" class="small-input">
                 <mat-label>FTP Remote Directory</mat-label>
                 <input matInput formControlName="ftpRemoteDir" />
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline" class="small-input">
                 <mat-label>FTP Local Directory</mat-label>
                 <input matInput formControlName="ftpLocalDir" />
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline" class="small-input">
                 <mat-label>FTP File Types (comma separated)</mat-label>
                 <input matInput formControlName="ftpFileTypes" />
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline" class="small-input">
                 <mat-label>FTP Retry Delay (seconds)</mat-label>
                 <input matInput type="number" formControlName="ftpRetryDelay" min="0" />
               </mat-form-field>
             </ng-container>
-            <mat-form-field appearance="fill">
+            <mat-form-field appearance="outline" class="small-input">
               <mat-label>CSV Output Path</mat-label>
               <input matInput formControlName="csvOutputPath" />
             </mat-form-field>
@@ -138,21 +140,25 @@
         </div>
       </div>
       <ng-template #editTargetForm>
-        <form class="edit-config-form" [formGroup]="editTargetFormGroup">
-          <div class="edit-config-fields">
-            <mat-form-field appearance="fill">
+        <form *ngIf="isTargetEditFormReady" class="edit-config-form" [formGroup]="editTargetFormGroup">
+          <div class="top-row-equal">
+            <mat-form-field appearance="outline">
               <mat-label>Name</mat-label>
               <input matInput formControlName="name" />
             </mat-form-field>
-            <mat-form-field appearance="fill">
+            <mat-form-field appearance="outline">
               <mat-label>Type</mat-label>
-              <mat-select formControlName="type">
-                <mat-option value="API">API</mat-option>
-                <mat-option value="FTP">FTP</mat-option>
+              <mat-select formControlName="type" [disabled]="true">
                 <mat-option value="DATABASE">DATABASE</mat-option>
               </mat-select>
             </mat-form-field>
-            <!-- Add more standard fields for target config as needed -->
+          </div>
+          <div class="input-row">
+            <mat-form-field appearance="outline" class="small-input">
+              <mat-label>Table Name</mat-label>
+              <input matInput formControlName="tableName" />
+            </mat-form-field>
+            <!-- Add more fields as needed for your target config -->
           </div>
           <div class="edit-config-actions">
             <button mat-button type="button" (click)="cancelEditTargetConfig()">Cancel</button>

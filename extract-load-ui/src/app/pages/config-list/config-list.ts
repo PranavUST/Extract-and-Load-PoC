@@ -103,6 +103,7 @@ export class ConfigListComponent implements OnInit {
   editTargetFormGroup: FormGroup;
   @ViewChild('editSourceDialog') editSourceDialog!: TemplateRef<any>;
   editingConfig: any = null;
+  isTargetEditFormReady = false;
 
   constructor(private http: HttpClient, private dialog: MatDialog, private fb: FormBuilder, private api: ApiService) {
     this.editForm = this.fb.group({
@@ -143,7 +144,8 @@ export class ConfigListComponent implements OnInit {
     });
     this.editTargetFormGroup = this.fb.group({
       name: ['', Validators.required],
-      type: ['API', Validators.required],
+      type: ['DATABASE', Validators.required],
+      tableName: [''],
       apiLimit: [100],
       apiMaxPages: [10],
       ftpRemoteDir: [''],
@@ -390,10 +392,12 @@ export class ConfigListComponent implements OnInit {
 
   // Inline edit logic for target configs
   startEditTargetConfig(config: TargetConfig) {
+    this.isTargetEditFormReady = false;
     this.editingTargetConfig = config;
     this.editTargetFormGroup.patchValue({
       name: config.name || '',
-      type: config.type || 'API',
+      type: 'DATABASE',
+      tableName: config.tableName || '',
       apiLimit: (config.advanced?.apiLimit ?? config.apiLimit) ?? 100,
       apiMaxPages: (config.advanced?.apiMaxPages ?? config.apiMaxPages) ?? 10,
       ftpRemoteDir: (config.advanced?.ftpRemoteDir ?? config.ftpRemoteDir) ?? '',
@@ -402,10 +406,13 @@ export class ConfigListComponent implements OnInit {
       ftpRetryDelay: (config.advanced?.ftpRetryDelay ?? config.ftpRetryDelay) ?? 5,
       csvOutputPath: (config.advanced?.csvOutputPath ?? config.csvOutputPath) ?? 'data/output.csv'
     });
+    // Ensure form is ready after patching
+    Promise.resolve().then(() => this.isTargetEditFormReady = true);
   }
 
   cancelEditTargetConfig() {
     this.editingTargetConfig = null;
+    this.isTargetEditFormReady = false;
   }
 
   saveEditTargetConfig() {
@@ -414,6 +421,7 @@ export class ConfigListComponent implements OnInit {
       const payload = {
         name: form.name,
         type: form.type,
+        tableName: form.tableName,
         advanced: {
           apiLimit: form.apiLimit,
           apiMaxPages: form.apiMaxPages,
@@ -427,6 +435,7 @@ export class ConfigListComponent implements OnInit {
       this.http.put(`http://localhost:5000/saved-target-configs/${this.editingTargetConfig.name}`, payload).subscribe({
         next: () => {
           this.editingTargetConfig = null;
+          this.isTargetEditFormReady = false;
           this.loadTargetConfigs();
           this.loadCurrentConfig();
         },
