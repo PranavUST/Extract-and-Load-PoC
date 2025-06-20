@@ -6,6 +6,8 @@ import pandas as pd
 from typing import List, Dict
 from datetime import datetime
 from pathlib import Path
+import traceback
+
 output_path = Path(__file__).parent.parent / 'data' / 'output.csv'
 from src.api_client import APIClient
 from src.config_loader import load_config, resolve_config_vars
@@ -208,7 +210,8 @@ class DataPipeline:
             stats['error_count'] = 1
             stats['status'] = 'failed'
             logger.error("Pipeline execution failed: %s", str(e))
-            insert_pipeline_status(f"Pipeline execution failed: {str(e)}", run_id)
+            tb = traceback.format_exc()
+            insert_pipeline_status(f"Pipeline execution failed:\n{tb}", run_id)
             raise
         finally:
             # Stats logging with guaranteed conn_params availability

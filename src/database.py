@@ -265,15 +265,20 @@ def create_pipeline_status_table_if_not_exists(conn_params: dict = None):
 
 def insert_pipeline_status(message: str, run_id: str = None, conn_params: dict = None):
     """Insert a pipeline status message into the database."""
+    logger.debug(f"insert_pipeline_status called with message='{message[:60]}...', run_id={run_id}, conn_params keys={list(conn_params.keys()) if conn_params else None}")
     try:
         if conn_params:
+            logger.debug(f"Connecting to DB with conn_params: {conn_params}")
             conn = psycopg2.connect(**conn_params)
         else:
+            logger.debug("Connecting to DB with default connection")
             conn = get_connection()
         cur = conn.cursor()
         if run_id:
+            logger.debug(f"Inserting with run_id: {run_id}")
             cur.execute("INSERT INTO pipeline_status (message, run_id) VALUES (%s, %s)", (message, run_id))
         else:
+            logger.debug("Inserting without run_id")
             cur.execute("INSERT INTO pipeline_status (message) VALUES (%s)", (message,))
         conn.commit()
         cur.close()

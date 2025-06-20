@@ -34,6 +34,7 @@ export class SchedulerConfig implements OnDestroy {
   status = '';
   isRunOnceDisabled = false;
   loading = false;
+  isScheduledRunning = false;
   private runIdCheckSub: Subscription | null = null;
   schedulerForm: FormGroup = this.fb.group({
     scheduleType: ['interval', Validators.required],
@@ -44,6 +45,7 @@ export class SchedulerConfig implements OnDestroy {
   statusDetails: {timestamp: string, message: string}[] = [];
   pollInterval: any;
   runId: string = '';
+  runIdPollInterval: any;
 
   onScheduleTypeChange(type: string) {
     // Reset validators based on type
@@ -70,6 +72,8 @@ export class SchedulerConfig implements OnDestroy {
   runPipeline() {
     if (this.schedulerForm.valid) {
       this.loading = true;
+      this.isScheduledRunning = true;
+      this.isRunOnceDisabled = true;
       const { scheduleType, interval, daysOfMonth, duration } = this.schedulerForm.value;
       this.api.getCurrentConfig().subscribe({
         next: (currentConfig) => {
@@ -96,29 +100,68 @@ export class SchedulerConfig implements OnDestroy {
                 error: (err) => {
                   this.status = `Error: ${err.error?.message || err.message || 'Failed to schedule pipeline'}`;
                   this.loading = false;
+                  this.isScheduledRunning = false;
+                  this.isRunOnceDisabled = false;
                 }
               });
             },
             error: () => {
               this.status = 'Error: Could not fetch source configs';
               this.loading = false;
+              this.isScheduledRunning = false;
+              this.isRunOnceDisabled = false;
             }
           });
         },
         error: () => {
           this.status = 'Error: Could not fetch current config';
           this.loading = false;
+          this.isScheduledRunning = false;
+          this.isRunOnceDisabled = false;
         }
       });
     }
   }
+
+  startRunIdPolling() {
+    if (this.runIdCheckSub) {
+      this.runIdCheckSub.unsubscribe();
+    }
+    this.runIdCheckSub = interval(2000).subscribe(() => {
+      this.http.get('/latest_scheduled_run_id.txt', { responseType: 'text' }).subscribe({
+        next: (txt) => {
+          this.loading = !!txt.trim();
+        },
+        error: () => {
+          this.loading = false;
+        }
+      });
+    });
+  }
+
   stopPipeline() {
+    // Stop polling for runId and logs
+    if (this.runIdPollInterval) {
+      clearInterval(this.runIdPollInterval);
+      this.runIdPollInterval = null;
+    }
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
+    }
+    this.status = 'Pipeline stopped';
+    // Optionally clear logs and runId
+    this.statusDetails = [];
+    this.runId = '';
+    this.isScheduledRunning = false;
+    this.isRunOnceDisabled = false;
     this.api.stopPipeline().subscribe({
-      next: () => this.status = 'Pipeline stopped',
-      error: (err: any) => this.status = `Error: ${err.message}`
+      next: () => {},
+      error: (err) => this.status = `Error: ${err.error?.message || err.message || 'Failed to stop pipeline'}`
     });
   }
   runOnce() {
+    this.isScheduledRunning = true;
     this.isRunOnceDisabled = true;
     this.loading = true;
     this.api.getCurrentConfig().subscribe({
@@ -181,35 +224,32 @@ export class SchedulerConfig implements OnDestroy {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
     }
-    if (!this.runId) return;
+    if (!this.runId) {
+      // Fallback: fetch latest logs if no runId is set
+      this.api.getPipelineStatus().subscribe({
+        next: (res) => {
+          this.statusDetails = res.status;
+        },
+        error: () => this.statusDetails = []
+      });
+      return;
+    }
     this.pollInterval = setInterval(() => {
       this.api.getPipelineStatusByRunId(this.runId).subscribe({
         next: (res) => {
           this.statusDetails = res.status;
-          if (this.statusDetails.some(s => s.message.includes('Pipeline completed successfully'))) {
+          const isRunComplete = this.statusDetails.some(s => s.message.includes('Pipeline completed successfully') || s.message.toLowerCase().includes('failed'));
+          if (isRunComplete) {
             clearInterval(this.pollInterval);
             this.pollInterval = null;
+            // After a run completes (success or error), start polling for the next runId
+            this.runId = '';
+            this.startRunIdPolling();
           }
         },
         error: () => this.statusDetails = []
       });
     }, 5000);
-  }
-
-  startRunIdPolling() {
-    if (this.runIdCheckSub) {
-      this.runIdCheckSub.unsubscribe();
-    }
-    this.runIdCheckSub = interval(2000).subscribe(() => {
-      this.http.get('/latest_scheduled_run_id.txt', { responseType: 'text' }).subscribe({
-        next: (txt) => {
-          this.loading = !!txt.trim();
-        },
-        error: () => {
-          this.loading = false;
-        }
-      });
-    });
   }
 
   ngOnDestroy() {
@@ -218,6 +258,9 @@ export class SchedulerConfig implements OnDestroy {
     }
     if (this.runIdCheckSub) {
       this.runIdCheckSub.unsubscribe();
+    }
+    if (this.runIdPollInterval) {
+      clearInterval(this.runIdPollInterval);
     }
   }
 

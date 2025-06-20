@@ -22,10 +22,16 @@
     </mat-form-field>
   </div>
   <div class="button-row" style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
-    <button mat-raised-button color="primary" type="submit" [disabled]="schedulerForm.invalid">
+    <button mat-raised-button color="primary" type="submit"
+      [disabled]="schedulerForm.invalid || isScheduledRunning"
+      [style.opacity]="(schedulerForm.invalid || isScheduledRunning) ? 0.5 : 1">
       Run Pipeline
     </button>
-    <button mat-raised-button color="accent" type="button" (click)="runOnce()" [disabled]="isRunOnceDisabled" class="run-once-btn" style="background: #009999; color: #fff;">
+    <button mat-raised-button color="accent" type="button" (click)="runOnce()"
+      [disabled]="isRunOnceDisabled || isScheduledRunning"
+      class="run-once-btn"
+      [style.background]="'#009999'" [style.color]="'#fff'"
+      [style.opacity]="(isRunOnceDisabled || isScheduledRunning) ? 0.5 : 1">
       Run Once
     </button>
     <button mat-raised-button color="warn" type="button" (click)="stopPipeline()">
