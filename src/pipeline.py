@@ -16,6 +16,7 @@ from src.schema_generator import CSVSchemaGenerator
 from src.ftp_client import download_ftp_files
 from src.database import insert_pipeline_status
 
+
 logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
