@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../../services/api.service';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
@@ -21,7 +22,8 @@ import { HttpClient } from '@angular/common/http';
     MatInputModule,
     MatButtonModule,
     MatCardModule,
-    MatSelectModule
+    MatSelectModule,
+    MatProgressSpinnerModule
   ]
 })
 export class SchedulerConfig implements OnDestroy {
@@ -30,6 +32,7 @@ export class SchedulerConfig implements OnDestroy {
   private http = inject(HttpClient);
 
   status = '';
+  loading = false;
   isRunOnceDisabled = false;
   isScheduledRunning = false;
   schedulerForm: FormGroup = this.fb.group({
@@ -67,6 +70,7 @@ export class SchedulerConfig implements OnDestroy {
 
   runPipeline() {
     if (this.schedulerForm.valid) {
+      this.loading = true;
       this.isScheduledRunning = true;
       this.isRunOnceDisabled = true;
       const { scheduleType, interval, daysOfMonth, duration } = this.schedulerForm.value;
@@ -90,18 +94,27 @@ export class SchedulerConfig implements OnDestroy {
                 next: (res) => {
                   this.status = 'Pipeline scheduled successfully';
                   this.startRunIdPolling();
+                  // do not set loading = false here
                 },
-                error: (err) => this.status = `Error: ${err.error?.message || err.message || 'Failed to schedule pipeline'}`
+                error: (err) => {
+                  this.status = `Error: ${err.error?.message || err.message || 'Failed to schedule pipeline'}`;
+                  this.loading = false;
+                }
               });
             },
-            error: () => this.status = 'Error: Could not fetch source configs'
+            error: () => {
+              this.status = 'Error: Could not fetch source configs';
+              this.loading = false;
+            }
           });
         },
-        error: () => this.status = 'Error: Could not fetch current config'
+        error: () => {
+          this.status = 'Error: Could not fetch current config';
+          this.loading = false;
+        }
       });
     }
   }
-
   startRunIdPolling() {
     if (this.runIdPollInterval) {
       clearInterval(this.runIdPollInterval);
@@ -146,6 +159,7 @@ export class SchedulerConfig implements OnDestroy {
     });
   }
   runOnce() {
+    this.loading = true;
     this.isScheduledRunning = true;
     this.isRunOnceDisabled = true;
     this.api.getCurrentConfig().subscribe({
@@ -163,14 +177,24 @@ export class SchedulerConfig implements OnDestroy {
                 this.status = 'Pipeline run once successfully';
                 this.runId = res.run_id;
                 this.pollStatus();
+                // do not set loading = false here
               },
-              error: (err: any) => this.status = `Error: ${err.message}`
+              error: (err: any) => {
+                this.status = `Error: ${err.message}`;
+                this.loading = false;
+              }
             });
           },
-          error: () => this.status = 'Error: Could not fetch source configs'
+          error: () => {
+            this.status = 'Error: Could not fetch source configs';
+            this.loading = false;
+          }
         });
       },
-      error: () => this.status = 'Error: Could not fetch current config'
+      error: () => {
+        this.status = 'Error: Could not fetch current config';
+        this.loading = false;
+      }
     });
   }
 
@@ -213,16 +237,22 @@ export class SchedulerConfig implements OnDestroy {
             log_level: log.log_level || '',
             module: log.module || ''
           }));
-          const isRunComplete = this.statusDetails.some(s => s.message.includes('Pipeline completed successfully') || s.message.toLowerCase().includes('failed'));
+          const isRunComplete = this.statusDetails.some(
+            s => s.message.includes('Pipeline completed successfully') || s.message.toLowerCase().includes('failed')
+          );
           if (isRunComplete) {
             clearInterval(this.pollInterval);
             this.pollInterval = null;
+            this.loading = false;
             // After a run completes (success or error), start polling for the next runId
             this.runId = '';
             this.startRunIdPolling();
           }
         },
-        error: () => this.statusDetails = []
+        error: () => {
+          // Do NOT set this.loading = false here!
+          // Just keep the spinner until the run is truly finished, even if polling fails.
+        }
       });
     }, 5000);
   }

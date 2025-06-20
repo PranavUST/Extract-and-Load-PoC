@@ -21,7 +21,7 @@
       <input matInput type="number" formControlName="duration" min="0.1" step="0.1" required>
     </mat-form-field>
   </div>
-  <div class="button-row" style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+  <div class="button-row" style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; align-items: center;">
     <button mat-raised-button color="primary" type="submit"
       [disabled]="schedulerForm.invalid || isScheduledRunning"
       [style.opacity]="(schedulerForm.invalid || isScheduledRunning) ? 0.5 : 1">
@@ -37,11 +37,9 @@
     <button mat-raised-button color="warn" type="button" (click)="stopPipeline()">
       Stop Pipeline
     </button>
+    <mat-progress-spinner *ngIf="loading" diameter="28" mode="indeterminate" style="margin-left: 12px;"></mat-progress-spinner>
   </div>
 </form>
-<div *ngIf="status" class="status-message" style="margin-top:1rem;">
-  {{ status }}
-</div>
 <div *ngIf="statusDetails.length > 0" class="log-section" style="margin-top:1.5rem;">
   <h3 style="margin-bottom: 0.5rem; color: #004d4d; font-size: 1.1rem;">Current Run Logs</h3>
   <div class="log-list" style="max-height: 220px; overflow-y: auto; background: #f8fafc; border-radius: 8px; padding: 12px 18px; border: 1px solid #e0e0e0;">
