@@ -764,11 +764,9 @@ def edit_saved_target_config(name):
         if not updated:
             return jsonify({"status": "error", "message": "Config not found"}), 404
         with open(path, 'w') as f:
-            json.dump(configs, f)
-
-        # --- NEW: Update YAML files ---
+            json.dump(configs, f)        # --- NEW: Update YAML files ---
         table_name = data.get('tableName')
-        if data.get('type') == 'Database' and table_name:
+        if data.get('type', '').lower() == 'database' and table_name:
             for yaml_file in ['../config/api_config.yaml', '../config/ftp_config.yaml']:
                 config_path = os.path.join(BASE_DIR, yaml_file)
                 if os.path.exists(config_path):
