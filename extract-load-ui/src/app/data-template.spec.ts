@@ -52,9 +52,9 @@ describe('DataTemplate', () => {
   describe('checkStatus', () => {
     it('should set status on success', () => {
       const pipelineService = (component as any).pipelineService;
-      spyOn(pipelineService, 'getStatus').and.returnValue(of({ status: 'ok', message: 'msg' }));
+      spyOn(pipelineService, 'getStatus').and.returnValue(of({ status: 'success', message: 'msg' }));
       component.checkStatus();
-      expect(component.status).toContain('Status: ok');
+      expect(component.status).toContain('Status: success');
     });
     it('should set error status and log on error', () => {
       const pipelineService = (component as any).pipelineService;

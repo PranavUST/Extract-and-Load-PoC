@@ -266,14 +266,12 @@ mat-card {
   background: #fff !important; // Inverted: white background
   color: #009688 !important;   // Teal icon/text
   box-shadow: 0 4px 24px #00968844;
-  border-radius: 50%;
-  width: 64px;
-  height: 64px;
+  width: 54px;
+  height: 54px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
-  border: 2px solid #009688;
   transition: box-shadow 0.22s, transform 0.22s, background 0.22s, color 0.22s;
 }
 
@@ -282,12 +280,11 @@ mat-card {
   color: #00796b !important;
   box-shadow: 0 8px 32px #00968866;
   transform: scale(1.08);
-  border-color: #00796b;
 }
 
 .test-all-btn mat-icon {
   font-size: 2.2rem;
-  color: #009688 !important; // Teal icon
+  color: #004e46 !important; // Teal icon
   display: flex;
   align-items: center;
   justify-content: center;
