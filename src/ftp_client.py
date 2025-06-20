@@ -3,6 +3,7 @@ import os
 import logging
 import time
 from typing import List
+from src.database import insert_pipeline_status
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,8 @@ def download_ftp_files(
     local_dir: str,
     file_types: List[str] = None,
     retries: int = 3,
-    delay: int = 5
+    delay: int = 5,
+    run_id: str = None
 ) -> List[str]:
     """
     Robust FTP downloader with improved error handling.
@@ -43,7 +45,6 @@ def download_ftp_files(
                 files = ftp.nlst()
                 logger.info("Found %d files in %s", len(files), remote_dir)
                 
-                # ...existing code...
                 for filename in files:
                     # Ensure file_types is a list of lowercase extensions with dot
                     if file_types:
@@ -52,7 +53,6 @@ def download_ftp_files(
                         if not filename.lower().endswith(tuple(file_types_lc)):
                             logger.debug("Skipping non-matching file: %s", filename)
                             continue
-                    # ...existing code...
                     logger.info("Files found on FTP: %s", files)     
                     local_path = os.path.join(local_dir, filename)
                     
@@ -60,7 +60,7 @@ def download_ftp_files(
                     if os.path.exists(local_path):
                         logger.debug("File exists, skipping: %s", filename)
                         continue
-                        
+                    
                     logger.info("Downloading %s", filename)
                     with open(local_path, 'wb') as f:
                         ftp.retrbinary(f"RETR {filename}", f.write)
@@ -72,16 +72,19 @@ def download_ftp_files(
 
         except ftplib.error_perm as e:
             logger.error("FTP Error: %s", e)
+            # Do NOT insert every FTP error, only final exhaustion below
             if "530" in str(e):
                 logger.error("Invalid credentials")
             break  # Don't retry on permission errors
         except Exception as e:
             attempt += 1
             logger.error("Attempt %d/%d failed: %s", attempt, retries, e)
+            insert_pipeline_status(f"Attempt {attempt}/{retries} failed: {e}", run_id=run_id, log_level="ERROR", module="ftp_client")
             if attempt < retries:
                 time.sleep(delay)
             else:
                 logger.error("All %d retries exhausted", retries)
+                insert_pipeline_status(f"All {retries} retries exhausted", run_id=run_id, log_level="ERROR", module="ftp_client")
                 break
 
     return downloaded_files

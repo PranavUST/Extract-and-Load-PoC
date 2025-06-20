@@ -13,7 +13,7 @@ class APIClient:
         self.session = requests.Session()
         logger.debug("APIClient initialized with config: %s", config)
 
-    def _handle_pagination(self, params: Dict) -> List[Dict]:
+    def _handle_pagination(self, params: Dict, run_id=None) -> List[Dict]:
         pagination = self.config.get('pagination', {})
         all_records = []
         max_pages = pagination.get('max_pages', 1)
@@ -24,7 +24,7 @@ class APIClient:
 
         if not (page_param and page_size_param and page_size):
             logger.warning("Pagination parameters missing, fetching only first page.")
-            response = self._make_request_with_retries(params)
+            response = self._make_request_with_retries(params, run_id=run_id)
             return self._extract_records(response)
 
         for page in range(1, max_pages + 1):
@@ -34,7 +34,7 @@ class APIClient:
                 page_size_param: page_size
             })
             logger.debug("Requesting page %d with params: %s", page, page_params)
-            response = self._make_request_with_retries(page_params)
+            response = self._make_request_with_retries(page_params, run_id=run_id)
             records = self._extract_records(response)
             logger.info("Fetched %d records from page %d", len(records), page)
             if not records:
@@ -57,14 +57,15 @@ class APIClient:
         logger.debug("Request successful: %s %s", self.config.get('method', 'GET'), self.config.get('url', ''))
         return resp.json()
 
-    def _make_request_with_retries(self, params: Dict) -> Dict:
+    def _make_request_with_retries(self, params: Dict, run_id=None) -> Dict:
         retries = self.config.get('retries', 3)
         delay = self.config.get('retry_delay', 2)
         return retry_call(
             lambda: self._make_request(params),
             retries=retries,
             delay=delay,
-            exceptions=(requests.exceptions.RequestException,)
+            exceptions=(requests.exceptions.RequestException,),
+            run_id=run_id
         )
 
     def _extract_records(self, response: Dict) -> List[Dict]:
@@ -85,10 +86,10 @@ class APIClient:
             logger.warning("Data path did not yield a list. Got: %s", type(current_data))
             return []
 
-    def fetch_data(self) -> List[Dict]:
+    def fetch_data(self, run_id=None) -> List[Dict]:
         """Fetches data from the API using pagination."""
         logger.info("Fetching data using APIClient")
         params = self.config.get('params', {})
-        data = self._handle_pagination(params)
+        data = self._handle_pagination(params, run_id=run_id)
         logger.info("Data fetch complete. Total records: %d", len(data))
         return data

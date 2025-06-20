@@ -511,15 +511,25 @@ def stop_pipeline():
 @app.route('/pipeline-status', methods=['GET'])
 def get_pipeline_status():
     run_id = request.args.get('run_id')
+    if not run_id:
+        # Try to get latest run_id from file
+        run_id_path = os.path.join(os.path.dirname(__file__), '..', 'latest_scheduled_run_id.txt')
+        if os.path.exists(run_id_path):
+            with open(run_id_path, 'r') as f:
+                run_id = f.read().strip()
     conn = get_connection()
     with conn.cursor() as cur:
         if run_id:
-            cur.execute("SELECT timestamp, message FROM pipeline_status WHERE run_id = %s ORDER BY id DESC LIMIT 20", (run_id,))
+            cur.execute("SELECT timestamp, message, log_level, module FROM pipeline_status WHERE run_id = %s ORDER BY id ASC", (run_id,))
         else:
-            cur.execute("SELECT timestamp, message FROM pipeline_status ORDER BY id DESC LIMIT 20")
+            cur.execute("SELECT timestamp, message, log_level, module FROM pipeline_status ORDER BY id DESC LIMIT 100")
         rows = cur.fetchall()
     conn.close()
-    status = [{"timestamp": str(row[0]), "message": row[1]} for row in rows]
+    # Return all logs for the run (no filtering)
+    status = [
+        {"timestamp": str(row[0]), "message": row[1], "log_level": row[2], "module": row[3]}
+        for row in rows
+    ]
     return jsonify({"status": status})
 
 @app.route('/v1/data', methods=['GET'])

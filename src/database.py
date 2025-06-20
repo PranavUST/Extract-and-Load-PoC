@@ -223,15 +223,22 @@ def log_pipeline_stats(stats: dict, conn_params: dict):
         logger.error(f"Failed to log pipeline stats: {str(e)}")
         raise
 def create_pipeline_status_table_if_not_exists(conn_params: dict = None):
-    """Create the pipeline_status table if it does not exist, with run_id column."""
+    """Create the pipeline_status table if it does not exist, with run_id, log_level, and module columns."""
     create_table_sql = """
     CREATE TABLE IF NOT EXISTS pipeline_status (
         id SERIAL PRIMARY KEY,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        message TEXT NOT NULL,
-        run_id UUID
+        message TEXT,
+        run_id VARCHAR(64),
+        log_level VARCHAR(16) DEFAULT 'INFO',
+        module VARCHAR(64) DEFAULT NULL
     );
     """
+    # Add columns if they do not exist (for migration)
+    alter_sqls = [
+        "ALTER TABLE pipeline_status ADD COLUMN IF NOT EXISTS log_level VARCHAR(16) DEFAULT 'INFO';",
+        "ALTER TABLE pipeline_status ADD COLUMN IF NOT EXISTS module VARCHAR(64) DEFAULT NULL;"
+    ]
     try:
         if conn_params:
             conn = psycopg2.connect(**conn_params)
@@ -239,33 +246,21 @@ def create_pipeline_status_table_if_not_exists(conn_params: dict = None):
             conn = get_connection()
         cur = conn.cursor()
         cur.execute(create_table_sql)
+        for alter in alter_sqls:
+            cur.execute(alter)
         conn.commit()
-        # Ensure run_id column exists even if table already existed
-        cur.execute("""
-            DO $$
-            BEGIN
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns
-                    WHERE table_name='pipeline_status' AND column_name='run_id'
-                ) THEN
-                    ALTER TABLE pipeline_status ADD COLUMN run_id UUID;
-                END IF;
-            END
-            $$;
-        """)
-        conn.commit()   
         cur.close()
         conn.close()
-        logger.info("Ensured 'pipeline_status' table exists.")
+        logger.info("Ensured 'pipeline_status' table exists with log_level and module columns.")
     except Exception as e:
-        logger.error(f"Failed to create 'pipeline_status' table: {e}")
+        logger.error(f"Failed to create/alter 'pipeline_status' table: {e}")
         if 'conn' in locals():
             conn.close()
         raise
 
-def insert_pipeline_status(message: str, run_id: str = None, conn_params: dict = None):
-    """Insert a pipeline status message into the database."""
-    logger.debug(f"insert_pipeline_status called with message='{message[:60]}...', run_id={run_id}, conn_params keys={list(conn_params.keys()) if conn_params else None}")
+def insert_pipeline_status(message: str, run_id: str = None, log_level: str = 'INFO', module: str = None, conn_params: dict = None):
+    """Insert a pipeline status message into the database with log level and module."""
+    logger.debug(f"insert_pipeline_status called with message='{message[:60]}...', run_id={run_id}, log_level={log_level}, module={module}, conn_params keys={list(conn_params.keys()) if conn_params else None}")
     try:
         if conn_params:
             logger.debug(f"Connecting to DB with conn_params: {conn_params}")
@@ -276,10 +271,10 @@ def insert_pipeline_status(message: str, run_id: str = None, conn_params: dict =
         cur = conn.cursor()
         if run_id:
             logger.debug(f"Inserting with run_id: {run_id}")
-            cur.execute("INSERT INTO pipeline_status (message, run_id) VALUES (%s, %s)", (message, run_id))
+            cur.execute("INSERT INTO pipeline_status (message, run_id, log_level, module) VALUES (%s, %s, %s, %s)", (message, run_id, log_level, module))
         else:
             logger.debug("Inserting without run_id")
-            cur.execute("INSERT INTO pipeline_status (message) VALUES (%s)", (message,))
+            cur.execute("INSERT INTO pipeline_status (message, log_level, module) VALUES (%s, %s, %s)", (message, log_level, module))
         conn.commit()
         cur.close()
         conn.close()
