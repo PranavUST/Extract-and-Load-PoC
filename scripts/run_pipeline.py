@@ -16,6 +16,9 @@ from src.database import create_logins_table_if_not_exists, create_pipeline_stat
 
 def run_ingestion(config_path: str, run_id: str = None):
     """Run the pipeline with the specified config"""
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
     config_path = Path(config_path)
     if not config_path.is_absolute():
         config_path = (project_root / config_path).resolve()
@@ -28,11 +31,18 @@ def run_ingestion(config_path: str, run_id: str = None):
         run_id = str(uuid.uuid4())
 
     run_id_path = project_root / "latest_scheduled_run_id.txt"
+    logger.debug(f"Writing run_id {run_id} to {run_id_path}")
     with open(run_id_path, "w") as f:
         f.write(run_id)
     
+    logger.info(f"Starting DataPipeline for run_id {run_id} with config {config_path}")
     pipeline = DataPipeline(config_path)
-    pipeline.run(run_id=run_id)
+    try:
+        pipeline.run(run_id=run_id)
+        logger.info(f"Pipeline run complete for run_id {run_id}")
+    except Exception as e:
+        logger.error(f"Pipeline run failed for run_id {run_id}: {e}")
+        raise
 
 def main():
     """Entry point for command-line execution."""

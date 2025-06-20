@@ -31,6 +31,7 @@ export class SchedulerConfig implements OnDestroy {
 
   status = '';
   isRunOnceDisabled = false;
+  isScheduledRunning = false;
   schedulerForm: FormGroup = this.fb.group({
     scheduleType: ['interval', Validators.required],
     interval: [null],
@@ -40,6 +41,7 @@ export class SchedulerConfig implements OnDestroy {
   statusDetails: {timestamp: string, message: string}[] = [];
   pollInterval: any;
   runId: string = '';
+  runIdPollInterval: any;
 
   onScheduleTypeChange(type: string) {
     // Reset validators based on type
@@ -65,6 +67,8 @@ export class SchedulerConfig implements OnDestroy {
 
   runPipeline() {
     if (this.schedulerForm.valid) {
+      this.isScheduledRunning = true;
+      this.isRunOnceDisabled = true;
       const { scheduleType, interval, daysOfMonth, duration } = this.schedulerForm.value;
       this.api.getCurrentConfig().subscribe({
         next: (currentConfig) => {
@@ -85,7 +89,7 @@ export class SchedulerConfig implements OnDestroy {
               }).subscribe({
                 next: (res) => {
                   this.status = 'Pipeline scheduled successfully';
-                  this.fetchLatestScheduledRunId();
+                  this.startRunIdPolling();
                 },
                 error: (err) => this.status = `Error: ${err.error?.message || err.message || 'Failed to schedule pipeline'}`
               });
@@ -97,13 +101,52 @@ export class SchedulerConfig implements OnDestroy {
       });
     }
   }
+
+  startRunIdPolling() {
+    if (this.runIdPollInterval) {
+      clearInterval(this.runIdPollInterval);
+    }
+    this.runIdPollInterval = setInterval(() => {
+      this.api.getLatestScheduledRunId().subscribe({
+        next: (res) => {
+          console.log('Polled run_id:', res.run_id);
+          if (res.run_id && res.run_id !== this.runId) {
+            this.runId = res.run_id;
+            clearInterval(this.runIdPollInterval);
+            this.runIdPollInterval = null;
+            this.pollStatus();
+          }
+        },
+        error: (err) => {
+          console.error('Error polling latest run id', err);
+        }
+      });
+    }, 2000);
+  }
+
   stopPipeline() {
+    // Stop polling for runId and logs
+    if (this.runIdPollInterval) {
+      clearInterval(this.runIdPollInterval);
+      this.runIdPollInterval = null;
+    }
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
+    }
+    this.status = 'Pipeline stopped';
+    // Optionally clear logs and runId
+    this.statusDetails = [];
+    this.runId = '';
+    this.isScheduledRunning = false;
+    this.isRunOnceDisabled = false;
     this.api.stopPipeline().subscribe({
-      next: () => this.status = 'Pipeline stopped',
-      error: (err: any) => this.status = `Error: ${err.message}`
+      next: () => {},
+      error: (err) => this.status = `Error: ${err.error?.message || err.message || 'Failed to stop pipeline'}`
     });
   }
   runOnce() {
+    this.isScheduledRunning = true;
     this.isRunOnceDisabled = true;
     this.api.getCurrentConfig().subscribe({
       next: (currentConfig) => {
@@ -146,14 +189,27 @@ export class SchedulerConfig implements OnDestroy {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
     }
-    if (!this.runId) return;
+    if (!this.runId) {
+      // Fallback: fetch latest logs if no runId is set
+      this.api.getPipelineStatus().subscribe({
+        next: (res) => {
+          this.statusDetails = res.status;
+        },
+        error: () => this.statusDetails = []
+      });
+      return;
+    }
     this.pollInterval = setInterval(() => {
       this.api.getPipelineStatusByRunId(this.runId).subscribe({
         next: (res) => {
           this.statusDetails = res.status;
-          if (this.statusDetails.some(s => s.message.includes('Pipeline completed successfully'))) {
+          const isRunComplete = this.statusDetails.some(s => s.message.includes('Pipeline completed successfully') || s.message.toLowerCase().includes('failed'));
+          if (isRunComplete) {
             clearInterval(this.pollInterval);
             this.pollInterval = null;
+            // After a run completes (success or error), start polling for the next runId
+            this.runId = '';
+            this.startRunIdPolling();
           }
         },
         error: () => this.statusDetails = []
@@ -164,6 +220,9 @@ export class SchedulerConfig implements OnDestroy {
   ngOnDestroy() {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
+    }
+    if (this.runIdPollInterval) {
+      clearInterval(this.runIdPollInterval);
     }
   }
 

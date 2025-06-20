@@ -63,9 +63,8 @@ export class DataExtraction implements OnInit, OnDestroy, AfterViewInit {
 
   editingConfig: any = null;
   editConfigForm: FormGroup;
-
   ngOnInit() {
-    this.startRunIdPolling();
+    // Only call this.refreshSourceType();
     this.refreshSourceType();
   }
 
