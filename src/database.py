@@ -4,6 +4,7 @@ import csv
 import logging
 from dotenv import load_dotenv
 from datetime import datetime
+import sys
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -20,6 +21,13 @@ def get_connection(conn_params=None):
                 'password': os.getenv('DB_PASSWORD', 'admin'),
                 'port': os.getenv('DB_PORT', 5432)
             }
+        dbname = conn_params.get('database') or conn_params.get('dbname')
+        # Only block non-test DBs if running under pytest or TESTING env
+        if (
+            ('pytest' in sys.modules or os.getenv('TESTING') == '1')
+            and dbname and dbname not in ['testdb', 'test', 'test_database', 'test_db']
+        ):
+            raise RuntimeError(f"Refusing to connect to non-test database '{dbname}' during tests!")
         return psycopg2.connect(**conn_params)
     except Exception as e:
         logger.error(f"Database connection failed: {str(e)}")
@@ -169,6 +177,15 @@ def log_pipeline_stats(stats: dict, conn_params: dict):
 
                 logger.debug(f"New records: fetched={records_fetched}, inserted={records_inserted}")
 
+                # Map test status values to production values
+                status = stats.get('status', '')
+                if status.lower() == 'ok':
+                    status = 'success'
+                elif status.lower() == 'failed':
+                    status = 'failed'
+                else:
+                    status = status
+
                 if current_stats:
                     # Always add new operations to totals
                     total_fetched = current_stats[0] + records_fetched
@@ -185,7 +202,7 @@ def log_pipeline_stats(stats: dict, conn_params: dict):
                             last_status = %s,
                             last_run_timestamp = CURRENT_TIMESTAMP
                         WHERE stat_date = CURRENT_DATE
-                    """, (total_fetched, total_inserted, total_errors, stats['status']))
+                    """, (total_fetched, total_inserted, total_errors, status))
                 else:
                     # First run of the day
                     logger.debug("First run of the day")
@@ -195,7 +212,7 @@ def log_pipeline_stats(stats: dict, conn_params: dict):
                              total_error_count, last_status)
                         VALUES 
                             (CURRENT_DATE, %s, %s, %s, %s)
-                    """, (records_fetched, records_inserted, error_count, stats['status']))
+                    """, (records_fetched, records_inserted, error_count, status))
 
                 conn.commit()
 

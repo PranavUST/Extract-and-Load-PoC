@@ -33,8 +33,9 @@
     </button>
   </div>
 </form>
-<div *ngIf="status" class="status-message" style="margin-top:1rem;">
-  {{ status }}
+<div *ngIf="status" class="status-message" style="margin-top:1rem; display: flex; align-items: center; gap: 1rem;">
+  <span>{{ status }}</span>
+  <mat-spinner *ngIf="loading" diameter="28"></mat-spinner>
 </div>
 <div *ngIf="statusDetails.length > 0" class="log-section" style="margin-top:1.5rem;">
   <h3 style="margin-bottom: 0.5rem; color: #004d4d; font-size: 1.1rem;">Current Run Logs</h3>

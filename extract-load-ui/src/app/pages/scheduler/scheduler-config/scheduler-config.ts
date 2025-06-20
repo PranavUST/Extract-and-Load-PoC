@@ -6,8 +6,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../../services/api.service';
-import { Observable } from 'rxjs';
+import { Observable, interval, Subscription } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -21,7 +22,8 @@ import { HttpClient } from '@angular/common/http';
     MatInputModule,
     MatButtonModule,
     MatCardModule,
-    MatSelectModule
+    MatSelectModule,
+    MatProgressSpinnerModule
   ]
 })
 export class SchedulerConfig implements OnDestroy {
@@ -31,6 +33,8 @@ export class SchedulerConfig implements OnDestroy {
 
   status = '';
   isRunOnceDisabled = false;
+  loading = false;
+  private runIdCheckSub: Subscription | null = null;
   schedulerForm: FormGroup = this.fb.group({
     scheduleType: ['interval', Validators.required],
     interval: [null],
@@ -65,6 +69,7 @@ export class SchedulerConfig implements OnDestroy {
 
   runPipeline() {
     if (this.schedulerForm.valid) {
+      this.loading = true;
       const { scheduleType, interval, daysOfMonth, duration } = this.schedulerForm.value;
       this.api.getCurrentConfig().subscribe({
         next: (currentConfig) => {
@@ -86,14 +91,24 @@ export class SchedulerConfig implements OnDestroy {
                 next: (res) => {
                   this.status = 'Pipeline scheduled successfully';
                   this.fetchLatestScheduledRunId();
+                  this.startRunIdPolling();
                 },
-                error: (err) => this.status = `Error: ${err.error?.message || err.message || 'Failed to schedule pipeline'}`
+                error: (err) => {
+                  this.status = `Error: ${err.error?.message || err.message || 'Failed to schedule pipeline'}`;
+                  this.loading = false;
+                }
               });
             },
-            error: () => this.status = 'Error: Could not fetch source configs'
+            error: () => {
+              this.status = 'Error: Could not fetch source configs';
+              this.loading = false;
+            }
           });
         },
-        error: () => this.status = 'Error: Could not fetch current config'
+        error: () => {
+          this.status = 'Error: Could not fetch current config';
+          this.loading = false;
+        }
       });
     }
   }
@@ -105,6 +120,7 @@ export class SchedulerConfig implements OnDestroy {
   }
   runOnce() {
     this.isRunOnceDisabled = true;
+    this.loading = true;
     this.api.getCurrentConfig().subscribe({
       next: (currentConfig) => {
         const sourceName = currentConfig.source;
@@ -117,17 +133,36 @@ export class SchedulerConfig implements OnDestroy {
             }
             this.api.runPipelineOnce({ config_file: configFile }).subscribe({
               next: (res) => {
-                this.status = 'Pipeline run once successfully';
-                this.runId = res.run_id;
-                this.pollStatus();
+                // Only show success if backend response indicates success
+                if ((res && (res.success === true || res.status === 'success')) && res.run_id) {
+                  this.status = 'Pipeline run once successfully';
+                  this.runId = res.run_id;
+                  this.pollStatus();
+                  this.startRunIdPolling();
+                } else if (res && res.error) {
+                  this.status = `Error: ${res.error}`;
+                  this.loading = false;
+                } else {
+                  this.status = 'Error: Pipeline did not complete successfully.';
+                  this.loading = false;
+                }
               },
-              error: (err: any) => this.status = `Error: ${err.message}`
+              error: (err: any) => {
+                this.status = `Error: ${err.message}`;
+                this.loading = false;
+              }
             });
           },
-          error: () => this.status = 'Error: Could not fetch source configs'
+          error: () => {
+            this.status = 'Error: Could not fetch source configs';
+            this.loading = false;
+          }
         });
       },
-      error: () => this.status = 'Error: Could not fetch current config'
+      error: () => {
+        this.status = 'Error: Could not fetch current config';
+        this.loading = false;
+      }
     });
   }
 
@@ -161,9 +196,28 @@ export class SchedulerConfig implements OnDestroy {
     }, 5000);
   }
 
+  startRunIdPolling() {
+    if (this.runIdCheckSub) {
+      this.runIdCheckSub.unsubscribe();
+    }
+    this.runIdCheckSub = interval(2000).subscribe(() => {
+      this.http.get('/latest_scheduled_run_id.txt', { responseType: 'text' }).subscribe({
+        next: (txt) => {
+          this.loading = !!txt.trim();
+        },
+        error: () => {
+          this.loading = false;
+        }
+      });
+    });
+  }
+
   ngOnDestroy() {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
+    }
+    if (this.runIdCheckSub) {
+      this.runIdCheckSub.unsubscribe();
     }
   }
 
